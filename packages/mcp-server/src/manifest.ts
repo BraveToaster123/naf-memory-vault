@@ -29,7 +29,6 @@ export interface ToolManifest {
   version: string;
   transport: "stdio";
   policy_version: string;
-  generated_at: string;
   /** How another tool authenticates the caller's role. */
   rbac: { role_env: "MQM_USER_ROLE"; audit_roles: string[] };
   domains: string[];
@@ -53,7 +52,6 @@ export function buildManifest(): ToolManifest {
     version: "0.1.0",
     transport: "stdio",
     policy_version: getPolicy().version,
-    generated_at: new Date().toISOString(),
     rbac: { role_env: "MQM_USER_ROLE", audit_roles: ["qa_lead", "qc_analyst", "platform"] },
     domains: [...new Set(entries.map((e) => e.domain))],
     tools: entries,

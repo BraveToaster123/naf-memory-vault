@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "transport": "stdio",
   "policy_version": "mqm-policy-1",
-  "generated_at": "2026-07-14T15:50:44.928Z",
   "rbac": {
     "role_env": "MQM_USER_ROLE",
     "audit_roles": [

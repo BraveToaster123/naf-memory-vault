@@ -25,6 +25,12 @@ jobs:
         run: npm run typecheck
       - name: Unit tests (policy / redact / pipeline)
         run: npm test
+      - name: Tool manifest is committed and up to date
+        run: |
+          npm run manifest
+          git diff --exit-code -- docs/tools.json
+      - name: MCP end-to-end smoke
+        run: npm run seed:demo && npm run smoke
       - name: Seed synthetic memory
         run: npm run seed:demo
       - name: Flake-classification eval (gate)

@@ -26,10 +26,12 @@ real staging environment/SSO), NEEDS-HUMAN (needs a person to sign off).
 | Audit trail queryable | DONE | `get_audit_trail` (RBAC: qa_lead/qc_analyst/platform) |
 | Purge removes past-expiry rows | DONE | `npm run purge`, `purge.test.ts` |
 | CI artifact + eval gate | DONE | `.github/workflows/qa-memory.yml` uploads `qa-memory.db` |
-| 5-failure classification eval | DONE | `npm run eval` -> 3/5 (>= 0.6 gate) on golden set |
+| 5-failure classification eval | DONE | `npm run eval` -> 5/5 (>= 0.8 gate) on golden set |
 | Agent never persists snapshot in tested prompts | DONE | Tier 1 write drops raw error on PII; no snapshot tool exists |
 | `app_id` on Tier 1 rows (multi-project ready) | DONE | `test_runs.app_id`, `MQM_APP_ID` |
-| 2-3 journeys with TRID checkpoints | PARTIAL | 1 shipped (`journeys/le_generation.yaml`); QA adds `cd_generation`, `urla_data_entry` |
+| 3 journeys with TRID/URLA/ECOA checkpoints | DONE | `journeys/le_generation.yaml`, `cd_generation.yaml`, `urla_data_entry.yaml` |
+| Machine-readable tool contract + drift guard | DONE | `docs/tools.json`, CI `git diff --exit-code` on manifest |
+| Tier 2 locator PR home | DONE | `journeys/locators/` (README + curated file; agents cannot write) |
 | Dev/QA both read flake history | DONE | `engineer` + `qa_engineer` roles both have read access |
 | Compliance sign-off on `ai-inventory.yaml` | NEEDS-HUMAN | draft at `ai-inventory.yaml` (`review_status: draft_pending_signoff`) |
 | 5 *real* CI failures triaged on staging | NEEDS-ENV | eval currently uses synthetic golden set; rerun with `MQM_RUN_E2E=1` |

@@ -47,7 +47,7 @@ function main(): void {
   db.close();
 
   const accuracy = golden.length ? correct / golden.length : 0;
-  const min = Number(process.env.MQM_EVAL_MIN ?? "0.6");
+  const min = Number(process.env.MQM_EVAL_MIN ?? "0.8");
 
   // eslint-disable-next-line no-console
   console.table(rows);
