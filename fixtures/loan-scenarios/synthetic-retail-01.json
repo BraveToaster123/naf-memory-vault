@@ -1,0 +1,19 @@
+{
+  "loan_scenario_id": "synthetic-retail-01",
+  "description": "Synthetic retail purchase loan for QA. Contains NO real borrower data.",
+  "channel": "retail",
+  "product": "conventional_30yr_fixed",
+  "borrower": {
+    "first_name": "Testy",
+    "last_name": "McSynthetic",
+    "ssn": "000-00-0000",
+    "note": "SSN is intentionally an invalid placeholder; never use a real SSN here."
+  },
+  "loan": {
+    "amount": 320000,
+    "property_value": 400000,
+    "rate": 6.875,
+    "apr": 7.012
+  },
+  "safe_for": ["staging", "uat", "ci"]
+}

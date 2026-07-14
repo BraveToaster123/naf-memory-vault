@@ -1,0 +1,93 @@
+# LL-2026-04 AI Tool Inventory
+# Review annually. Owner: platform-engineering + compliance.
+# Effective: 2026-07-14
+#
+# COMPLIANCE STATUS (POC): DRAFT — pending sign-off (see mvp-gate).
+
+inventory_version: "2026.1-poc"
+last_review_date: 2026-07-14
+next_review_date: 2027-07-14
+governance_owner: platform-engineering@yourcompany.com
+compliance_owner: compliance@yourcompany.com
+review_status: draft_pending_signoff
+
+organization:
+  name: Your Company Name
+  role: mortgage_technology  # lender | servicer | mortgage_technology | imb
+  gse_exposure:
+    - fannie_mae
+    - freddie_mac
+
+tools:
+  - id: mqm-mcp
+    name: Mortgage QA Memory MCP
+    type: internal_mcp_server
+    vendor: internal
+    purpose: >
+      QA test intelligence — flakiness history, journey maps, compliance
+      checkpoint results. Does not make credit decisions.
+    use_cases:
+      - CI failure triage
+      - Pre-release compliance smoke aggregation
+      - QC audit query for validation runs
+    data_sources:
+      - Playwright CI reporter (synthetic scenarios)
+      - Git-reviewed journey YAML
+    data_stored:
+      - Aggregated flake metrics (30d TTL)
+      - Normalized failure signatures (no PII)
+      - Checkpoint pass/fail booleans
+    data_explicitly_not_stored:
+      - Raw browser snapshots
+      - Borrower NPI/PII
+      - Full prompts or LLM responses
+      - Production loan IDs
+    human_oversight:
+      - Tier 2 journey changes require QA lead PR approval
+      - Release gate on blocking compliance checkpoints
+    limits_of_use:
+      - Staging/UAT URLs only for browser repro
+      - Synthetic loan scenarios only
+    monitoring:
+      - Flake classification eval (npm run eval)
+      - PII block test in CI (npm test)
+      - Purge job health check daily
+
+  - id: playwright-mcp
+    name: Playwright MCP Server
+    type: mcp_server
+    vendor: Microsoft
+    package: "@playwright/mcp"
+    purpose: Browser automation for QA investigation and journey reproduction
+    use_cases:
+      - Reproduce staging UI failures after CI
+      - Validate TRID checkpoint visibility
+    data_sources:
+      - Staging/UAT web applications (allowlist)
+    human_oversight:
+      - QA engineer on investigation loop
+      - browser_run_code_unsafe disabled
+    limits_of_use:
+      - No production URLs
+      - No persistent snapshot storage
+    monitoring:
+      - Per-tool audit logging via MQM audit client
+
+  - id: cursor
+    name: Cursor IDE Agent
+    type: agent_client
+    vendor: Anysphere
+    purpose: Agentic development and QA triage interface
+    use_cases:
+      - CI failure investigation with MCP tools
+    human_oversight:
+      - Human initiates and reviews all triage sessions
+    limits_of_use:
+      - mortgage-qa-triage skill enforces memory-before-browser
+
+safeguards_summary: >
+  All QA AI paths use synthetic loan scenarios, staging URL allowlists,
+  pre-save policy enforcement, tiered retention with automatic purge,
+  and append-only audit metadata without raw prompt storage.
+
+disclosure_contact: compliance@yourcompany.com

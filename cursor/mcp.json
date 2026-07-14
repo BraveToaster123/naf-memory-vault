@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "mortgage-qa-memory": {
+      "command": "npx",
+      "args": ["tsx", "packages/mcp-server/src/index.ts"],
+      "env": {
+        "MQM_POLICY_PATH": "./packages/policy/mqm-policy.yaml",
+        "MQM_DB_PATH": "./data/qa-memory.db",
+        "MQM_JOURNEYS_DIR": "./journeys",
+        "MQM_ENV": "local",
+        "MQM_USER_ROLE": "qa_engineer",
+        "MQM_USER_ID": "local-user"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--headless",
+        "--isolated",
+        "--browser=chromium"
+      ]
+    }
+  }
+}

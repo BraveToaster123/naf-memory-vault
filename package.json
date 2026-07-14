@@ -1,0 +1,32 @@
+{
+  "name": "mortgage-qa-memory",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Governed QA memory MCP for mortgage technology teams (POC/MVP).",
+  "workspaces": [
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run test --workspaces --if-present",
+    "purge": "tsx packages/shared/src/purge.ts",
+    "seed:demo": "tsx packages/reporter/src/seed-demo.ts",
+    "mcp": "tsx packages/mcp-server/src/index.ts",
+    "manifest": "tsx packages/mcp-server/src/manifest.ts",
+    "smoke": "tsx packages/mcp-server/src/smoke.ts",
+    "eval": "tsx eval/run-eval.ts",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/node": "^22.7.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

@@ -1,0 +1,56 @@
+name: qa-memory
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-test-eval:
+    runs-on: ubuntu-latest
+    env:
+      MQM_DB_PATH: ${{ github.workspace }}/data/qa-memory.db
+      MQM_ENV: ci
+      MQM_LOAN_SCENARIO: synthetic-retail-01
+      MQM_APP_ID: loan-origination-portal
+      CI_COMMIT_SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests (policy / redact / pipeline)
+        run: npm test
+      - name: Seed synthetic memory
+        run: npm run seed:demo
+      - name: Flake-classification eval (gate)
+        run: npm run eval
+      - name: Purge expired Tier 1 rows
+        run: npm run purge
+      - name: Publish qa-memory snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-memory-snapshot-${{ github.run_id }}
+          path: ${{ github.workspace }}/data/qa-memory.db
+          if-no-files-found: warn
+          retention-days: 7
+
+  # Deterministic Playwright smoke runs on a schedule against staging.
+  # No agent / Playwright MCP in CI (token + NPI risk). Disabled until a
+  # reachable staging environment + secrets are configured.
+  # e2e-smoke:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with: { node-version: "22", cache: npm }
+  #     - run: npm ci
+  #     - run: npx playwright install --with-deps chromium
+  #     - run: npm run test:e2e
+  #       env:
+  #         MQM_RUN_E2E: "1"
+  #         MQM_BASE_URL: ${{ secrets.MQM_STAGING_URL }}

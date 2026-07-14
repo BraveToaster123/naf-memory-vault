@@ -1,7 +1,7 @@
 # Mortgage QA Memory MCP
 
 **Repository:** `C:\Repo\mcp-memory`  
-**Status:** Design & templates (implementation packages per [06-build-from-scratch.md](./06-build-from-scratch.md))
+**Status:** Design & templates + working POC/MVP implementation. See [IMPLEMENTATION.md](./IMPLEMENTATION.md) for the runnable `packages/*` monorepo, [docs/INTEGRATION.md](./docs/INTEGRATION.md), and [docs/DEFINITION-OF-DONE.md](./docs/DEFINITION-OF-DONE.md).
 
 A from-scratch design for **Playwright QA automation** with a **custom Memory MCP**, **tiered retention**, and **mortgage compliance audit** — adapted from DoorDash's agentic memory architecture and Salesforce Agentic Memory patterns.
 
