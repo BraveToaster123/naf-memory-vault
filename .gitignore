@@ -1,0 +1,33 @@
+# Runtime / local data
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Node (when implementation packages are added)
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Audit / evidence blobs (never commit)
+evidence/
+traces/
+*.zip
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/

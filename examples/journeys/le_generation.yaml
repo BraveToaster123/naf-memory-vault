@@ -1,0 +1,92 @@
+journey_id: le_generation
+name: Loan Estimate Generation
+regulation_tags:
+  - TRID
+  - TILA
+overlay_key: default
+version: 1
+owner: qa-team@yourcompany.com
+last_reviewed: 2026-07-13
+
+loan_scenario_id: synthetic-retail-01
+
+kb_articles:
+  - trid-le-disclosure-overview
+  - staging-test-accounts-synthetic
+
+app:
+  app_id: loan-origination-portal
+  doc_wizard_link: /apps/loan-origination-portal/docs
+
+steps:
+  - id: open_le_page
+    description: Navigate to Loan Estimate for synthetic loan
+    url: https://staging.yourcompany.com/loans/{loan_id}/le
+    expected:
+      - http_status: 200
+
+  - id: le_document_title
+    description: Loan Estimate document header visible
+    assertion:
+      type: text_visible
+      target: Loan Estimate
+
+  - id: apr_visible
+    description: APR disclosed per TRID
+    checkpoint_id: TRID-LE-APR-VISIBLE
+    assertion:
+      type: text_visible
+      target: Annual Percentage Rate
+
+  - id: finance_charge_visible
+    description: Finance charge disclosed
+    checkpoint_id: TRID-LE-FINANCE-CHARGE
+    assertion:
+      type: text_visible
+      target: Finance Charge
+
+  - id: issue_date_visible
+    description: Date issued field present
+    checkpoint_id: TRID-LE-DATE-ISSUED
+    assertion:
+      type: text_visible
+      target: Date Issued
+
+checkpoints:
+  - id: TRID-LE-APR-VISIBLE
+    regulation: TRID
+    severity: blocking
+    description: Annual Percentage Rate must be visible on Loan Estimate
+    assertion_type: text_visible
+    target: Annual Percentage Rate
+
+  - id: TRID-LE-FINANCE-CHARGE
+    regulation: TRID
+    severity: blocking
+    description: Finance Charge must be visible
+    assertion_type: text_visible
+    target: Finance Charge
+
+  - id: TRID-LE-DATE-ISSUED
+    regulation: TRID
+    severity: warning
+    description: Date Issued should be visible
+    assertion_type: text_visible
+    target: Date Issued
+
+playwright:
+  test_title_tag: "[le_generation]"
+  synthetic_loan_id_env: MQM_LOAN_SCENARIO
+  projects:
+    - chromium
+    - firefox
+
+memory:
+  tier1_record_on_run: true
+  tier2_curated: true
+  store_snapshot: false
+  store_fields:
+    - status
+    - error_class
+    - failure_signature
+    - checkpoint_results
