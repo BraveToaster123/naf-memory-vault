@@ -41,7 +41,7 @@ mortgage-qa-memory/                    # implementation repo (separate from this
 └── package.json
 ```
 
-This `mcp-memory/` folder in the sandbox is **documentation and templates**. Copy artifacts into the implementation repo when building.
+This repo combines **unified docs** (`docs/`) and **runnable packages** (`packages/`). The layout above is what ships today.
 
 ---
 
@@ -49,7 +49,7 @@ This `mcp-memory/` folder in the sandbox is **documentation and templates**. Cop
 
 ### Tasks
 
-1. Copy [policies/mqm-policy.yaml](./policies/mqm-policy.yaml); set your staging URLs
+1. Customize [packages/policy/mqm-policy.yaml](../../packages/policy/mqm-policy.yaml); set your staging URLs
 2. Implement `classifyAndRedact()` in `packages/shared/src/redact.ts`
 3. Implement `evaluatePolicy()` reading deny_fields, deny_patterns, write_permissions
 4. Document owner in policy file
@@ -128,7 +128,7 @@ sqlite3 data/qa-memory.db "SELECT count(*) FROM test_runs;"
 
 ### Cursor config
 
-Copy [examples/cursor/mcp.json](./examples/cursor/mcp.json).
+Copy [cursor/mcp.json](../../cursor/mcp.json).
 
 ### Verify
 
@@ -171,7 +171,7 @@ Run MCP tool → row appears in `audit_events` with no prompt text.
 
 ## Phase 4 — Journey YAML + checkpoints (days 10–14)
 
-1. Add [examples/journeys/le_generation.yaml](./examples/journeys/le_generation.yaml) to `journeys/`
+1. Add [journeys/le_generation.yaml](../../journeys/le_generation.yaml) (or author your own) under `journeys/`
 2. Add `cd_generation.yaml`, `urla_data_entry.yaml`
 3. PR review by QA lead
 4. Implement `get_compliance_checkpoint` reading checkpoint results from reporter
@@ -180,7 +180,7 @@ Run MCP tool → row appears in `audit_events` with no prompt text.
 
 ## Phase 5 — Cursor skill + Playwright MCP (days 14–18)
 
-1. Copy [examples/cursor/skills/mortgage-qa-triage/SKILL.md](./examples/cursor/skills/mortgage-qa-triage/SKILL.md)
+1. Copy [cursor/skills/mortgage-qa-triage/SKILL.md](../../cursor/skills/mortgage-qa-triage/SKILL.md)
 2. Add Playwright MCP to `mcp.json`
 3. Test triage workflow on real CI failure
 4. Confirm agent does **not** persist snapshot when asked
@@ -261,14 +261,15 @@ Extend Gemini gateway:
 
 ---
 
-## Copy from this doc folder
+## Bootstrap checklist (greenfield)
+
+If cloning into a fresh org repo, copy these paths from this monorepo:
 
 ```bash
-cp mcp-memory/policies/mqm-policy.yaml ./packages/policy/
-cp mcp-memory/examples/journeys/*.yaml ./journeys/
-cp mcp-memory/examples/ai-inventory.yaml ./
-cp -r mcp-memory/examples/cursor/* ./cursor/
+cp -r packages/ journeys/ cursor/ ai-inventory.yaml eval/ ./
 ```
+
+Policy lives at `packages/policy/mqm-policy.yaml` — customize staging URLs before first write.
 
 ---
 

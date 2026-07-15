@@ -1,4 +1,4 @@
-# Integration Guide
+# 12 — MCP Integration Guide
 
 How another tool, agent, or MCP host (e.g. your knowledge MCP) consumes
 Mortgage QA Memory (MQM), and how to extend it to new domains/namespaces.
@@ -17,7 +17,7 @@ into a generic engine + domain packs later (see "Cleanup roadmap").
 | Policy | Security / platform | `packages/policy/mqm-policy.yaml` |
 
 The tool contract is machine-readable: run `npm run manifest` to (re)generate
-[`docs/tools.json`](./tools.json). A knowledge MCP can ingest that file directly
+[`tools.json`](./tools.json). A knowledge MCP can ingest that file directly
 instead of parsing TypeScript.
 
 ---
@@ -84,7 +84,8 @@ that invariant in any tool you build on top.
 
 ## 4. RBAC contract
 
-Role comes from `MQM_USER_ROLE` (wire it from SSO at your gateway).
+Role comes from `MQM_USER_ROLE` (wire it from SSO at your gateway).  
+**When auth is required:** see [14-operational-readiness.md §3](./14-operational-readiness.md#3-auth-when-do-you-need-per-user-identity) (POC = env var OK; shared server = SSO required).
 
 | Role | Reads | Tier 0/1 writes | Tier 2 | Audit query |
 |------|-------|-----------------|--------|-------------|

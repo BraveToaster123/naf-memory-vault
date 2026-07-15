@@ -129,7 +129,7 @@ When PR touches UI or Playwright tests, PR assistant comment includes:
 
 ## Cursor
 
-### MCP servers (see examples/cursor/mcp.json)
+### MCP servers (see [cursor/mcp.json](../../cursor/mcp.json))
 
 - `mortgage-qa-memory` — always on for QA repos
 - `playwright` — on for UI repos / triage sessions

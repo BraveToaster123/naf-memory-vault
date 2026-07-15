@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Memory Console</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Memory Console</h1>
+        <p>Local desktop inspector — read-only view of memory, policy blocks, and QA signals.</p>
+      </div>
+      <span class="badge" id="health-badge">loading…</span>
+    </header>
+
+    <main>
+      <section class="panel">
+        <h2>Flaky tests (memory before browser)</h2>
+        <div class="body">
+          <div class="actions" style="margin-bottom: 0.75rem">
+            <button type="button" id="btn-refresh">Refresh</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Test</th>
+                <th>Flake rate</th>
+                <th>Runs</th>
+                <th>Last</th>
+              </tr>
+            </thead>
+            <tbody id="flaky-rows">
+              <tr><td colspan="4" class="empty">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Selected test</h2>
+        <div class="body" id="test-detail">
+          <p class="empty">Click a test row to see history and skip-browser decision.</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Journey map (Tier 2)</h2>
+        <div class="body">
+          <div class="actions" style="margin-bottom: 0.75rem">
+            <button type="button" class="secondary" data-journey="le_generation">le_generation</button>
+            <button type="button" class="secondary" data-journey="cd_generation">cd_generation</button>
+            <button type="button" class="secondary" data-journey="urla_data_entry">urla_data_entry</button>
+          </div>
+          <pre id="journey-json" class="empty">Select a journey.</pre>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Environment facts</h2>
+        <div class="body">
+          <pre id="env-json" class="empty">Loading…</pre>
+        </div>
+      </section>
+
+      <section class="panel full">
+        <h2>Recent policy blocks (governance)</h2>
+        <div class="body">
+          <table>
+            <thead>
+              <tr>
+                <th>Time (UTC)</th>
+                <th>Role</th>
+                <th>Tool</th>
+                <th>Summary</th>
+                <th>Outcome</th>
+              </tr>
+            </thead>
+            <tbody id="block-rows">
+              <tr><td colspan="5" class="empty">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+
+      async function api(path) {
+        const r = await fetch(path);
+        if (!r.ok) throw new Error(`${r.status} ${path}`);
+        return r.json();
+      }
+
+      function escapeHtml(s) {
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      async function loadHealth() {
+        const h = await api("/api/health");
+        $("health-badge").textContent = `${h.test_runs} runs · desktop · read-only`;
+      }
+
+      let selectedRow = null;
+
+      async function loadFlaky() {
+        const rows = await api("/api/flaky?limit=10");
+        const tbody = $("flaky-rows");
+        if (!rows.length) {
+          tbody.innerHTML = '<tr><td colspan="4" class="empty">No data — run npm run seed:demo</td></tr>';
+          return;
+        }
+        tbody.innerHTML = rows
+          .map(
+            (r) => `
+          <tr data-test-id="${escapeHtml(r.test_id)}">
+            <td>${escapeHtml(r.test_id)}</td>
+            <td class="rate-high">${(r.flake_rate * 100).toFixed(0)}%</td>
+            <td>${r.runs}</td>
+            <td>${escapeHtml(r.last_status)}</td>
+          </tr>`,
+          )
+          .join("");
+
+        tbody.querySelectorAll("tr[data-test-id]").forEach((tr) => {
+          tr.addEventListener("click", () => selectTest(tr.dataset.testId, tr));
+        });
+      }
+
+      async function selectTest(testId, tr) {
+        if (selectedRow) selectedRow.classList.remove("selected");
+        selectedRow = tr;
+        tr.classList.add("selected");
+
+        const detail = await api(`/api/tests/${encodeURIComponent(testId)}`);
+        const skip = detail.skip_browser;
+        const sig = detail.signature;
+
+        $("test-detail").innerHTML = `
+          <p><strong>${escapeHtml(testId)}</strong></p>
+          <p class="${skip.skip ? "skip-yes" : "skip-no"}">
+            should_skip_browser: <strong>${skip.skip ? "YES" : "no"}</strong> — ${escapeHtml(skip.reason)}
+          </p>
+          <p>Signature: ${sig.known ? escapeHtml(sig.signature) : "unknown"}
+             · ${escapeHtml(sig.classification)} · rec: ${escapeHtml(sig.recommendation)}</p>
+          <table>
+            <thead><tr><th>When</th><th>Status</th><th>Class</th><th>Signature</th></tr></thead>
+            <tbody>
+              ${detail.history
+                .map(
+                  (h) => `
+                <tr>
+                  <td>${escapeHtml(h.created_at?.slice(0, 19) ?? "")}</td>
+                  <td>${escapeHtml(h.status ?? "")}</td>
+                  <td>${escapeHtml(h.error_class ?? "—")}</td>
+                  <td>${escapeHtml((h.failure_signature ?? "—").slice(0, 24))}</td>
+                </tr>`,
+                )
+                .join("")}
+            </tbody>
+          </table>`;
+
+        const journeyId = testId.split("/")[0];
+        if (journeyId) loadJourney(journeyId);
+      }
+
+      async function loadJourney(journeyId) {
+        try {
+          const j = await api(`/api/journeys/${encodeURIComponent(journeyId)}`);
+          $("journey-json").textContent = JSON.stringify(j, null, 2);
+          $("journey-json").classList.remove("empty");
+        } catch (e) {
+          $("journey-json").textContent = String(e);
+        }
+      }
+
+      async function loadEnv() {
+        const facts = await api("/api/env?env=uat");
+        $("env-json").textContent = JSON.stringify(facts, null, 2);
+        $("env-json").classList.remove("empty");
+      }
+
+      async function loadBlocks() {
+        const rows = await api("/api/policy-blocks?limit=20");
+        const tbody = $("block-rows");
+        if (!rows.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="5" class="empty">No blocks yet — run npm run smoke</td></tr>';
+          return;
+        }
+        tbody.innerHTML = rows
+          .map(
+            (r) => `
+          <tr>
+            <td>${escapeHtml(r.timestamp_utc?.slice(0, 19) ?? "")}</td>
+            <td>${escapeHtml(r.principal_role)}</td>
+            <td>${escapeHtml(r.tool_name)}</td>
+            <td>${escapeHtml(r.args_summary ?? "")}</td>
+            <td class="deny">${escapeHtml(r.outcome)}</td>
+          </tr>`,
+          )
+          .join("");
+      }
+
+      document.querySelectorAll("[data-journey]").forEach((btn) => {
+        btn.addEventListener("click", () => loadJourney(btn.dataset.journey));
+      });
+
+      $("btn-refresh").addEventListener("click", () => {
+        loadFlaky();
+        loadBlocks();
+      });
+
+      (async () => {
+        try {
+          await loadHealth();
+          await Promise.all([loadFlaky(), loadEnv(), loadBlocks()]);
+        } catch (e) {
+          $("health-badge").textContent = "server error";
+          console.error(e);
+        }
+      })();
+    </script>
+  </body>
+</html>

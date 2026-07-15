@@ -1,4 +1,4 @@
-# Memory MCP Playbook v2 — Mirror and Privatize `@modelcontextprotocol/server-memory`
+# 16 — Playbook: Mirror and Privatize `@modelcontextprotocol/server-memory`
 
 **Status:** portable playbook. Drop this file into any project that wants to give agents
 persistent entity/relation memory without depending on Anthropic's unmanaged reference
@@ -7,9 +7,12 @@ tested reference implementation — but nothing here is mortgage-specific. If yo
 building this pattern in a different codebase, copy the pattern, not the mortgage
 domain logic.
 
-Companion reading in this repo: [10-doordash-salesforce-memory-deep-dive.md](../10-doordash-salesforce-memory-deep-dive.md)
-(source architecture patterns), [05-data-retention-and-privacy.md](../05-data-retention-and-privacy.md)
-(the retention/PII philosophy this playbook operationalizes for generic KG memory).
+Companion reading in this repo: [10-doordash-salesforce-memory-deep-dive.md](./10-doordash-salesforce-memory-deep-dive.md)
+(source architecture patterns), [05-data-retention-and-privacy.md](./05-data-retention-and-privacy.md)
+(the retention/PII philosophy this playbook operationalizes for generic KG memory),
+[17-governed-memory-landscape.md](./17-governed-memory-landscape.md) (OSS peers and production teams survey),
+[18-official-mcp-packages-risk-brief.md](./18-official-mcp-packages-risk-brief.md) (leadership decision brief on official packages),
+[14-operational-readiness.md](./14-operational-readiness.md) (non-savable list, auth, namespace owners, compliance gates).
 
 ---
 
@@ -104,16 +107,16 @@ Six layers, each independently testable:
 
 | Dimension | `@modelcontextprotocol/server-memory` | Privatized pattern | This repo's implementation |
 |---|---|---|---|
-| Storage backend | Single flat JSONL file | Namespaced, indexed, TTL'd rows in a real database | SQLite tables `kg_entities` / `kg_observations` / `kg_relations` — [packages/shared/src/db.ts](../packages/shared/src/db.ts) |
-| PII / secret handling | None | Every string field scanned against deny-patterns pre-save; a hit denies that item only, not the whole batch | `evaluatePolicy` in [packages/shared/src/policy.ts](../packages/shared/src/policy.ts), called per-item from [packages/shared/src/kg.ts](../packages/shared/src/kg.ts) |
-| Retention | None (manual file edits only) | Per-namespace TTL, enforced by a scheduled hard-delete purge | `namespaceRetentionDays` + `purgeExpiredKg`, wired into [packages/shared/src/purge.ts](../packages/shared/src/purge.ts) |
-| RBAC | None | Role-based tool permission + a second, namespace-scoped writer/reader list; unknown namespace = deny | `isNamespaceWriteAllowed` / `isNamespaceReadAllowed` in policy.ts; config in [packages/policy/mqm-policy.yaml](../packages/policy/mqm-policy.yaml) `namespaces:` block |
+| Storage backend | Single flat JSONL file | Namespaced, indexed, TTL'd rows in a real database | SQLite tables `kg_entities` / `kg_observations` / `kg_relations` — [packages/shared/src/db.ts](../../packages/shared/src/db.ts) |
+| PII / secret handling | None | Every string field scanned against deny-patterns pre-save; a hit denies that item only, not the whole batch | `evaluatePolicy` in [packages/shared/src/policy.ts](../../packages/shared/src/policy.ts), called per-item from [packages/shared/src/kg.ts](../../packages/shared/src/kg.ts) |
+| Retention | None (manual file edits only) | Per-namespace TTL, enforced by a scheduled hard-delete purge | `namespaceRetentionDays` + `purgeExpiredKg`, wired into [packages/shared/src/purge.ts](../../packages/shared/src/purge.ts) |
+| RBAC | None | Role-based tool permission + a second, namespace-scoped writer/reader list; unknown namespace = deny | `isNamespaceWriteAllowed` / `isNamespaceReadAllowed` in policy.ts; config in [packages/policy/mqm-policy.yaml](../../packages/policy/mqm-policy.yaml) `namespaces:` block |
 | Namespace isolation | None (one global graph) | Every row tagged with a namespace; queries always scoped; cross-namespace reads/writes require explicit RBAC | Same as above; enforced in every `kg.ts` function via `ctx.namespace` |
-| Audit | None | Hash-chained append-only log of every tool call (success/blocked/failure) | [packages/audit-client/src/log.ts](../packages/audit-client/src/log.ts) `logAudit` |
+| Audit | None | Hash-chained append-only log of every tool call (success/blocked/failure) | [packages/audit-client/src/log.ts](../../packages/audit-client/src/log.ts) `logAudit` |
 | Referential integrity | Relations can reference nonexistent entities | Relation creation checks both endpoints exist in-namespace first | `createRelations` in kg.ts (a real bug caught during this project's own smoke test — see §6) |
-| Resource exposure | Static `memory://knowledge-graph`, no auth | Same resource shape, but namespace-scoped and RBAC-filtered in `resources/list` | [packages/mcp-server/src/index.ts](../packages/mcp-server/src/index.ts) `ListResourcesRequestSchema`/`ReadResourceRequestSchema` handlers |
+| Resource exposure | Static `memory://knowledge-graph`, no auth | Same resource shape, but namespace-scoped and RBAC-filtered in `resources/list` | [packages/mcp-server/src/index.ts](../../packages/mcp-server/src/index.ts) `ListResourcesRequestSchema`/`ReadResourceRequestSchema` handlers |
 | Transport | stdio only | stdio for local/IDE use; same code is transport-agnostic for a future remote deployment | Currently stdio only — see gap list in §5 |
-| Contract stability | None — must read source to know the tool surface | Machine-readable manifest, regenerated and diff-checked in CI | [packages/mcp-server/src/manifest.ts](../packages/mcp-server/src/manifest.ts) → `docs/tools.json`, checked in `.github/workflows/qa-memory.yml` |
+| Contract stability | None — must read source to know the tool surface | Machine-readable manifest, regenerated and diff-checked in CI | [packages/mcp-server/src/manifest.ts](../../packages/mcp-server/src/manifest.ts) → `docs/tools.json`, checked in `.github/workflows/qa-memory.yml` |
 
 ---
 
@@ -125,22 +128,22 @@ Six layers, each independently testable:
    `delete_observations(deletions[])`, `delete_relations(relations[])`, `read_graph()`,
    `search_nodes(query)`, `open_nodes(names[])` verbatim, plus the
    `memory://knowledge-graph` resource shape. Reference:
-   [packages/mcp-server/src/tools.ts](../packages/mcp-server/src/tools.ts),
-   [packages/shared/src/kg.ts](../packages/shared/src/kg.ts).
+   [packages/mcp-server/src/tools.ts](../../packages/mcp-server/src/tools.ts),
+   [packages/shared/src/kg.ts](../../packages/shared/src/kg.ts).
 2. **Add a policy pre-save gate.** One function every write path must call before
    touching storage — role/tier permission, then PII/secret pattern scan, then any
    domain-specific allowlist. Reference: `evaluatePolicy` in
-   [packages/shared/src/policy.ts](../packages/shared/src/policy.ts).
+   [packages/shared/src/policy.ts](../../packages/shared/src/policy.ts).
 3. **Add namespace isolation, deny-by-default.** An undeclared namespace has no
    writers/readers — don't default to "allow" for the unknown case. Reference:
    `isNamespaceWriteAllowed`/`isNamespaceReadAllowed`, and the `namespaces:` block in
-   [packages/policy/mqm-policy.yaml](../packages/policy/mqm-policy.yaml).
+   [packages/policy/mqm-policy.yaml](../../packages/policy/mqm-policy.yaml).
 4. **Add tiered retention + a purge job.** Every row gets an `expires_at`; a scheduled
    job hard-deletes past-expiry rows. Don't soft-delete — reduces forensic recovery
-   risk. Reference: [packages/shared/src/purge.ts](../packages/shared/src/purge.ts).
+   risk. Reference: [packages/shared/src/purge.ts](../../packages/shared/src/purge.ts).
 5. **Add a hash-chained audit log.** Every tool call — success, denial, or error —
    appends a row referencing the previous row's hash, so tampering is detectable.
-   Reference: [packages/audit-client/src/log.ts](../packages/audit-client/src/log.ts).
+   Reference: [packages/audit-client/src/log.ts](../../packages/audit-client/src/log.ts).
 6. **Add referential-integrity checks upstream skips.** At minimum, reject relations
    whose endpoints don't exist in the namespace — otherwise denied/deleted entities
    leave dangling edges in the graph.
@@ -148,11 +151,11 @@ Six layers, each independently testable:
    denies that entity but not the batch," "unknown namespace is denied," "namespace
    isolation holds across reads" — these are the tests that matter, more than
    round-trip create/read tests. Reference:
-   [packages/shared/test/kg.test.ts](../packages/shared/test/kg.test.ts).
+   [packages/shared/test/kg.test.ts](../../packages/shared/test/kg.test.ts).
 8. **Wire a machine-readable manifest + CI drift guard.** Generate a JSON contract
    from your tool definitions and fail CI if it's stale — this is what lets other
    tools/teams discover your surface without parsing your source. Reference:
-   [packages/mcp-server/src/manifest.ts](../packages/mcp-server/src/manifest.ts) and
+   [packages/mcp-server/src/manifest.ts](../../packages/mcp-server/src/manifest.ts) and
    the manifest-diff step in `.github/workflows/qa-memory.yml`.
 
 ---
@@ -161,17 +164,17 @@ Six layers, each independently testable:
 
 Grounded in the capabilities actually present in the installed
 `@modelcontextprotocol/sdk` (resolved version **1.29.0** in this repo's
-[package-lock.json](../package-lock.json) — verified by grepping the SDK's
+[package-lock.json](../../package-lock.json) — verified by grepping the SDK's
 `types.js` for exported request schemas, not assumed from memory). Status legend:
 **Done** (implemented + tested here), **Partial**, **Gap** (not implemented; noted
 honestly rather than left ambiguous).
 
 | Capability | What it's for | Status here | Notes |
 |---|---|---|---|
-| `tools/list`, `tools/call` | Core tool surface | Done | 22 tools across QA + core domains — [packages/mcp-server/src/tools.ts](../packages/mcp-server/src/tools.ts) |
+| `tools/list`, `tools/call` | Core tool surface | Done | 22 tools across QA + core domains — [packages/mcp-server/src/tools.ts](../../packages/mcp-server/src/tools.ts) |
 | `resources/list`, `resources/read` | Expose readable state | Done | Namespace-scoped `memory://knowledge-graph[/ns]` |
 | `resources/subscribe`, `resources/unsubscribe` + update notifications | Push live updates instead of polling | **Gap** | Explicitly deferred; callers must poll `read_graph` |
-| `prompts/list`, `prompts/get` | Server-authored, portable workflow templates | Done | `triage_qa_failure` — [packages/mcp-server/src/prompts.ts](../packages/mcp-server/src/prompts.ts); makes the triage workflow usable by any MCP host, not just Cursor's skill file |
+| `prompts/list`, `prompts/get` | Server-authored, portable workflow templates | Done | `triage_qa_failure` — [packages/mcp-server/src/prompts.ts](../../packages/mcp-server/src/prompts.ts); makes the triage workflow usable by any MCP host, not just Cursor's skill file |
 | `completion/complete` | Argument autocomplete (e.g. valid `namespace`/`journey_id` values) | **Gap** | Would improve UX for `namespace`, `journey_id`, `checkpoint_id` args |
 | `sampling/createMessage` | Server asks the *client's* LLM to generate something, without the server holding a model key | **Gap** | Relevant for flake classification without baking an LLM key into the server |
 | `elicitation/create` | Server pauses mid-call to ask the human for structured input | **Gap** | Natural fit for the Tier 2 `upsert_locator` approval flow, which today just returns a text `require_approval` |
@@ -192,19 +195,19 @@ approval UX) → subscriptions (reduce polling) → completion (UX polish) → s
 
 | Practice | Status here | Evidence | Notes |
 |---|---|---|---|
-| PII/secret scan on every write, pre-save | Done | `evaluatePolicy` deny-pattern scan, [packages/shared/test/kg.test.ts](../packages/shared/test/kg.test.ts) "PII in an observation denies that entity only" | Per-item denial, not whole-batch failure |
+| PII/secret scan on every write, pre-save | Done | `evaluatePolicy` deny-pattern scan, [packages/shared/test/kg.test.ts](../../packages/shared/test/kg.test.ts) "PII in an observation denies that entity only" | Per-item denial, not whole-batch failure |
 | Deny-by-default RBAC | Done | Unknown namespace → deny; `qc_analyst` role can write nothing | `isNamespaceWriteAllowed` returns `false` when the namespace isn't declared |
-| Per-namespace retention + hard delete | Done | `namespaceRetentionDays`, `purgeExpiredKg`, nightly cron in policy `auto_purge` block | Hard delete, not soft delete, per [05-data-retention-and-privacy.md](../05-data-retention-and-privacy.md) |
+| Per-namespace retention + hard delete | Done | `namespaceRetentionDays`, `purgeExpiredKg`, nightly cron in policy `auto_purge` block | Hard delete, not soft delete, per [05-data-retention-and-privacy.md](./05-data-retention-and-privacy.md) |
 | Tamper-evident audit | Done | Hash-chained `audit_events` table, `get_audit_trail` RBAC-restricted to `qa_lead`/`qc_analyst`/`platform` | |
-| Least-privilege roles | Done | 5 distinct roles with different read/write/tier scopes | [packages/policy/mqm-policy.yaml](../packages/policy/mqm-policy.yaml) `roles:` block |
+| Least-privilege roles | Done | 5 distinct roles with different read/write/tier scopes | [packages/policy/mqm-policy.yaml](../../packages/policy/mqm-policy.yaml) `roles:` block |
 | Referential integrity on writes | Done | `createRelations` rejects edges to nonexistent entities | Caught as a real bug during this project's own smoke test (see below) |
 | Human-in-the-loop for curated/high-trust data | Done | Tier 2 (`upsert_locator`, journeys) is never a direct agent write — always `require_approval`, human opens a PR | |
-| Secrets never logged, even in audit | Done | Audit rows store `args_summary` (a short derived string), never raw args | [packages/audit-client/src/log.ts](../packages/audit-client/src/log.ts) |
+| Secrets never logged, even in audit | Done | Audit rows store `args_summary` (a short derived string), never raw args | [packages/audit-client/src/log.ts](../../packages/audit-client/src/log.ts) |
 | CI drift guard on the tool contract | Done | `git diff --exit-code -- docs/tools.json` after manifest regeneration | `.github/workflows/qa-memory.yml` |
 | Verified caller identity for RBAC | **Gap (NEEDS-ENV)** | RBAC trusts the `MQM_USER_ROLE` env var as-is | Fine for a single-IDE pilot; needs a gateway/SSO to cryptographically assert the role claim before this is safe for a shared/remote deployment |
-| All declared namespaces actually usable | **Partial (policy decision, not a code gap)** | `ops`/`compliance`/`product` namespaces exist structurally but have empty `writers` lists — only the `platform` break-glass role can write there today | Intentionally conservative default; needs a role/owner decision per namespace, not more code |
+| All declared namespaces actually usable | **Partial (policy decision, not a code gap)** | `ops`/`compliance`/`product` namespaces exist structurally but have empty `writers` lists — only the `platform` break-glass role can write there today | Intentionally conservative default; owner worksheet in [14-operational-readiness.md §4](./14-operational-readiness.md#4-namespace-owners-checklist) |
 | Semantic (not just substring) search | **Gap** | `search_nodes` is case-insensitive substring match only | Acceptable for v1 volume; revisit if namespaces grow large enough that substring recall becomes a problem |
-| Annual policy/compliance review cadence | Partial | [packages/policy/mqm-policy.yaml](../packages/policy/mqm-policy.yaml) declares an annual review cadence and named approvers | Process commitment, not something code can enforce — needs a human owner and calendar reminder |
+| Annual policy/compliance review cadence | Partial | [packages/policy/mqm-policy.yaml](../../packages/policy/mqm-policy.yaml) declares an annual review cadence and named approvers | Process commitment, not something code can enforce — needs a human owner and calendar reminder |
 
 **A worked example of why the referential-integrity check matters:** during this
 project's own end-to-end smoke test, `create_entities` correctly denied an entity
@@ -225,18 +228,18 @@ of the pattern from §2, mapped to its exact location in this repo.
 
 | Pattern piece | File | Key export(s) |
 |---|---|---|
-| Tool schemas (parity layer) | [packages/mcp-server/src/tools.ts](../packages/mcp-server/src/tools.ts) | `tools`, `TOOL_META` |
-| Knowledge-graph engine (CRUD + search) | [packages/shared/src/kg.ts](../packages/shared/src/kg.ts) | `createEntities`, `createRelations`, `addObservations`, `deleteEntities`, `deleteObservations`, `deleteRelations`, `readGraph`, `searchNodes`, `openNodes`, `purgeExpiredKg` |
-| Policy pre-save gate + namespace RBAC | [packages/shared/src/policy.ts](../packages/shared/src/policy.ts) | `evaluatePolicy`, `isNamespaceWriteAllowed`, `isNamespaceReadAllowed`, `namespaceRetentionDays` |
-| PII/secret detection | [packages/shared/src/redact.ts](../packages/shared/src/redact.ts) | `containsPii`, `classifyAndRedact` |
-| Storage schema (namespaced, TTL'd) | [packages/shared/src/db.ts](../packages/shared/src/db.ts) | `openDb` (see `kg_entities`/`kg_observations`/`kg_relations` tables) |
-| Retention purge job | [packages/shared/src/purge.ts](../packages/shared/src/purge.ts) | `purgeExpired` |
-| Hash-chained audit | [packages/audit-client/src/log.ts](../packages/audit-client/src/log.ts) | `logAudit`, `getAuditTrail` |
-| MCP server wiring (tools + resources + prompts) | [packages/mcp-server/src/index.ts](../packages/mcp-server/src/index.ts) | request handlers for `CallToolRequestSchema`, `ListResourcesRequestSchema`, `ReadResourceRequestSchema`, `ListPromptsRequestSchema`, `GetPromptRequestSchema` |
-| Portable MCP-native prompt (workflow, not just a skill file) | [packages/mcp-server/src/prompts.ts](../packages/mcp-server/src/prompts.ts) | `prompts`, `renderPrompt` |
-| Machine-readable contract + CI drift guard | [packages/mcp-server/src/manifest.ts](../packages/mcp-server/src/manifest.ts), `.github/workflows/qa-memory.yml` | `buildManifest` |
-| Governance-focused test suite | [packages/shared/test/kg.test.ts](../packages/shared/test/kg.test.ts), [policy.test.ts](../packages/shared/test/policy.test.ts) | — |
-| Namespace + retention configuration | [packages/policy/mqm-policy.yaml](../packages/policy/mqm-policy.yaml) | `namespaces:`, `write_permissions:`, `roles:` |
+| Tool schemas (parity layer) | [packages/mcp-server/src/tools.ts](../../packages/mcp-server/src/tools.ts) | `tools`, `TOOL_META` |
+| Knowledge-graph engine (CRUD + search) | [packages/shared/src/kg.ts](../../packages/shared/src/kg.ts) | `createEntities`, `createRelations`, `addObservations`, `deleteEntities`, `deleteObservations`, `deleteRelations`, `readGraph`, `searchNodes`, `openNodes`, `purgeExpiredKg` |
+| Policy pre-save gate + namespace RBAC | [packages/shared/src/policy.ts](../../packages/shared/src/policy.ts) | `evaluatePolicy`, `isNamespaceWriteAllowed`, `isNamespaceReadAllowed`, `namespaceRetentionDays` |
+| PII/secret detection | [packages/shared/src/redact.ts](../../packages/shared/src/redact.ts) | `containsPii`, `classifyAndRedact` |
+| Storage schema (namespaced, TTL'd) | [packages/shared/src/db.ts](../../packages/shared/src/db.ts) | `openDb` (see `kg_entities`/`kg_observations`/`kg_relations` tables) |
+| Retention purge job | [packages/shared/src/purge.ts](../../packages/shared/src/purge.ts) | `purgeExpired` |
+| Hash-chained audit | [packages/audit-client/src/log.ts](../../packages/audit-client/src/log.ts) | `logAudit`, `getAuditTrail` |
+| MCP server wiring (tools + resources + prompts) | [packages/mcp-server/src/index.ts](../../packages/mcp-server/src/index.ts) | request handlers for `CallToolRequestSchema`, `ListResourcesRequestSchema`, `ReadResourceRequestSchema`, `ListPromptsRequestSchema`, `GetPromptRequestSchema` |
+| Portable MCP-native prompt (workflow, not just a skill file) | [packages/mcp-server/src/prompts.ts](../../packages/mcp-server/src/prompts.ts) | `prompts`, `renderPrompt` |
+| Machine-readable contract + CI drift guard | [packages/mcp-server/src/manifest.ts](../../packages/mcp-server/src/manifest.ts), `.github/workflows/qa-memory.yml` | `buildManifest` |
+| Governance-focused test suite | [packages/shared/test/kg.test.ts](../../packages/shared/test/kg.test.ts), [policy.test.ts](../../packages/shared/test/policy.test.ts) | — |
+| Namespace + retention configuration | [packages/policy/mqm-policy.yaml](../../packages/policy/mqm-policy.yaml) | `namespaces:`, `write_permissions:`, `roles:` |
 
 ---
 
