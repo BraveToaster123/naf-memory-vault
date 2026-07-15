@@ -348,6 +348,291 @@
           "end_date"
         ]
       }
+    },
+    {
+      "name": "create_entities",
+      "description": "Core memory write. Create entities (name, entityType, observations[]). Ignores names that already exist — use add_observations to extend one. Policy-gated: PII/secret patterns in any field deny that entity only.",
+      "kind": "write",
+      "tier": 1,
+      "domain": "core",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "entities": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "entityType": {
+                  "type": "string"
+                },
+                "observations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "name",
+                "entityType"
+              ]
+            }
+          },
+          "namespace": {
+            "type": "string",
+            "description": "qa | pr | ops | compliance | product. Default qa."
+          }
+        },
+        "required": [
+          "entities"
+        ]
+      }
+    },
+    {
+      "name": "create_relations",
+      "description": "Core memory write. Create directed relations (from, to, relationType) in active voice. Ignores exact duplicates.",
+      "kind": "write",
+      "tier": 1,
+      "domain": "core",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "string"
+                },
+                "to": {
+                  "type": "string"
+                },
+                "relationType": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "from",
+                "to",
+                "relationType"
+              ]
+            }
+          },
+          "namespace": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "relations"
+        ]
+      }
+    },
+    {
+      "name": "add_observations",
+      "description": "Core memory write. Append new observation strings to existing entities. Entities that don't exist are reported, not created.",
+      "kind": "write",
+      "tier": 1,
+      "domain": "core",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "observations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "entityName": {
+                  "type": "string"
+                },
+                "contents": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "entityName",
+                "contents"
+              ]
+            }
+          },
+          "namespace": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "observations"
+        ]
+      }
+    },
+    {
+      "name": "delete_entities",
+      "description": "Core memory write. Delete entities by name, cascading their observations and any relation touching them.",
+      "kind": "write",
+      "tier": 1,
+      "domain": "core",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "entityNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "namespace": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "entityNames"
+        ]
+      }
+    },
+    {
+      "name": "delete_observations",
+      "description": "Core memory write. Remove specific observation strings from named entities.",
+      "kind": "write",
+      "tier": 1,
+      "domain": "core",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "deletions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "entityName": {
+                  "type": "string"
+                },
+                "observations": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "entityName",
+                "observations"
+              ]
+            }
+          },
+          "namespace": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "deletions"
+        ]
+      }
+    },
+    {
+      "name": "delete_relations",
+      "description": "Core memory write. Remove exact-match relations (from, to, relationType).",
+      "kind": "write",
+      "tier": 1,
+      "domain": "core",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "relations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "string"
+                },
+                "to": {
+                  "type": "string"
+                },
+                "relationType": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "from",
+                "to",
+                "relationType"
+              ]
+            }
+          },
+          "namespace": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "relations"
+        ]
+      }
+    },
+    {
+      "name": "read_graph",
+      "description": "Core memory read. Return the full (non-expired) knowledge graph for a namespace.",
+      "kind": "read",
+      "tier": 1,
+      "domain": "core",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "namespace": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "search_nodes",
+      "description": "Core memory read. Substring search (case-insensitive) across entity name, type, and observation content within a namespace.",
+      "kind": "read",
+      "tier": 1,
+      "domain": "core",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "namespace": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "name": "open_nodes",
+      "description": "Core memory read. Fetch specific named entities plus relations strictly between them.",
+      "kind": "read",
+      "tier": 1,
+      "domain": "core",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "names": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "namespace": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "names"
+        ]
+      }
     }
   ]
 }

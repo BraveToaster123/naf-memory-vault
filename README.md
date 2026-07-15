@@ -40,6 +40,7 @@ See [PROJECT-CONTEXT.md](./PROJECT-CONTEXT.md) for how this repo was assembled a
 | [examples/ai-inventory.yaml](./examples/ai-inventory.yaml) | LL-2026-04 AI tool inventory template |
 | [examples/cursor/mcp.json](./examples/cursor/mcp.json) | Cursor MCP server configuration |
 | [examples/cursor/skills/mortgage-qa-triage/SKILL.md](./examples/cursor/skills/mortgage-qa-triage/SKILL.md) | Cursor skill for CI triage workflow |
+| [docs/v2.md](./docs/v2.md) | Portable playbook: mirror + privatize `@modelcontextprotocol/server-memory`, with an MCP-protocol and data-governance best-practices audit |
 
 ---
 

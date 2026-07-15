@@ -14,6 +14,7 @@ Governed **Mortgage QA Memory MCP** design repo. Documentation and templates tod
 2. [10-doordash-salesforce-memory-deep-dive.md](./10-doordash-salesforce-memory-deep-dive.md) — recreate reference
 3. [05-data-retention-and-privacy.md](./05-data-retention-and-privacy.md) — storage rules
 4. [policies/mqm-policy.yaml](./policies/mqm-policy.yaml) — enforce before any write path
+5. [docs/v2.md](./docs/v2.md) — portable playbook for mirroring + privatizing `@modelcontextprotocol/server-memory`, with a best-practices audit (use on other projects too)
 
 ## Hard rules for agents working here
 

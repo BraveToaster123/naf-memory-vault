@@ -6,6 +6,12 @@ import type { PolicyDecision, Role, Tier, WriteContext } from "./types.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+export interface NamespacePolicy {
+  retention_days: number;
+  writers: string[];
+  readers: string[];
+}
+
 export interface Policy {
   version: string;
   urls: {
@@ -25,6 +31,8 @@ export interface Policy {
     tier2_workflow: string;
   };
   reporter: { allowed_columns: string[]; drop_run_on_pii_detected: boolean };
+  /** Namespace isolation + retention (doc 09). Unknown namespaces are denied by default. */
+  namespaces: Record<string, NamespacePolicy>;
   raw: Record<string, unknown>;
 }
 
@@ -62,6 +70,7 @@ export function loadPolicy(path: string = defaultPolicyPath()): Policy {
     loan_scenarios: raw.loan_scenarios as Policy["loan_scenarios"],
     write_permissions: raw.write_permissions as Policy["write_permissions"],
     reporter: raw.reporter as Policy["reporter"],
+    namespaces: (raw.namespaces as Policy["namespaces"]) ?? {},
     raw,
   };
   return policy;
@@ -87,6 +96,29 @@ export function isUrlAllowed(url: string, policy: Policy = getPolicy()): boolean
 export function isScenarioAllowed(id: string | undefined, policy: Policy = getPolicy()): boolean {
   if (!id) return true; // scenario is optional; only reject when explicitly provided
   return (policy.loan_scenarios?.allowed_ids ?? []).includes(id);
+}
+
+/**
+ * Namespace isolation (doc 09 — multi-domain memory). Deny-by-default: an
+ * undeclared namespace has no writers/readers, matching "isolate by default".
+ */
+export function isNamespaceWriteAllowed(namespace: string, role: Role, policy: Policy = getPolicy()): boolean {
+  if (role === "platform") return true;
+  const ns = policy.namespaces?.[namespace];
+  if (!ns) return false;
+  return (ns.writers ?? []).includes(role);
+}
+
+export function isNamespaceReadAllowed(namespace: string, role: Role, policy: Policy = getPolicy()): boolean {
+  if (role === "platform") return true;
+  const ns = policy.namespaces?.[namespace];
+  if (!ns) return false;
+  return (ns.readers ?? []).includes(role);
+}
+
+/** Per-namespace Tier 1 retention override, falling back to the global default. */
+export function namespaceRetentionDays(namespace: string, fallback: number, policy: Policy = getPolicy()): number {
+  return policy.namespaces?.[namespace]?.retention_days ?? fallback;
 }
 
 /** Which write-tools may a given role invoke? */
@@ -169,6 +201,16 @@ export function evaluatePolicy(
     return {
       outcome: ctx.tier === 2 ? "require_approval" : "deny",
       reason: `role ${ctx.principal.role} not permitted to write ${ctx.tool}`,
+      policyVersion,
+    };
+  }
+
+  // 1b. Namespace write scoping (doc 09). Only enforced when the caller
+  // targets a namespace — existing QA tools that don't set one are unaffected.
+  if (ctx.namespace && !isNamespaceWriteAllowed(ctx.namespace, ctx.principal.role, policy)) {
+    return {
+      outcome: "deny",
+      reason: `role ${ctx.principal.role} not permitted to write namespace ${ctx.namespace}`,
       policyVersion,
     };
   }
