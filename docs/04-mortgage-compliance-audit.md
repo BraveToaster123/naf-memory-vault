@@ -17,7 +17,7 @@ MQM is **quality control / software verification AI**, not loan underwriting AI.
 
 | GSE expectation | MQM implementation |
 |-----------------|-------------------|
-| Documented AI governance program | [examples/ai-inventory.yaml](./examples/ai-inventory.yaml) + policy owner |
+| Documented AI governance program | [ai-inventory.yaml](../../ai-inventory.yaml) + policy owner |
 | AI inventory (including vendor tools) | Inventory lists Playwright MCP, Gemini, Cursor, MQM server |
 | Third-party AI governed same as internal | Gateway logs Gemini; vendor docs retained |
 | Records for QC and GSE audit | Append-only audit store |
@@ -133,7 +133,7 @@ MCP tool: `export_qc_sample(start_date, end_date, journey_id?)` → JSON bundle 
 
 ## AI inventory (LL-2026-04)
 
-Maintain [examples/ai-inventory.yaml](./examples/ai-inventory.yaml):
+Maintain [ai-inventory.yaml](../../ai-inventory.yaml):
 
 | Tool | Purpose | Data sources | Human oversight | Vendor |
 |------|---------|--------------|-----------------|--------|

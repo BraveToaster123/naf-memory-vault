@@ -109,6 +109,14 @@ write_permissions:
     - record_run_summary
     - tag_failure_signature
     - remember_env_fact
+    # Core knowledge-graph memory (generic engine; namespace RBAC below is a
+    # second, orthogonal gate on top of this role/tier check).
+    - create_entities
+    - create_relations
+    - add_observations
+    - delete_entities
+    - delete_observations
+    - delete_relations
 
   tier1_denied:
     - remember_raw_snapshot
@@ -120,6 +128,33 @@ write_permissions:
     - propose_checkpoint
 
   tier2_workflow: git_pr_approval  # opens PR; no direct write
+
+# ─── Namespaces (multi-domain memory, see doc 09) ───────────────────────────
+# Enforced by isNamespaceWriteAllowed / isNamespaceReadAllowed in policy.ts —
+# an undeclared namespace has no writers/readers and is denied by default.
+# `platform` role always passes (break-glass), matching roles.platform below.
+
+namespaces:
+  qa:
+    retention_days: 30
+    writers: [qa_engineer, qa_lead]
+    readers: [qa_engineer, qa_lead, qc_analyst, engineer]
+  pr:
+    retention_days: 30
+    writers: [engineer, qa_lead]
+    readers: [engineer, qa_lead]
+  ops:
+    retention_days: 30
+    writers: []
+    readers: [engineer]
+  compliance:
+    retention_days: 365
+    writers: []
+    readers: [qc_analyst]
+  product:
+    retention_days: 7
+    writers: []
+    readers: []
 
 # ─── Role-based access ──────────────────────────────────────────────────────
 

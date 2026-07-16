@@ -4,7 +4,7 @@
 
 DoorDash described the memory architecture behind **Ask DoorDash** in a three-part engineering deep dive, summarized by [InfoQ (July 2026)](https://www.infoq.com/news/2026/07/doordash-ai-ask-assistant/). The diagram provided in this project illustrates how they separate **memory generation**, **tooling**, **storage**, **policy**, and **agents** — with a dedicated **eval platform** feedback loop.
 
-![DoorDash agentic memory architecture](./assets/doordash-memory-architecture.png)
+![DoorDash agentic memory architecture](../../assets/doordash-memory-architecture.png)
 
 ---
 

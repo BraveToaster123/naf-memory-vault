@@ -140,7 +140,7 @@ Reporter regex: `title.match(/\[(\w+)\]/)?.[1]` → `journey_id`
 
 ### Journey YAML (Tier 2)
 
-See [examples/journeys/le_generation.yaml](./examples/journeys/le_generation.yaml).
+See [journeys/le_generation.yaml](../../journeys/le_generation.yaml).
 
 Checkpoints link to regulations: TRID, ECOA, RESPA, state overlays.
 
@@ -158,7 +158,7 @@ test.describe('compliance-smoke @blocking', () => {
 
 ## Playwright MCP configuration
 
-See [examples/cursor/mcp.json](./examples/cursor/mcp.json).
+See [cursor/mcp.json](../../cursor/mcp.json).
 
 | Flag | Value | Reason |
 |------|-------|--------|

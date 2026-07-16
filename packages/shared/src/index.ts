@@ -6,3 +6,4 @@ export * from "./db.js";
 export * from "./pipeline.js";
 export * from "./purge.js";
 export * from "./queries.js";
+export * from "./kg.js";

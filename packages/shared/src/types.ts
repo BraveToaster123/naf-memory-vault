@@ -22,6 +22,9 @@ export interface Principal {
   displayName?: string;
 }
 
+/** Namespaces per doc 09 (multi-domain memory). Unknown strings are rejected by policy. */
+export type Namespace = "qa" | "pr" | "ops" | "compliance" | "product";
+
 /** Context passed to the save pipeline on every write attempt. */
 export interface WriteContext {
   tier: Tier;
@@ -29,6 +32,8 @@ export interface WriteContext {
   principal: Principal;
   agent?: string;
   policyVersion?: string;
+  /** Namespace isolation (doc 09). When set, policy enforces per-namespace writer RBAC. */
+  namespace?: string;
 }
 
 /** Raw run info handed to the reporter/pipeline. `errorMessage` is NEVER stored raw. */
@@ -112,6 +117,58 @@ export interface PolicyDecision {
   /** Sanitized payload safe to persist (deny-fields removed). */
   transformed?: Record<string, unknown>;
   matchedPattern?: string;
+}
+
+// ─── Core knowledge-graph memory (generic engine — see kg.ts) ──────────────
+// Superset of @modelcontextprotocol/server-memory's entity/relation/observation
+// model: same shape, but every write passes through evaluatePolicy (PII deny,
+// RBAC, namespace isolation) and rows carry namespace + expires_at.
+
+export interface KgEntityInput {
+  name: string;
+  entityType: string;
+  observations?: string[];
+}
+
+export interface KgEntity {
+  name: string;
+  entityType: string;
+  observations: string[];
+}
+
+export interface KgRelationInput {
+  from: string;
+  to: string;
+  relationType: string;
+}
+
+export interface KgObservationAdd {
+  entityName: string;
+  contents: string[];
+}
+
+export interface KgObservationDelete {
+  entityName: string;
+  observations: string[];
+}
+
+export interface KgGraph {
+  entities: KgEntity[];
+  relations: KgRelationInput[];
+}
+
+export interface KgDenied {
+  key: string;
+  reason: string;
+  matchedPattern?: string;
+}
+
+export interface KgWriteResult<T> {
+  outcome: PolicyOutcome;
+  reason?: string;
+  created: T[];
+  skippedExisting: string[];
+  denied: KgDenied[];
 }
 
 /** Thrown when a write is blocked pre-save. */

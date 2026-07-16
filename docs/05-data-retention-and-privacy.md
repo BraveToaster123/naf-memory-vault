@@ -66,7 +66,7 @@ Tier 2 — Curated (long-term, human-approved)
 
 ## Policy enforcement (pre-save)
 
-From [policies/mqm-policy.yaml](./policies/mqm-policy.yaml):
+From [packages/policy/mqm-policy.yaml](../../packages/policy/mqm-policy.yaml):
 
 ```yaml
 deny_fields:

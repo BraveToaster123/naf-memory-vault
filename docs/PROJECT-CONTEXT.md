@@ -34,8 +34,8 @@ Research and design sessions (July 2026) covering:
 
 | Phase | This repo | Separate implementation repo (future) |
 |-------|-----------|--------------------------------------|
-| **Now** | Docs, policy, examples, eval golden set | — |
-| **Next** | — | `packages/*` TypeScript monorepo per doc 06 |
+| **Now** | `docs/` (design + implementation + gates), `packages/*` POC/MVP | — |
+| **Next** | Staging CI + namespace owners + compliance sign-off | SSO / shared server per [14-operational-readiness.md](./14-operational-readiness.md) |
 
 ## Key stakeholder concerns addressed
 
@@ -55,7 +55,7 @@ Research and design sessions (July 2026) covering:
 
 ## Maintainer checklist
 
-- [ ] Customize `policies/mqm-policy.yaml` staging URLs
-- [ ] Security/compliance sign-off on doc 05 + `examples/ai-inventory.yaml`
-- [ ] Add journey YAML for top 3 borrower flows
-- [ ] Scaffold `packages/` when implementation starts
+- [ ] Replace pilot staging URLs in [packages/policy/mqm-policy.yaml](../../packages/policy/mqm-policy.yaml)
+- [ ] Security/compliance sign-off — [14-operational-readiness.md](./14-operational-readiness.md) + [ai-inventory.yaml](../../ai-inventory.yaml)
+- [ ] Assign namespace owners for `ops` / `compliance` — worksheet in [14 §4](./14-operational-readiness.md#4c-sign-off-worksheet-fill-in-names)
+- [ ] Wire staging Playwright reporter — [14 §5](./14-operational-readiness.md#5-real-staging-ci-data-needs-env)
