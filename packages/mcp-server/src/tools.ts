@@ -38,6 +38,19 @@ export const TOOL_META: Record<string, ToolMeta> = {
   remember_env_fact: { kind: "write", tier: 1, domain: "qa" },
   upsert_locator: { kind: "tier2_approval", tier: 2, domain: "qa" },
   get_audit_trail: { kind: "audit", tier: null, domain: "core" },
+
+  // Core knowledge-graph memory — generic engine (kg.ts), namespace-isolated.
+  // Same tool surface as @modelcontextprotocol/server-memory, plus policy
+  // pre-save (PII deny, namespace RBAC), TTL, and audit.
+  create_entities: { kind: "write", tier: 1, domain: "core" },
+  create_relations: { kind: "write", tier: 1, domain: "core" },
+  add_observations: { kind: "write", tier: 1, domain: "core" },
+  delete_entities: { kind: "write", tier: 1, domain: "core" },
+  delete_observations: { kind: "write", tier: 1, domain: "core" },
+  delete_relations: { kind: "write", tier: 1, domain: "core" },
+  read_graph: { kind: "read", tier: 1, domain: "core" },
+  search_nodes: { kind: "read", tier: 1, domain: "core" },
+  open_nodes: { kind: "read", tier: 1, domain: "core" },
 };
 
 export const tools: Tool[] = [
@@ -193,6 +206,167 @@ export const tools: Tool[] = [
         loan_scenario_id: { type: "string" },
       },
       required: ["start_date", "end_date"],
+    },
+  },
+
+  // ── Core knowledge-graph memory ──────────────────────────────────────
+  // Drop-in superset of @modelcontextprotocol/server-memory's tool surface.
+  // Every tool accepts an optional `namespace` (default "qa"; one of
+  // qa | pr | ops | compliance | product, see doc 09) — reads/writes are
+  // scoped to that namespace and gated by policy RBAC + PII deny.
+  {
+    name: "create_entities",
+    description:
+      "Core memory write. Create entities (name, entityType, observations[]). Ignores names that already exist — use add_observations to extend one. Policy-gated: PII/secret patterns in any field deny that entity only.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        entities: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              entityType: { type: "string" },
+              observations: { type: "array", items: { type: "string" } },
+            },
+            required: ["name", "entityType"],
+          },
+        },
+        namespace: { type: "string", description: "qa | pr | ops | compliance | product. Default qa." },
+      },
+      required: ["entities"],
+    },
+  },
+  {
+    name: "create_relations",
+    description: "Core memory write. Create directed relations (from, to, relationType) in active voice. Ignores exact duplicates.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        relations: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              from: { type: "string" },
+              to: { type: "string" },
+              relationType: { type: "string" },
+            },
+            required: ["from", "to", "relationType"],
+          },
+        },
+        namespace: { type: "string" },
+      },
+      required: ["relations"],
+    },
+  },
+  {
+    name: "add_observations",
+    description: "Core memory write. Append new observation strings to existing entities. Entities that don't exist are reported, not created.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        observations: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              entityName: { type: "string" },
+              contents: { type: "array", items: { type: "string" } },
+            },
+            required: ["entityName", "contents"],
+          },
+        },
+        namespace: { type: "string" },
+      },
+      required: ["observations"],
+    },
+  },
+  {
+    name: "delete_entities",
+    description: "Core memory write. Delete entities by name, cascading their observations and any relation touching them.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        entityNames: { type: "array", items: { type: "string" } },
+        namespace: { type: "string" },
+      },
+      required: ["entityNames"],
+    },
+  },
+  {
+    name: "delete_observations",
+    description: "Core memory write. Remove specific observation strings from named entities.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        deletions: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              entityName: { type: "string" },
+              observations: { type: "array", items: { type: "string" } },
+            },
+            required: ["entityName", "observations"],
+          },
+        },
+        namespace: { type: "string" },
+      },
+      required: ["deletions"],
+    },
+  },
+  {
+    name: "delete_relations",
+    description: "Core memory write. Remove exact-match relations (from, to, relationType).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        relations: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              from: { type: "string" },
+              to: { type: "string" },
+              relationType: { type: "string" },
+            },
+            required: ["from", "to", "relationType"],
+          },
+        },
+        namespace: { type: "string" },
+      },
+      required: ["relations"],
+    },
+  },
+  {
+    name: "read_graph",
+    description: "Core memory read. Return the full (non-expired) knowledge graph for a namespace.",
+    inputSchema: {
+      type: "object",
+      properties: { namespace: { type: "string" } },
+    },
+  },
+  {
+    name: "search_nodes",
+    description: "Core memory read. Substring search (case-insensitive) across entity name, type, and observation content within a namespace.",
+    inputSchema: {
+      type: "object",
+      properties: { query: { type: "string" }, namespace: { type: "string" } },
+      required: ["query"],
+    },
+  },
+  {
+    name: "open_nodes",
+    description: "Core memory read. Fetch specific named entities plus relations strictly between them.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        names: { type: "array", items: { type: "string" } },
+        namespace: { type: "string" },
+      },
+      required: ["names"],
     },
   },
 ];

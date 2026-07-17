@@ -3,7 +3,7 @@ import type { DB, AuditEventRow, Principal } from "@mqm/shared";
 
 export interface AuditInput {
   principal: Principal;
-  actionClass: "memory_read" | "memory_write" | "browser_action" | "policy_block";
+  actionClass: "memory_read" | "memory_write" | "browser_action" | "policy_block" | "prompt_get";
   toolServer: string;
   toolName: string;
   /** Short summary only — never raw args that may contain CI error text. */

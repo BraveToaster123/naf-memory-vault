@@ -3,8 +3,13 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
+  ListResourcesRequestSchema,
+  ReadResourceRequestSchema,
+  ListPromptsRequestSchema,
+  GetPromptRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { tools, READ_TOOLS } from "./tools.js";
+import { prompts, renderPrompt } from "./prompts.js";
 import {
   openDb,
   getPolicy,
@@ -18,10 +23,24 @@ import {
   shouldSkipBrowser,
   getJourneyMap,
   getComplianceCheckpoint,
+  isNamespaceReadAllowed,
+  createEntities,
+  createRelations,
+  addObservations,
+  deleteEntities,
+  deleteObservations,
+  deleteRelations,
+  readGraph,
+  searchNodes,
+  openNodes,
   type Principal,
   type Role,
   type TestStatus,
   type Classification,
+  type KgEntityInput,
+  type KgRelationInput,
+  type KgObservationAdd,
+  type KgObservationDelete,
 } from "@mqm/shared";
 import { logAudit, getAuditTrail } from "@mqm/audit-client";
 
@@ -38,10 +57,50 @@ const AUDIT_ROLES: Role[] = ["qa_lead", "qc_analyst", "platform"];
 
 const server = new Server(
   { name: "mortgage-qa-memory", version: "0.1.0" },
-  { capabilities: { tools: {} } },
+  { capabilities: { tools: {}, resources: {} } },
 );
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools }));
+
+const KG_NAMESPACES = ["qa", "pr", "ops", "compliance", "product"] as const;
+
+function kgResourceUri(namespace: string): string {
+  return namespace === "qa" ? "memory://knowledge-graph" : `memory://knowledge-graph/${namespace}`;
+}
+
+// Mirrors @modelcontextprotocol/server-memory's `memory://knowledge-graph`
+// resource, one per namespace this caller may read. No live update
+// notifications (v1) — poll read_graph/this resource as needed.
+server.setRequestHandler(ListResourcesRequestSchema, async () => ({
+  resources: KG_NAMESPACES.filter((ns) => isNamespaceReadAllowed(ns, principal.role, policy)).map((ns) => ({
+    uri: kgResourceUri(ns),
+    name: `Knowledge graph (${ns})`,
+    mimeType: "application/json",
+    description: `Full core knowledge-graph memory for namespace "${ns}".`,
+  })),
+}));
+
+server.setRequestHandler(ReadResourceRequestSchema, async (req) => {
+  const uri = req.params.uri;
+  const match = /^memory:\/\/knowledge-graph(?:\/(.+))?$/.exec(uri);
+  if (!match) throw new Error(`unknown_resource: ${uri}`);
+  const namespace = match[1] ?? "qa";
+  if (!isNamespaceReadAllowed(namespace, principal.role, policy)) {
+    throw new Error(`namespace_rbac_denied: ${namespace}`);
+  }
+  const data = readGraph(db, namespace);
+  logAudit(db, {
+    principal,
+    actionClass: "memory_read",
+    toolServer: "mortgage-qa-memory",
+    toolName: "resource:knowledge-graph",
+    argsSummary: `ns=${namespace}`,
+    environment: process.env.MQM_ENV,
+    policyVersion: policy.version,
+    outcome: "success",
+  });
+  return { contents: [{ uri, mimeType: "application/json", text: JSON.stringify(data, null, 2) }] };
+});
 
 function ok(data: unknown) {
   return { content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }] };
@@ -201,6 +260,86 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
         return ok(data);
       }
 
+      // ── Core knowledge-graph memory ────────────────────────────────
+      case "create_entities": {
+        const namespace = str(args.namespace) ?? "qa";
+        const res = createEntities(db, arr<KgEntityInput>(args.entities), { tier: 1, tool: name, principal, policyVersion: policy.version, namespace }, policy);
+        audit("success", `ns=${namespace},created=${res.created.length},denied=${res.denied.length}`);
+        return ok(res);
+      }
+      case "create_relations": {
+        const namespace = str(args.namespace) ?? "qa";
+        const res = createRelations(db, arr<KgRelationInput>(args.relations), { tier: 1, tool: name, principal, policyVersion: policy.version, namespace }, policy);
+        audit("success", `ns=${namespace},created=${res.created.length},denied=${res.denied.length}`);
+        return ok(res);
+      }
+      case "add_observations": {
+        const namespace = str(args.namespace) ?? "qa";
+        const res = addObservations(db, arr<KgObservationAdd>(args.observations), { tier: 1, tool: name, principal, policyVersion: policy.version, namespace }, policy);
+        audit("success", `ns=${namespace},entities=${res.results.length},denied=${res.denied.length}`);
+        return ok(res);
+      }
+      case "delete_entities": {
+        const namespace = str(args.namespace) ?? "qa";
+        const res = deleteEntities(db, arr<string>(args.entityNames), { tier: 1, tool: name, principal, policyVersion: policy.version, namespace }, policy);
+        if (res.decision.outcome !== "allow") {
+          audit("blocked", res.decision.reason);
+          return fail(res.decision.reason);
+        }
+        audit("success", `ns=${namespace},deleted=${res.deleted.length}`);
+        return ok({ deleted: res.deleted });
+      }
+      case "delete_observations": {
+        const namespace = str(args.namespace) ?? "qa";
+        const res = deleteObservations(db, arr<KgObservationDelete>(args.deletions), { tier: 1, tool: name, principal, policyVersion: policy.version, namespace }, policy);
+        if (res.decision.outcome !== "allow") {
+          audit("blocked", res.decision.reason);
+          return fail(res.decision.reason);
+        }
+        audit("success", `ns=${namespace}`);
+        return ok({ deleted: true });
+      }
+      case "delete_relations": {
+        const namespace = str(args.namespace) ?? "qa";
+        const res = deleteRelations(db, arr<KgRelationInput>(args.relations), { tier: 1, tool: name, principal, policyVersion: policy.version, namespace }, policy);
+        if (res.decision.outcome !== "allow") {
+          audit("blocked", res.decision.reason);
+          return fail(res.decision.reason);
+        }
+        audit("success", `ns=${namespace}`);
+        return ok({ deleted: true });
+      }
+      case "read_graph": {
+        const namespace = str(args.namespace) ?? "qa";
+        if (!isNamespaceReadAllowed(namespace, principal.role, policy)) {
+          audit("blocked", "namespace_rbac_denied");
+          return fail("namespace_rbac_denied", { namespace });
+        }
+        const data = readGraph(db, namespace);
+        audit("success", `ns=${namespace},entities=${data.entities.length}`);
+        return ok(data);
+      }
+      case "search_nodes": {
+        const namespace = str(args.namespace) ?? "qa";
+        if (!isNamespaceReadAllowed(namespace, principal.role, policy)) {
+          audit("blocked", "namespace_rbac_denied");
+          return fail("namespace_rbac_denied", { namespace });
+        }
+        const data = searchNodes(db, namespace, String(args.query ?? ""));
+        audit("success", `ns=${namespace},matches=${data.entities.length}`);
+        return ok(data);
+      }
+      case "open_nodes": {
+        const namespace = str(args.namespace) ?? "qa";
+        if (!isNamespaceReadAllowed(namespace, principal.role, policy)) {
+          audit("blocked", "namespace_rbac_denied");
+          return fail("namespace_rbac_denied", { namespace });
+        }
+        const data = openNodes(db, namespace, arr<string>(args.names));
+        audit("success", `ns=${namespace},opened=${data.entities.length}`);
+        return ok(data);
+      }
+
       default:
         return fail("unknown_tool", { tool: name });
     }
@@ -231,6 +370,9 @@ function num(v: unknown): number | undefined {
 }
 function str(v: unknown): string | undefined {
   return typeof v === "string" ? v : undefined;
+}
+function arr<T>(v: unknown): T[] {
+  return Array.isArray(v) ? (v as T[]) : [];
 }
 
 const transport = new StdioServerTransport();

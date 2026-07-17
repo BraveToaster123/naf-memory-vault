@@ -1,0 +1,16 @@
+# Tier 2 curated locators — human PR only (agents cannot write here).
+app: loan-origination-portal
+app_version: "2.14.0"
+last_reviewed: 2026-07-14
+owner: qa-team@yourcompany.com
+
+locators:
+  - element_key: le_apr_value
+    selector: "[data-testid='le-apr']"
+    journey_id: le_generation
+  - element_key: cd_cash_to_close
+    selector: "[data-testid='cd-cash-to-close']"
+    journey_id: cd_generation
+  - element_key: urla_required_error
+    selector: "[data-testid='field-required-error']"
+    journey_id: urla_data_entry

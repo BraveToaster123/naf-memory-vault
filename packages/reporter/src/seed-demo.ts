@@ -3,6 +3,8 @@
  * have data to work with before a live Playwright suite exists.
  *
  *   npm run seed:demo
+ *
+ * Covers every test in eval/ci-failures.jsonl so the eval gate is meaningful.
  */
 import {
   openDb,
@@ -10,6 +12,7 @@ import {
   tagFailureSignature,
   rememberEnvFact,
   getPolicy,
+  type Classification,
   type TestRunInput,
   type TestStatus,
   type WriteContext,
@@ -36,13 +39,74 @@ const base = (over: Partial<TestRunInput>): TestRunInput => ({
   ...over,
 });
 
-// [testId, journeyId, patternOfStatuses]
-const scenarios: Array<{ testId: string; journeyId: string; statuses: TestStatus[]; errClass?: string; errMsg?: string }> = [
-  { testId: "le_generation/apr visible", journeyId: "le_generation", statuses: ["passed", "flaky", "passed", "passed", "flaky", "passed", "passed"], errClass: "TimeoutError", errMsg: "locator getByText('Annual Percentage Rate') not visible after 5000ms on firefox" },
-  { testId: "le_generation/issue date", journeyId: "le_generation", statuses: ["passed", "passed", "flaky", "passed", "flaky", "flaky"], errClass: "TimeoutError", errMsg: "sso redirect slow, timeout after 5000ms" },
-  { testId: "cd_generation/fee table", journeyId: "cd_generation", statuses: ["passed", "passed", "passed", "failed", "failed", "failed"], errClass: "AssertionError", errMsg: "expected fee table row 'Origination Charges' to be visible" },
-  { testId: "urla_data_entry/required fields", journeyId: "urla_data_entry", statuses: ["passed", "passed", "passed", "passed", "passed"], errClass: "AssertionError", errMsg: "required field validation" },
+interface Scenario {
+  testId: string;
+  journeyId: string;
+  statuses: TestStatus[];
+  errClass?: string;
+  errMsg?: string;
+  /** How this test's failure signature should be classified (drives eval). */
+  classify?: Classification;
+  notes?: string;
+}
+
+// One entry per test in eval/ci-failures.jsonl (plus healthy noise).
+const scenarios: Scenario[] = [
+  {
+    testId: "le_generation/apr visible",
+    journeyId: "le_generation",
+    statuses: ["passed", "flaky", "passed", "passed", "flaky", "passed", "passed"],
+    errClass: "TimeoutError",
+    errMsg: "locator getByText('Annual Percentage Rate') not visible after 5000ms on firefox",
+    classify: "flake",
+    notes: "firefox staging timing flake",
+  },
+  {
+    testId: "le_generation/issue date",
+    journeyId: "le_generation",
+    statuses: ["passed", "passed", "flaky", "passed", "flaky", "flaky"],
+    errClass: "TimeoutError",
+    errMsg: "sso redirect slow, timeout after 5000ms",
+    classify: "flake",
+    notes: "uat sso slow flake",
+  },
+  {
+    testId: "cd_generation/fee table",
+    journeyId: "cd_generation",
+    statuses: ["passed", "passed", "passed", "failed", "failed", "failed"],
+    errClass: "AssertionError",
+    errMsg: "expected fee table row 'Origination Charges' to be visible",
+    classify: "regression",
+    notes: "broke on deploy 18440 fee selector",
+  },
+  {
+    testId: "urla_data_entry/required fields",
+    journeyId: "urla_data_entry",
+    statuses: ["passed", "passed", "failed", "failed", "failed"],
+    errClass: "AssertionError",
+    errMsg: "required-field validation did not block submit after rule change",
+    classify: "regression",
+    notes: "new validation rule 2026-07-01",
+  },
+  {
+    testId: "eclose_package/consent",
+    journeyId: "eclose_package",
+    statuses: ["passed", "passed", "failed", "failed"],
+    errClass: "Error",
+    errMsg: "third-party e-sign iframe failed to load",
+    classify: "regression",
+    notes: "e-sign iframe load failure",
+  },
 ];
+
+function latestSignature(db: ReturnType<typeof openDb>, testId: string): string | undefined {
+  const row = db
+    .prepare(
+      "SELECT failure_signature FROM test_runs WHERE test_id = ? AND failure_signature IS NOT NULL ORDER BY created_at DESC LIMIT 1",
+    )
+    .get(testId) as { failure_signature: string } | undefined;
+  return row?.failure_signature;
+}
 
 function main(): void {
   const db = openDb();
@@ -65,30 +129,18 @@ function main(): void {
     }
   }
 
-  // Classify the two flaky signatures so should_skip_browser can short-circuit.
-  const flakySigs = db
-    .prepare(
-      "SELECT failure_signature FROM test_runs WHERE test_id IN ('le_generation/apr visible','le_generation/issue date') AND failure_signature IS NOT NULL GROUP BY failure_signature",
-    )
-    .all() as { failure_signature: string }[];
-  for (const { failure_signature } of flakySigs) {
-    tagFailureSignature(
+  // Tag each scenario's signature so get_failure_signature / eval can classify.
+  let tagged = 0;
+  for (const s of scenarios) {
+    if (!s.classify) continue;
+    const sig = latestSignature(db, s.testId);
+    if (!sig) continue;
+    const d = tagFailureSignature(
       db,
-      { signature: failure_signature, classification: "flake", notes: "known staging/uat timing flake" },
+      { signature: sig, classification: s.classify, notes: s.notes },
       { ...ctx, tool: "tag_failure_signature" },
     );
-  }
-
-  // Classify the CD fee-table regression.
-  const regSig = db
-    .prepare("SELECT failure_signature FROM test_runs WHERE test_id = 'cd_generation/fee table' AND failure_signature IS NOT NULL LIMIT 1")
-    .get() as { failure_signature: string } | undefined;
-  if (regSig) {
-    tagFailureSignature(
-      db,
-      { signature: regSig.failure_signature, classification: "regression", notes: "broke on deploy 18440 fee selector" },
-      { ...ctx, tool: "tag_failure_signature" },
-    );
+    if (d.outcome === "allow") tagged++;
   }
 
   rememberEnvFact(
@@ -99,7 +151,7 @@ function main(): void {
 
   db.close();
   // eslint-disable-next-line no-console
-  console.log(`[seed:demo] inserted ${n} run summaries + tagged signatures + 1 env fact.`);
+  console.log(`[seed:demo] inserted ${n} run summaries + tagged ${tagged} signatures + 1 env fact.`);
 }
 
 main();

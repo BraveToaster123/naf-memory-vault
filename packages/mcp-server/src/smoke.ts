@@ -52,15 +52,57 @@ async function main(): Promise<void> {
   });
   console.log("\nupsert_locator (expect require_approval):\n" + textOf(tier2 as never));
 
+  // Core knowledge-graph memory — superset of @modelcontextprotocol/server-memory.
+  const created = await client.callTool({
+    name: "create_entities",
+    arguments: {
+      entities: [
+        { name: "le_generation", entityType: "journey", observations: ["APR label flaky on staging"] },
+        { name: "dirty_entity", entityType: "note", observations: ["borrower 123-45-6789 seen"] },
+      ],
+    },
+  });
+  console.log("\ncreate_entities (1 allowed, 1 PII-denied):\n" + textOf(created as never));
+
+  const relations = await client.callTool({
+    name: "create_relations",
+    arguments: {
+      relations: [
+        // dirty_entity never got created above (PII-denied), so this edge is
+        // rejected too — the graph never accumulates dangling relations.
+        { from: "le_generation", to: "dirty_entity", relationType: "references" },
+      ],
+    },
+  });
+  console.log("\ncreate_relations (expect denied: entity_not_found):\n" + textOf(relations as never));
+
+  const graph = await client.callTool({ name: "read_graph", arguments: {} });
+  console.log("\nread_graph (qa namespace):\n" + textOf(graph as never));
+
+  const search = await client.callTool({ name: "search_nodes", arguments: { query: "flaky" } });
+  console.log("\nsearch_nodes('flaky'):\n" + textOf(search as never));
+
+  const opsDenied = await client.callTool({ name: "read_graph", arguments: { namespace: "compliance" } });
+  console.log("\nread_graph(compliance) as qa_engineer (expect namespace_rbac_denied):\n" + textOf(opsDenied as never));
+
+  const resources = await client.listResources();
+  console.log("\nresources:", resources.resources.map((r) => r.uri).join(", "));
+
   await client.close();
 
   const db = openDb();
   const n = db.prepare("SELECT COUNT(*) AS n FROM audit_events").get() as { n: number };
   const blocked = db.prepare("SELECT COUNT(*) AS n FROM audit_events WHERE action_class = 'policy_block'").get() as { n: number };
+  const kgEntities = db.prepare("SELECT COUNT(*) AS n FROM kg_entities WHERE namespace = 'qa'").get() as { n: number };
   db.close();
   console.log(`\naudit_events rows: ${n.n} (policy_block: ${blocked.n})`);
+  console.log(`kg_entities rows (qa): ${kgEntities.n}`);
   if (n.n < 4) {
     console.error("SMOKE FAIL: expected an audit row per tool call");
+    process.exit(1);
+  }
+  if (kgEntities.n < 1) {
+    console.error("SMOKE FAIL: expected create_entities to persist at least one entity");
     process.exit(1);
   }
   console.log("SMOKE PASS");

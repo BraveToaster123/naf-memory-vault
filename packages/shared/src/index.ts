@@ -7,3 +7,4 @@ export * from "./graph.js";
 export * from "./pipeline.js";
 export * from "./purge.js";
 export * from "./queries.js";
+export * from "./kg.js";
