@@ -114,6 +114,81 @@ export interface PolicyDecision {
   matchedPattern?: string;
 }
 
+// ── Governed knowledge graph (server-memory-compatible) ─────────────────────
+
+/** Input to create_entities. `observations` are scanned for PII pre-save. */
+export interface EntityInput {
+  name: string;
+  entityType: string;
+  observations?: string[];
+  /** Optional project tag; falls back to MQM_APP_ID. */
+  appId?: string;
+}
+
+/** Input to add_observations. */
+export interface ObservationInput {
+  entityName: string;
+  contents: string[];
+}
+
+/** Input to create_relations. */
+export interface RelationInput {
+  from: string;
+  to: string;
+  relationType: string;
+}
+
+export interface EntityRow {
+  name: string;
+  entity_type: string;
+  app_id: string | null;
+  tier: number;
+  created_at: string;
+  updated_at: string;
+  expires_at: string | null;
+}
+
+export interface ObservationRow {
+  id: string;
+  entity_name: string;
+  content: string;
+  created_at: string;
+  expires_at: string | null;
+}
+
+export interface RelationRow {
+  id: string;
+  from_entity: string;
+  to_entity: string;
+  relation_type: string;
+  created_at: string;
+  expires_at: string | null;
+}
+
+/** server-memory-compatible node shape returned by read/search/open. */
+export interface GraphNode {
+  name: string;
+  entityType: string;
+  observations: string[];
+}
+
+export interface GraphRelation {
+  from: string;
+  to: string;
+  relationType: string;
+}
+
+export interface KnowledgeGraph {
+  entities: GraphNode[];
+  relations: GraphRelation[];
+}
+
+/** Per-item outcome of a gated graph write. */
+export interface GraphWriteResult<T> {
+  created: T[];
+  denied: Array<{ item: T; reason: string; matchedPattern?: string }>;
+}
+
 /** Thrown when a write is blocked pre-save. */
 export class PolicyDeniedError extends Error {
   readonly reason: string;

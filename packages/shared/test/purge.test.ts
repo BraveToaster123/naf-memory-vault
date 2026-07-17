@@ -1,22 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import Database from "better-sqlite3";
+import type Database from "better-sqlite3";
+import { openDb } from "../src/db.js";
 import { purgeExpired } from "../src/purge.js";
 
 function dbWithRows(): Database.Database {
-  const db = new Database(":memory:");
-  db.exec(`CREATE TABLE test_runs (
-    id TEXT PRIMARY KEY, test_id TEXT NOT NULL, journey_id TEXT, app_id TEXT,
-    status TEXT NOT NULL, duration_ms INTEGER, browser TEXT, os TEXT, env TEXT,
-    commit_sha TEXT, loan_scenario_id TEXT, error_class TEXT, failure_signature TEXT,
-    created_at TEXT NOT NULL, expires_at TEXT NOT NULL);
-   CREATE TABLE failure_signatures (
-    signature TEXT PRIMARY KEY, classification TEXT NOT NULL, notes TEXT,
-    occurrence_count INTEGER NOT NULL DEFAULT 1, first_seen TEXT NOT NULL,
-    last_seen TEXT NOT NULL, expires_at TEXT NOT NULL);
-   CREATE TABLE env_facts (
-    id TEXT PRIMARY KEY, env TEXT NOT NULL, overlay_key TEXT, fact TEXT NOT NULL,
-    source TEXT, created_at TEXT NOT NULL, expires_at TEXT NOT NULL);`);
+  const db = openDb(":memory:"); // real schema (incl. graph tables) so purge never drifts
   const past = "2000-01-01T00:00:00.000Z";
   const future = "2999-01-01T00:00:00.000Z";
   db.prepare("INSERT INTO test_runs (id, test_id, status, created_at, expires_at) VALUES (?,?,?,?,?)").run("a", "t", "passed", past, past);

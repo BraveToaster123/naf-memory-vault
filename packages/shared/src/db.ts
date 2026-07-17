@@ -66,6 +66,49 @@ CREATE TABLE IF NOT EXISTS audit_events (
   record_hash TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_audit_ts ON audit_events(timestamp_utc);
+
+-- ── Governed knowledge graph (server-memory-compatible) ─────────────────────
+-- Entities, observations, and relations that back the create_entities /
+-- add_observations / create_relations / search_nodes / open_nodes / read_graph
+-- tool surface. Every write is gated by evaluatePolicy first (see graph.ts).
+CREATE TABLE IF NOT EXISTS entities (
+  name TEXT PRIMARY KEY,
+  entity_type TEXT NOT NULL,
+  app_id TEXT,
+  tier INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  expires_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_entities_type ON entities(entity_type);
+CREATE INDEX IF NOT EXISTS idx_entities_expires ON entities(expires_at);
+
+CREATE TABLE IF NOT EXISTS observations (
+  id TEXT PRIMARY KEY,
+  entity_name TEXT NOT NULL,
+  content TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  expires_at TEXT,
+  UNIQUE(entity_name, content),
+  FOREIGN KEY (entity_name) REFERENCES entities(name) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_obs_entity ON observations(entity_name);
+CREATE INDEX IF NOT EXISTS idx_obs_expires ON observations(expires_at);
+
+CREATE TABLE IF NOT EXISTS relations (
+  id TEXT PRIMARY KEY,
+  from_entity TEXT NOT NULL,
+  to_entity TEXT NOT NULL,
+  relation_type TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  expires_at TEXT,
+  UNIQUE(from_entity, to_entity, relation_type),
+  FOREIGN KEY (from_entity) REFERENCES entities(name) ON DELETE CASCADE,
+  FOREIGN KEY (to_entity) REFERENCES entities(name) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_rel_from ON relations(from_entity);
+CREATE INDEX IF NOT EXISTS idx_rel_to ON relations(to_entity);
+CREATE INDEX IF NOT EXISTS idx_rel_expires ON relations(expires_at);
 `;
 
 export function dbPath(): string {
@@ -77,6 +120,7 @@ export function openDb(path: string = dbPath()): DB {
   mkdirSync(dirname(path), { recursive: true });
   const db = new Database(path);
   db.pragma("journal_mode = WAL");
+  db.pragma("foreign_keys = ON"); // enforce graph FK cascades (observations/relations)
   db.exec(SCHEMA);
   return db;
 }

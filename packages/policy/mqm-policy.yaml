@@ -109,6 +109,13 @@ write_permissions:
     - record_run_summary
     - tag_failure_signature
     - remember_env_fact
+    # Governed knowledge-graph writes (server-memory-compatible surface).
+    - create_entities
+    - add_observations
+    - create_relations
+    - delete_entities
+    - delete_observations
+    - delete_relations
 
   tier1_denied:
     - remember_raw_snapshot
@@ -171,6 +178,14 @@ reporter:
     - created_at
     - expires_at
   drop_run_on_pii_detected: true   # prefer drop over redact for CI errors
+
+# ─── Knowledge-graph limits (governed memory service) ───────────────────────
+# Guards against dumping raw snapshots / prompts / long payloads as
+# "observations". PII/credential content is separately blocked by deny_patterns.
+
+graph:
+  max_observation_chars: 2000       # a single observation may not exceed this
+  max_observations_per_entity: 200  # per create_entities / add_observations call
 
 # ─── Audit ──────────────────────────────────────────────────────────────────
 
