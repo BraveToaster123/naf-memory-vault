@@ -27,7 +27,7 @@ You do **not** need staging, Playwright CI, or SSO for this demo.
 ## 10-minute prep (before the meeting)
 
 ```powershell
-cd C:\Repo\mcp-memory
+cd C:\Projects\naf-memory-vault
 npm install
 npm run seed:demo
 npm run seed:demo:namespaces

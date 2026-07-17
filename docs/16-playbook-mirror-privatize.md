@@ -2,7 +2,7 @@
 
 **Status:** portable playbook. Drop this file into any project that wants to give agents
 persistent entity/relation memory without depending on Anthropic's unmanaged reference
-server. This repo (`mcp-memory` / Mortgage QA Memory) is cited throughout as the worked,
+server. This repo (`naf-memory-vault` / Mortgage QA Memory) is cited throughout as the worked,
 tested reference implementation — but nothing here is mortgage-specific. If you're
 building this pattern in a different codebase, copy the pattern, not the mortgage
 domain logic.

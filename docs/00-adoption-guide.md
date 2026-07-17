@@ -2,7 +2,7 @@
 
 **Read this first** if you are another AI, another repo, or a team deciding how to use, fork, or replace governed agent memory — especially around Anthropic's official MCP packages.
 
-**This repo:** Mortgage QA Memory (MQM) — a **reference implementation** of the mirror-and-govern pattern. Copy the **pattern**, not necessarily the mortgage domain logic.
+**This repo:** `naf-memory-vault` (Mortgage QA Memory / MQM) — a **reference implementation** of the mirror-and-govern pattern. Copy the **pattern**, not necessarily the mortgage domain logic.
 
 **Last updated:** 2026-07-15
 

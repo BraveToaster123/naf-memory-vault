@@ -1,6 +1,6 @@
-# Mortgage QA Memory MCP
+# naf-memory-vault
 
-**Status:** working POC/MVP, now pivoting toward a governed knowledge-graph
+Governed **Mortgage QA Memory MCP** (MQM). **Status:** working POC/MVP, now pivoting toward a governed knowledge-graph
 memory core. See [PLAN.md](./PLAN.md) for the full history (v1 design → v2
 build → v3 roadmap) — start there.
 

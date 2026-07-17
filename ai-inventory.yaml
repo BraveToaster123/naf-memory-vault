@@ -19,8 +19,8 @@ organization:
     - freddie_mac
 
 tools:
-  - id: mqm-mcp
-    name: Mortgage QA Memory MCP
+  - id: naf-memory-vault
+    name: NAF Memory Vault (Mortgage QA Memory MCP)
     type: internal_mcp_server
     vendor: internal
     purpose: >

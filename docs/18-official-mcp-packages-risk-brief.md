@@ -29,7 +29,7 @@ Anthropic publishes two packages teams often reach for when adding agent memory:
 
 **Bottom line:** Using the SDK is normal infrastructure. Pointing production agents at vanilla `server-memory` is equivalent to giving every agent an unencrypted, ungoverned notebook that never expires — and letting it write whatever the model suggests.
 
-This repo (`mcp-memory`) exists because that gap is real. We keep the same agent-facing tool names agents already know; we add policy, retention, namespaces, and audit underneath.
+This repo (`naf-memory-vault`) exists because that gap is real. We keep the same agent-facing tool names agents already know; we add policy, retention, namespaces, and audit underneath.
 
 ---
 

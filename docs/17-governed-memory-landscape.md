@@ -1,7 +1,7 @@
 # 17 — Governed Memory MCP Landscape
 
 **Status:** reference survey for team review.  
-**Purpose:** Catalog open-source projects, gateway patterns, and production write-ups that mirror what this repo (`mcp-memory` / Mortgage QA Memory) is building — so we can compare approaches, borrow ideas, and avoid reinventing wheels.
+**Purpose:** Catalog open-source projects, gateway patterns, and production write-ups that mirror what this repo (`naf-memory-vault` / Mortgage QA Memory) is building — so we can compare approaches, borrow ideas, and avoid reinventing wheels.
 
 **Companion docs in this repo:**
 
@@ -49,7 +49,7 @@ flowchart TB
   end
 
   subgraph ours [This repo]
-    MQM[mcp-memory]
+    MQM[naf-memory-vault]
   end
 
   SDK --> SM

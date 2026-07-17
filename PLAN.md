@@ -1,4 +1,4 @@
-# MQM Plan — v1 Design → v2 POC/MVP → v3 Roadmap
+# naf-memory-vault — MQM Plan (v1 Design → v2 POC/MVP → v3 Roadmap)
 
 One document, three chapters: why this was designed the way it was (v1), what
 got built first (v2), and where it's going now (v3). Older per-topic docs (10

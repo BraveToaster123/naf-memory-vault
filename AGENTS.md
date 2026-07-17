@@ -1,4 +1,4 @@
-# AGENTS.md — mcp-memory
+# AGENTS.md — naf-memory-vault
 
 Governed **Mortgage QA Memory MCP**. Working POC/MVP (`packages/*`), now
 pivoting to a governed knowledge-graph memory core (see PLAN.md v3).

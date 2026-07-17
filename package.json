@@ -1,9 +1,13 @@
 {
-  "name": "mortgage-qa-memory",
+  "name": "naf-memory-vault",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Governed QA memory MCP for mortgage technology teams (POC/MVP).",
+  "description": "naf-memory-vault — governed QA memory MCP for mortgage technology teams (POC/MVP).",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BraveToaster123/naf-memory-vault.git"
+  },
   "workspaces": [
     "packages/*"
   ],
