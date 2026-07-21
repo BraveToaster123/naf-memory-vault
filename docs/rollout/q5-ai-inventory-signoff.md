@@ -22,7 +22,7 @@ As compliance, I want a signed inventory of AI tools in the QA memory workflow b
 - Review [ai-inventory.yaml](../../ai-inventory.yaml)
 - Confirm tools list: memory MCP, Playwright MCP, Cursor agent
 - Update `review_status` after sign-off (human process)
-- Align with [04-mortgage-compliance-audit.md](../04-mortgage-compliance-audit.md)
+- Align with [14-operational-readiness.md](../14-operational-readiness.md) and [PLAN.md](../../PLAN.md) compliance section
 
 ## Out of scope
 

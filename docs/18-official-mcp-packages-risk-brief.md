@@ -9,7 +9,7 @@
 | Doc | Use when |
 |-----|----------|
 | [archive/design-essays/16-playbook-mirror-privatize.md](./archive/design-essays/16-playbook-mirror-privatize.md) | Technical playbook: mirror tool surface, own governance |
-| [05-data-retention-and-privacy.md](./05-data-retention-and-privacy.md) | Our retention and PII philosophy |
+| [PLAN.md](../PLAN.md) | Our retention and PII philosophy (v1 tiers) |
 | [15-poc-demo.md](./15-poc-demo.md) | Live demo of governed memory for stakeholders |
 | [14-operational-readiness.md](./14-operational-readiness.md) | Non-savable list, auth stages, namespace owners, production checklist |
 | [archive/design-essays/17-governed-memory-landscape.md](./archive/design-essays/17-governed-memory-landscape.md) | How peers and production teams handle the same gap |
@@ -115,7 +115,7 @@ flowchart TB
 **Real risks (material for us):**
 
 1. **Uncontrolled persistence** — Agents routinely summarize errors, URLs, and field values into `observations`. Without a pre-save gate, sensitive data becomes a permanent local archive.
-2. **Compliance exposure** — Indefinite storage of personal or loan-adjacent data without documented retention, access control, or deletion workflow conflicts with how we treat QA and audit data ([05-data-retention-and-privacy.md](./05-data-retention-and-privacy.md)).
+2. **Compliance exposure** — Indefinite storage of personal or loan-adjacent data without documented retention, access control, or deletion workflow conflicts with how we treat QA and audit data ([PLAN.md](../PLAN.md) v1 tiers).
 3. **Shared blast radius** — One file, one graph. A personalization experiment and a compliance workflow must not share the same memory store.
 4. **Memory poisoning** — Adversarial or untrusted content in context can be written as "facts" and recalled in later sessions (documented MCP class of risk; see [Checkmarx MCP risk survey](https://checkmarx.com/zero-post/11-emerging-ai-security-risks-with-mcp-model-context-protocol/)).
 5. **Destructive tools by default** — Delete operations require no confirmation; accidental or injected deletes are possible.
@@ -152,7 +152,7 @@ Proof point for leadership: `npm run smoke` → **`SMOKE PASS`** (policy block, 
 ### Approve
 
 - `@modelcontextprotocol/sdk` in repos where **we implement and operate** the MCP server
-- Governed memory MCP (`mortgage-qa-memory`) for QA and adjacent namespaces per [mqm-policy.yaml](../../packages/policy/mqm-policy.yaml)
+- Governed memory MCP (`memory-vault`) for QA and adjacent namespaces per [mqm-policy.yaml](../../packages/policy/mqm-policy.yaml)
 - Local `server-memory` only under a **personal, non-production** exception with security acknowledgment
 
 ### Deny or require exception

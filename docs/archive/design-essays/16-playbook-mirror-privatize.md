@@ -7,8 +7,7 @@ tested reference implementation — but nothing here is mortgage-specific. If yo
 building this pattern in a different codebase, copy the pattern, not the mortgage
 domain logic.
 
-Companion reading in this repo: [10-doordash-salesforce-memory-deep-dive.md](./10-doordash-salesforce-memory-deep-dive.md)
-(source architecture patterns), [05-data-retention-and-privacy.md](./05-data-retention-and-privacy.md)
+Companion reading: [PLAN.md](../../PLAN.md) (DoorDash/Salesforce patterns in v1, retention tiers).
 (the retention/PII philosophy this playbook operationalizes for generic KG memory),
 [17-governed-memory-landscape.md](./17-governed-memory-landscape.md) (OSS peers and production teams survey),
 [18-official-mcp-packages-risk-brief.md](./18-official-mcp-packages-risk-brief.md) (leadership decision brief on official packages),
@@ -197,7 +196,7 @@ approval UX) → subscriptions (reduce polling) → completion (UX polish) → s
 |---|---|---|---|
 | PII/secret scan on every write, pre-save | Done | `evaluatePolicy` deny-pattern scan, [packages/shared/test/kg.test.ts](../../packages/shared/test/kg.test.ts) "PII in an observation denies that entity only" | Per-item denial, not whole-batch failure |
 | Deny-by-default RBAC | Done | Unknown namespace → deny; `qc_analyst` role can write nothing | `isNamespaceWriteAllowed` returns `false` when the namespace isn't declared |
-| Per-namespace retention + hard delete | Done | `namespaceRetentionDays`, `purgeExpiredKg`, nightly cron in policy `auto_purge` block | Hard delete, not soft delete, per [05-data-retention-and-privacy.md](./05-data-retention-and-privacy.md) |
+| Per-namespace retention + hard delete | Done | `namespaceRetentionDays`, `purgeExpiredKg`, nightly cron in policy `auto_purge` block | Hard delete per [PLAN.md](../../PLAN.md) v1 tiers |
 | Tamper-evident audit | Done | Hash-chained `audit_events` table, `get_audit_trail` RBAC-restricted to `qa_lead`/`qc_analyst`/`platform` | |
 | Least-privilege roles | Done | 5 distinct roles with different read/write/tier scopes | [packages/policy/mqm-policy.yaml](../../packages/policy/mqm-policy.yaml) `roles:` block |
 | Referential integrity on writes | Done | `createRelations` rejects edges to nonexistent entities | Caught as a real bug during this project's own smoke test (see below) |

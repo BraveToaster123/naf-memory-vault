@@ -60,4 +60,4 @@ npm run purge
 
 ## Related
 
-- [05-data-retention-and-privacy.md](../05-data-retention-and-privacy.md)
+- [PLAN.md](../../PLAN.md) v3 namespace roadmap

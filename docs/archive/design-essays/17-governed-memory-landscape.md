@@ -8,8 +8,7 @@
 | Doc | Relationship |
 |-----|--------------|
 | [16-playbook-mirror-privatize.md](./16-playbook-mirror-privatize.md) | Our portable playbook: mirror `server-memory` tool surface + own governance |
-| [10-doordash-salesforce-memory-deep-dive.md](./10-doordash-salesforce-memory-deep-dive.md) | Production team patterns (DoorDash, Salesforce) — deepest blog analysis |
-| [05-data-retention-and-privacy.md](./05-data-retention-and-privacy.md) | Our retention / PII philosophy |
+| [PLAN.md](../../PLAN.md) | DoorDash/Salesforce patterns (v1) and retention / PII philosophy |
 | [18-official-mcp-packages-risk-brief.md](./18-official-mcp-packages-risk-brief.md) | Leadership risk brief: official SDK vs server-memory |
 | [14-operational-readiness.md](./14-operational-readiness.md) | Production gates: non-savable list, auth, namespace owners |
 | [packages/policy/mqm-policy.yaml](../../../packages/policy/mqm-policy.yaml) | Our policy config |
@@ -200,7 +199,7 @@ Alternative architecture: **keep any memory server; enforce policy in front.**
 |---------|-----|---------|------------|--------|
 | **AttestMCP** | [github.com/attestmcp/attestmcp](https://github.com/attestmcp/attestmcp) · [attestmcp.com](https://attestmcp.com/) | Transparent MCP proxy; hash-chained audit; JWT identity; SOC 2 HTML reports | Compliance evidence without changing memory server; works with Mem0, Anthropic KG, any MCP memory | We embed audit in-server ([audit-client](../../packages/audit-client/src/log.ts)); AttestMCP is drop-in for teams that can't fork the server |
 | **oss-governance-for-mem0** | [github.com/ugenkudupudiqbnox/oss-governance-for-mem0](https://github.com/ugenkudupudiqbnox/oss-governance-for-mem0) | Sidecar around Mem0: Keycloak + OPA + Postgres audit + FastAPI gateway | Enterprise reference: IAM + policy engine separate from memory engine | Same separation-of-concerns idea; we merged gate + store |
-| **JinBeiCN/mcp-gateway** | [github.com/JinBeiCN/mcp-gateway](https://github.com/JinBeiCN/mcp-gateway) | Multi-backend gateway: API key/JWT, tool-level RBAC, rate limits, injection detection, audit JSON | One gateway in front of `mortgage-qa-memory` + Playwright MCP + others | Could complement our stdio server for shared/remote deployment |
+| **JinBeiCN/mcp-gateway** | [github.com/JinBeiCN/mcp-gateway](https://github.com/JinBeiCN/mcp-gateway) | Multi-backend gateway: API key/JWT, tool-level RBAC, rate limits, injection detection, audit JSON | One gateway in front of `memory-vault` + Playwright MCP + others | Could complement our stdio server for shared/remote deployment |
 | **PolicyLayer** | [policylayer.com blog](https://policylayer.com/blog/kubernetes-mcp-namespace-scoping) | Second policy wall on `tools/call`; logs denies without storing arg values | Matches our `args_summary` audit discipline | K8s-focused; pattern applies to any MCP tool |
 | **Cordum MCP governance** | [cordum.io blog](https://cordum.io/blog/mcp-governance-servers) | PDP returns ALLOW / DENY / REQUIRE_APPROVAL / ALLOW_WITH_CONSTRAINTS | Vocabulary aligns with our tier model | Process doc, not code |
 | **Tyk MCP governance** | [tyk.io guide](https://tyk.io/learning-center/mcp-server-governance-plan-step-by-step/) | Registry + gateway; filtered `tools/list`; per-tool rate limits | Central inventory + runtime enforcement for many MCP servers | Platform-team pattern for multi-server shops |
@@ -233,7 +232,7 @@ Different memory model (embeddings / facts), but relevant for **semantic search*
 
 ## 6. Production teams — learn from blogs, not repos
 
-No public GitHub memory server from these teams. Our deepest analysis is already in [10-doordash-salesforce-memory-deep-dive.md](./10-doordash-salesforce-memory-deep-dive.md).
+No public GitHub memory server from these teams. DoorDash/Salesforce analysis is in [PLAN.md](../../PLAN.md) v1.
 
 ### DoorDash (Ask DoorDash / consumer memory)
 
@@ -326,7 +325,7 @@ Use this table in planning meetings. Link to our code where we already have the 
 1. **Baseline (5 min)** — Confirm we will not ship vanilla `server-memory` to production agents ([16-playbook-mirror-privatize.md](./16-playbook-mirror-privatize.md) §1).
 2. **Closest OSS peers (15 min)** — FlarelyLegal + memcp: what do they have that we lack (semantic search, admin UI, team RBAC)?
 3. **Gateway vs embedded (10 min)** — Stay embedded (current) vs add AttestMCP/mcp-gateway for multi-user?
-4. **Production patterns (15 min)** — Walk [10-doordash-salesforce-memory-deep-dive.md](./10-doordash-salesforce-memory-deep-dive.md) § “MQM mapping”; confirm Tier 0/1/2 still right.
+4. **Production patterns (15 min)** — Walk [PLAN.md](../../PLAN.md) v1 DoorDash/Salesforce section; confirm Tier 0/1/2 still right.
 5. **Gap closure (15 min)** — Pick 2 items from §9 for next sprint: likely caller identity (SSO) + `prompts/list` handlers or retention preview.
 
 ---

@@ -1,4 +1,4 @@
-# Q4 — mortgage-qa-triage skill
+# Q4 — memory-vault-triage skill
 
 **Phase:** Q4 · **Status:** not_started  
 **Owner:** QA team  
@@ -19,8 +19,8 @@ As a QA engineer investigating a failed staging test, I want the triage skill to
 
 ## In scope
 
-- Roll out [mortgage-qa-triage](../../cursor/skills/mortgage-qa-triage/SKILL.md) to pilot team
-- MCP: `mortgage-qa-memory` (QA tools + KG) per [q4-unified-mcp-server.md](./q4-unified-mcp-server.md)
+- Roll out [memory-vault-triage](../../cursor/skills/memory-vault-triage/SKILL.md) to pilot team
+- MCP: `memory-vault` (QA tools + KG) per [q4-unified-mcp-server.md](./q4-unified-mcp-server.md)
 - Workflow: `get_failure_signature` → `should_skip_browser` → `get_journey_map` → optional Playwright
 - `record_run_summary` after investigation (no raw errors)
 
@@ -34,7 +34,7 @@ As a QA engineer investigating a failed staging test, I want the triage skill to
 
 | Item | Path |
 |------|------|
-| Skill | `cursor/skills/mortgage-qa-triage/SKILL.md` |
+| Skill | `cursor/skills/memory-vault-triage/SKILL.md` |
 | QA tools | `packages/mcp-server/src/index.ts` |
 
 ---
@@ -60,5 +60,5 @@ npm run smoke
 
 ## Related
 
-- [03-qa-automation-playwright.md](../03-qa-automation-playwright.md)
-- [07-mcp-tools-specification.md](../07-mcp-tools-specification.md)
+- [FLOW2-INTEGRATION.md](../FLOW2-INTEGRATION.md)
+- [tools.json](../tools.json)

@@ -1,15 +1,17 @@
 ---
-name: mortgage-qa-triage
-description: Investigate Playwright CI failures on mortgage UI flows using MQM memory before ever opening a browser. Use when a mortgage staging/UAT test fails or flakes.
+name: memory-vault-triage
+description: Investigate Playwright CI failures on mortgage UI flows using memory-vault before ever opening a browser. Use when a mortgage staging/UAT test fails or flakes.
 ---
 
-# Mortgage QA Triage
+# Memory Vault — CI Triage
 
-Use this skill when investigating Playwright CI failures on mortgage UI flows (staging/UAT only).
+Use when investigating Playwright CI failures on mortgage UI flows (staging/UAT only).
+
+Prefer starting with `plan_qa_workflow(intent=triage_failure, test_id=..., ci_failed=true)` from **memory-vault** MCP, then follow `ordered_plan`.
 
 ## Prerequisites
 
-- MCP servers: `mortgage-qa-memory`, `playwright` (optional until repro needed)
+- MCP servers: `memory-vault`, `playwright` (optional until repro needed)
 - Synthetic loan scenarios only — never paste real borrower data
 - Policy: `mqm-policy-1`
 
@@ -23,6 +25,14 @@ Use this skill when investigating Playwright CI failures on mortgage UI flows (s
 6. `record_run_summary` accepts only: `test_id`, `status`, `duration_ms`, `journey_id`, `error_class`, `error_hint` (redacted), `loan_scenario_id`.
 
 ## Workflow
+
+### Step 0 — Plan (memory-vault MCP)
+
+```
+plan_qa_workflow(intent=triage_failure, test_id=<id>, ci_failed=true)
+```
+
+If `blockers` non-empty, stop and report them.
 
 ### Step 1 — Recall (memory MCP)
 

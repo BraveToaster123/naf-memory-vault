@@ -27,7 +27,7 @@ flowchart TB
     CI[Playwright CI]
     REP[reporter]
     DB[(test_runs SQLite)]
-    TRI[mortgage-qa-triage skill]
+    TRI[memory-vault-triage skill]
     PW[Playwright MCP]
     CI --> REP --> DB --> TRI --> PW
   end
@@ -66,7 +66,7 @@ Specs moved to [../archive/rollout-q1-q3/](../archive/rollout-q1-q3/). Agent def
 |-----|---------|
 | [q4-ci-triage.md](./q4-ci-triage.md) | Phase umbrella |
 | [q4-playwright-reporter.md](./q4-playwright-reporter.md) | CI → `test_runs` |
-| [q4-triage-skill.md](./q4-triage-skill.md) | `mortgage-qa-triage` rollout |
+| [q4-triage-skill.md](./q4-triage-skill.md) | `memory-vault-triage` rollout |
 | [q4-journeys.md](./q4-journeys.md) | Tier 2 journey YAML |
 | [q4-unified-mcp-server.md](./q4-unified-mcp-server.md) | Single MCP entry point |
 
@@ -123,7 +123,8 @@ Every `q*-*.md` feature doc uses:
 | Doc | Use when |
 |-----|----------|
 | [PLAN.md](../../PLAN.md) | History and north star |
-| [03-qa-automation-playwright.md](../03-qa-automation-playwright.md) | Playwright MCP |
-| [07-mcp-tools-specification.md](../07-mcp-tools-specification.md) | Tool catalog |
+| [POC.md](../POC.md) | 5-minute setup |
+| [FLOW2-INTEGRATION.md](../FLOW2-INTEGRATION.md) | Playwright CI + MCP |
+| [tools.json](../tools.json) | Tool catalog (CI manifest) |
 | [14-operational-readiness.md](../14-operational-readiness.md) | Compliance gates |
 | [docs/archive/flow1-agents/README.md](../archive/flow1-agents/README.md) | Story-pipeline agents (deferred) |

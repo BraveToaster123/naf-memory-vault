@@ -8,3 +8,4 @@ export * from "./purge.js";
 export * from "./queries.js";
 export * from "./kg.js";
 export * from "./inventory.js";
+export * from "./workflow-planner.js";

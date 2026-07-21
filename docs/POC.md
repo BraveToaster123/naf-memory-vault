@@ -22,15 +22,18 @@ npm run smoke
 ## 2. Wire Cursor
 
 1. Open this repo as the workspace (MCP paths are relative to repo root).
-2. Merge [`cursor/mcp.json`](../cursor/mcp.json) into Cursor MCP settings — one server: `mortgage-qa-memory`.
-3. Restart Cursor.
-4. Optional: add skill [`cursor/skills/mortgage-qa-triage/`](../cursor/skills/mortgage-qa-triage/SKILL.md).
+2. Merge [`cursor/mcp.json`](../cursor/mcp.json) into Cursor MCP settings — one server: `memory-vault`.
+3. Remove legacy MCP blocks (`naf-qa-memory`, `mortgage-qa-memory`) from user Cursor settings if present — use only `memory-vault` ([q4-unified-mcp-server.md](./rollout/q4-unified-mcp-server.md)).
+4. Restart Cursor.
+5. Add skill [`cursor/skills/memory-vault-assist/`](../cursor/skills/memory-vault-assist/SKILL.md) (router) or [`memory-vault-triage/`](../cursor/skills/memory-vault-triage/SKILL.md) (CI only).
 
 ## 3. Try it
 
 **MCP tool panel:** run `get_flaky_tests` with `limit: 5`.
 
 **Chat:** “Triage `le_generation/apr visible` — should we skip browser?”
+
+**Workflow assist:** `plan_qa_workflow(intent=triage_failure, test_id="le_generation/apr visible", ci_failed=true)`
 
 **Console:** flaky list → click row → skip-browser + history.
 

@@ -11,7 +11,7 @@
 
 - **`qa` namespace only** — exploration entities, flake data, journeys, env facts
 - **Flow 1** — story pipeline: `ac-explorer` → memory → writer → publisher → generator
-- **Flow 2** — CI triage: reporter → flake tools → `mortgage-qa-triage` skill
+- **Flow 2** — CI triage: reporter → flake tools → `memory-vault-triage` skill
 - **Memory console** — read-first; KG panel in Q1, flake polish in Q5
 - **External QA pilot** — validate with another team's QA engineers in Q1
 
@@ -27,7 +27,7 @@
 
 ## Principles
 
-1. **Memory before browser** — triage and exploration consult memory MCP first ([mortgage-qa-triage skill](../../cursor/skills/mortgage-qa-triage/SKILL.md)).
+1. **Memory before browser** — triage and exploration consult memory MCP first ([memory-vault-triage skill](../../cursor/skills/memory-vault-triage/SKILL.md)).
 2. **Policy pre-save on every write** — no bypass ([mqm-policy.yaml](../../packages/policy/mqm-policy.yaml)).
 3. **Tier 1 by default** — agent exploration expires in 30d; promote to Tier 2 only via human PR.
 4. **Credentials never in graph** — `credential_ref` names a secret the host resolves ([q1-staging-and-credentials.md](./q1-staging-and-credentials.md)).

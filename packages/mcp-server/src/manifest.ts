@@ -48,7 +48,7 @@ export function buildManifest(): ToolManifest {
     };
   });
   return {
-    server: "mortgage-qa-memory",
+    server: "memory-vault",
     version: "0.1.0",
     transport: "stdio",
     policy_version: getPolicy().version,

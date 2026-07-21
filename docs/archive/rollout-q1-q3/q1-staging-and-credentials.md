@@ -67,7 +67,7 @@ Agent reads credentials from host resolution only. Policy `deny_patterns` blocks
 
 ```bash
 npm test                    # policy blocks SSN etc.
-npm run smoke:graph
+npm run smoke
 ```
 
 Manual: attempt `record_run_summary` or `add_observations` with `password: foo` → denied.

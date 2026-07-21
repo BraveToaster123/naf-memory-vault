@@ -36,5 +36,5 @@ Flow 2 live: CI writes flake history; agents triage real staging failures with m
 
 ## Related
 
-- [13-definition-of-done.md](../13-definition-of-done.md)
+- [14-operational-readiness.md](../14-operational-readiness.md)
 - [15-poc-demo.md](../15-poc-demo.md)

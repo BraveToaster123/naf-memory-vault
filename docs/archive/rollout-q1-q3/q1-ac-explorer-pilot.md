@@ -20,7 +20,7 @@ As a QA engineer on the pilot team, I want to explore acceptance criteria in sta
 ## In scope
 
 - `@ac-explorer {storyId}` on 2–3 ADO user stories
-- MCP server: `naf-qa-memory` (`packages/mcp-server/src/graph-index.ts`)
+- MCP server: `memory-vault` (`packages/mcp-server/src/index.ts`)
 - `namespace: qa` on all KG writes
 - Playwright MCP for browser (staging allowlist)
 - Modes: AC exploration (primary); TC execution optional
@@ -37,7 +37,7 @@ As a QA engineer on the pilot team, I want to explore acceptance criteria in sta
 
 - [q1-staging-and-credentials.md](./q1-staging-and-credentials.md)
 - [q1-entity-schema-contract.md](./q1-entity-schema-contract.md)
-- Governed memory core ✅ (`npm run smoke:graph`)
+- Governed memory core ✅ (`npm run smoke`)
 
 ---
 
@@ -46,7 +46,7 @@ As a QA engineer on the pilot team, I want to explore acceptance criteria in sta
 | Item | Path |
 |------|------|
 | Agent definition | `cursor/qa-testing-agents/ac-explorer.agent.md` |
-| MCP config | `cursor/mcp.json` → `naf-qa-memory` block |
+| MCP config | `cursor/mcp.json` → `memory-vault` block |
 | Pilot runbook | This doc + kickoff checklist in [q1-exploration-pilot.md](./q1-exploration-pilot.md) |
 
 ---
@@ -64,7 +64,7 @@ As a QA engineer on the pilot team, I want to explore acceptance criteria in sta
 ## Verification
 
 ```bash
-npm run smoke:graph
+npm run smoke
 # After pilot: open console KG panel or call read_graph(namespace=qa)
 ```
 
@@ -85,4 +85,4 @@ Manual: invoke `@ac-explorer {ID}` in Cursor; inspect memory via console or MCP.
 ## Related
 
 - [cursor/qa-testing-agents/README.md](../../cursor/qa-testing-agents/README.md)
-- [03-qa-automation-playwright.md](../03-qa-automation-playwright.md)
+- [FLOW2-INTEGRATION.md](../FLOW2-INTEGRATION.md)

@@ -1,6 +1,6 @@
 ---
 description: "Use when: publishing manual test cases to Azure DevOps, creating test case work items, adding test steps to ADO, linking test cases to user stories. Trigger: publish test cases, create ADO test cases, push to ADO, link test cases."
-tools: [microsoft/azure-devops-mcp/*, mortgage-qa-memory/*]
+tools: [microsoft/azure-devops-mcp/*, memory-vault/*]
 argument-hint: "Provide the user story ID, e.g. 'publish test cases for US 471244'"
 ---
 

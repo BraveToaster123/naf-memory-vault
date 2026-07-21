@@ -74,4 +74,4 @@ Manual: full chain `@ac-explorer` → `@testcase-writer` → `@ado-publisher`; v
 
 ## Related
 
-- [08-integration-with-existing-stack.md](../08-integration-with-existing-stack.md)
+- [PLAN.md](../../PLAN.md) — enterprise stack integration (deferred)

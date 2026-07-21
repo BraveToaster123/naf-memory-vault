@@ -9,7 +9,7 @@ flowchart LR
   CI[Playwright CI job]
   REP[MqmReporter]
   DB[(qa-memory.db)]
-  MCP[mortgage-qa-memory MCP]
+  MCP[memory-vault MCP]
   QA[QA in Cursor]
   CI --> REP --> DB
   DB --> MCP --> QA
@@ -82,7 +82,7 @@ Use the same path CI writes to (copy artifact locally, or shared team volume whe
 ## 6. Triage workflow
 
 1. CI fails → reporter writes Tier 1 row.
-2. QA opens Cursor with `mortgage-qa-triage` skill.
+2. QA opens Cursor with `memory-vault-triage` skill.
 3. Agent calls `get_failure_signature`, `should_skip_browser`, `get_test_history`.
 4. If not known flake → optional Playwright MCP repro → `record_run_summary`.
 

@@ -20,14 +20,15 @@ organization:
 
 tools:
   - id: naf-memory-vault
-    name: NAF Memory Vault (Mortgage QA Memory MCP)
+    name: NAF Memory Vault (`memory-vault` MCP)
     type: internal_mcp_server
     vendor: internal
     purpose: >
       QA test intelligence — flakiness history, journey maps, compliance
       checkpoint results. Does not make credit decisions.
     use_cases:
-      - CI failure triage
+      - CI failure triage via plan_qa_workflow
+      - Story pipeline status lookup
       - Pre-release compliance smoke aggregation
       - QC audit query for validation runs
     data_sources:
@@ -83,7 +84,7 @@ tools:
     human_oversight:
       - Human initiates and reviews all triage sessions
     limits_of_use:
-      - mortgage-qa-triage skill enforces memory-before-browser
+      - memory-vault-triage skill enforces memory-before-browser
 
 safeguards_summary: >
   All QA AI paths use synthetic loan scenarios, staging URL allowlists,

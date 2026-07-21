@@ -103,4 +103,4 @@ All entities use `namespace: qa`, Tier 1 (30d TTL) unless promoted to Tier 2.
 ## Related
 
 - [cursor/qa-testing-agents/README.md](../../cursor/qa-testing-agents/README.md) — memory entity table
-- [05-data-retention-and-privacy.md](../05-data-retention-and-privacy.md)
+- [PLAN.md](../../PLAN.md) — retention tiers

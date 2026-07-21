@@ -7,7 +7,7 @@
 
 ## Not in QA rollout Q1–Q5
 
-These items are documented in [PLAN.md](../../PLAN.md) and [09-multi-domain-memory.md](../09-multi-domain-memory.md) but **intentionally deferred** until QA flows are stable.
+These items are documented in [PLAN.md](../../PLAN.md) but **intentionally deferred** until QA flows are stable.
 
 ---
 

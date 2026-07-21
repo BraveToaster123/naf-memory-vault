@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "mortgage-qa-memory": {
+    "memory-vault": {
       "command": "npx",
       "args": ["tsx", "packages/mcp-server/src/index.ts"],
       "env": {

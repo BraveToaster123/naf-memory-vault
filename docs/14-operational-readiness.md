@@ -7,12 +7,11 @@
 
 | Doc | Relationship |
 |-----|--------------|
-| [13-definition-of-done.md](./13-definition-of-done.md) | Engineering proof gates (DONE / NEEDS-ENV / NEEDS-HUMAN) |
+| [POC.md](./POC.md) | Quickstart and `memory-vault` MCP wiring |
 | [18-official-mcp-packages-risk-brief.md](./18-official-mcp-packages-risk-brief.md) | Why not vanilla `server-memory` |
-| [09-multi-domain-memory.md](./09-multi-domain-memory.md) | Namespace rollout phases and fact-key conventions |
-| [05-data-retention-and-privacy.md](./05-data-retention-and-privacy.md) | Tier 0/1/2 philosophy |
-| [packages/policy/mqm-policy.yaml](../../packages/policy/mqm-policy.yaml) | Enforced deny lists + namespace RBAC |
-| [ai-inventory.yaml](../../ai-inventory.yaml) | LL-2026-04 inventory (pending sign-off) |
+| [PLAN.md](../PLAN.md) | Tiers, namespaces, retention philosophy |
+| [packages/policy/mqm-policy.yaml](../packages/policy/mqm-policy.yaml) | Enforced deny lists + namespace RBAC |
+| [ai-inventory.yaml](../ai-inventory.yaml) | LL-2026-04 inventory (pending sign-off) |
 
 **Last updated:** 2026-07-15
 
@@ -89,7 +88,7 @@ Auth controls **who can read/write which namespace**. It does **not** replace PI
 | **Pilot** — small team, each on own laptop + own SQLite | Low urgency | Same; isolated DB per machine |
 | **Shared service** — one memory DB, many users/agents | **Yes, required** | Gateway SSO must assert role before MCP sees the call |
 
-**NEEDS-ENV item:** replace trust-on-honor `MQM_USER_ROLE` with cryptographically verified identity at the gateway. See [12-integration-mcp.md](./12-integration-mcp.md) and [archive/design-essays/16-playbook-mirror-privatize.md §6](./archive/design-essays/16-playbook-mirror-privatize.md).
+**NEEDS-ENV item:** replace trust-on-honor `MQM_USER_ROLE` with cryptographically verified identity at the gateway. See [PLAN.md](../PLAN.md) v3 Phase 5 and [archive/design-essays/16-playbook-mirror-privatize.md §6](./archive/design-essays/16-playbook-mirror-privatize.md).
 
 ---
 
@@ -204,4 +203,4 @@ flowchart TB
 
 - [15-poc-demo.md](./15-poc-demo.md) — live stakeholder demo script
 - [archive/design-essays/16-playbook-mirror-privatize.md](./archive/design-essays/16-playbook-mirror-privatize.md) — technical mirror + govern playbook
-- [11-implementation.md](./11-implementation.md) — package map + quickstart
+- [PLAN.md](../PLAN.md) — package map, quickstart, roadmap

@@ -29,7 +29,7 @@ Prove governed **exploration memory** works for real user stories with an extern
 
 - [ ] External QA team named; 2–3 user stories selected
 - [ ] Staging URLs in policy ([q1-staging-and-credentials.md](./q1-staging-and-credentials.md))
-- [ ] Pilot kit distributed: `cursor/mcp.json` (`naf-qa-memory`), `ac-explorer` agent, 1-pager
+- [ ] Pilot kit distributed: `cursor/mcp.json` (`memory-vault`), `ac-explorer` agent, 1-pager
 - [ ] Retention decision: exploration entities Tier 1 (30d) — document exceptions
 - [ ] Entity schema contract reviewed ([q1-entity-schema-contract.md](./q1-entity-schema-contract.md))
 
@@ -56,7 +56,7 @@ Prove governed **exploration memory** works for real user stories with an extern
 ## Out of scope (Q1)
 
 - `testcase-writer`, `ado-publisher`, `automation-generator` production rollout
-- CI reporter, flake triage, `mortgage-qa-memory` QA tools
+- CI reporter, flake triage, `memory-vault` QA tools
 - `pr` / `ops` / `compliance` namespaces
 - Gateway SSO
 
@@ -65,5 +65,5 @@ Prove governed **exploration memory** works for real user stories with an extern
 ## Related
 
 - [README.md](./README.md)
-- [00-scope-and-principles.md](./00-scope-and-principles.md)
+- [00-scope-and-principles.md](../../rollout/00-scope-and-principles.md)
 - [PLAN.md](../../PLAN.md) v3 Phase 3

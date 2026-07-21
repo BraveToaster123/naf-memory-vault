@@ -37,4 +37,4 @@ Production-adjacent gates for QA deployment: compliance sign-off, retention enfo
 
 ## Related
 
-- [13-definition-of-done.md](../13-definition-of-done.md)
+- [14-operational-readiness.md](../14-operational-readiness.md)

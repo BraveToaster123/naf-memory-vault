@@ -1,6 +1,6 @@
 # AGENTS.md — naf-memory-vault
 
-Governed **Mortgage QA Memory MCP**. Working POC/MVP (`packages/*`), now
+Governed **memory-vault** MCP. Working POC/MVP (`packages/*`), now
 pivoting to a governed knowledge-graph memory core (see PLAN.md v3).
 
 ## What this repo is
@@ -30,10 +30,12 @@ pivoting to a governed knowledge-graph memory core (see PLAN.md v3).
 packages/policy/           mqm-policy.yaml — the one enforced policy
 packages/shared/            pipeline, redact, types, graph store, policy engine
 packages/reporter/          Playwright MqmReporter
-packages/mcp-server/        QA-domain MCP + governed knowledge-graph MCP
+packages/mcp-server/        `memory-vault` MCP (QA tools + governed KG)
 packages/audit-client/      hash-chained audit log
 journeys/                   Tier 2 curated YAML
-cursor/skills/mortgage-qa-triage/  CI triage skill (Flow 2)
+cursor/agents/memory-vault-assist.agent.md  Entry agent — plan_qa_workflow first
+cursor/skills/memory-vault-assist/          Workflow router skill
+cursor/skills/memory-vault-triage/          CI triage skill (Flow 2)
 docs/archive/flow1-agents/         Story-pipeline agents (deferred Flow 1)
 eval/                        golden CI failure labels
 ```

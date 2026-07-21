@@ -8,7 +8,7 @@
 
 ## What is already proven (no extra build)
 
-Your POC gate passes locally. Evidence from [13-definition-of-done.md](./13-definition-of-done.md):
+Your POC gate passes locally. Evidence: `npm run smoke` → **SMOKE PASS**, `npm test`, `npm run eval`.
 
 | Story | Status | One-liner for the room |
 |-------|--------|------------------------|
@@ -60,14 +60,14 @@ Optional: open these files in tabs for “show the policy” moments:
 
 ### Cursor setup (if demoing in IDE)
 
-Copy or symlink [cursor/mcp.json](../cursor/mcp.json) into your Cursor MCP config (single `mortgage-qa-memory` server). For Playwright repro, see [cursor/mcp.browser.json.example](../cursor/mcp.browser.json.example). Restart Cursor after changing MCP config.
+Copy or symlink [cursor/mcp.json](../cursor/mcp.json) into your Cursor MCP config (single `memory-vault` server). For Playwright repro, see [cursor/mcp.browser.json.example](../cursor/mcp.browser.json.example). Restart Cursor after changing MCP config.
 
 ### Deploy to another machine
 
 1. Clone repo; Node 20+
 2. `npm install && npm run demo` (or `seed:demo` + `smoke` if you skip the console)
 3. Expect terminal **SMOKE PASS**; console at **http://127.0.0.1:4173** if you ran `demo`
-4. Merge `mortgage-qa-memory` from `cursor/mcp.json` into Cursor; open repo as workspace
+4. Merge `memory-vault` from `cursor/mcp.json` into Cursor; open repo as workspace
 5. **Optional:** real staging URLs in policy only when using Playwright MCP
 
 ---
@@ -110,7 +110,7 @@ Close with: “QA namespace is live; PR/ops/compliance namespaces are seeded for
 
 ## Demo script B — Cursor live (15–20 min)
 
-Use the [mortgage-qa-triage](../cursor/skills/mortgage-qa-triage/SKILL.md) skill or paste prompts below.
+Use the [memory-vault-triage](../cursor/skills/memory-vault-triage/SKILL.md) skill or paste prompts below.
 
 ### Act 1 — QA engineer (default `MQM_USER_ROLE=qa_engineer`)
 
@@ -182,7 +182,7 @@ Honest pitch: **“We POC’d the governed platform and QA layer; other team lay
 ## Architecture slide (30 seconds)
 
 ```
-Cursor / Claude  →  mortgage-qa-memory MCP  →  policy (mqm-policy.yaml)
+Cursor / Claude  →  memory-vault MCP  →  policy (mqm-policy.yaml)
                               ↓
                     Tier 1 SQLite (30d)  +  Tier 2 git YAML
                               ↓
@@ -202,6 +202,7 @@ Cursor / Claude  →  mortgage-qa-memory MCP  →  policy (mqm-policy.yaml)
 | `SMOKE FAIL` | Run `npm run seed:demo` first |
 | Empty `get_flaky_tests` | Re-run seed; check `MQM_DB_PATH` points at `./data/qa-memory.db` |
 | MCP not in Cursor | Restart Cursor; verify `mcp.json` paths are relative to repo root |
+| Legacy MCP name (`naf-qa-memory`, `mortgage-qa-memory`) | Remove from user MCP settings; use only `memory-vault` ([q4-unified-mcp-server.md](./rollout/q4-unified-mcp-server.md)) |
 | `namespace_rbac_denied` when you expected allow | Check `MQM_USER_ROLE` matches [mqm-policy.yaml](../packages/policy/mqm-policy.yaml) `namespaces.*.readers` |
 | Windows `npx tsx` slow | First call may take ~10s — normal |
 
@@ -235,8 +236,8 @@ See [14-operational-readiness.md](./14-operational-readiness.md) for full checkl
 
 ## Related docs
 
-- [11-implementation.md](./11-implementation.md) — package map + quickstart
+- [POC.md](./POC.md) — 5-minute quickstart
+- [PLAN.md](../PLAN.md) — package map, roadmap, namespace plan
 - [14-operational-readiness.md](./14-operational-readiness.md) — production gates, namespace owners, non-savable list
-- [09-multi-domain-memory.md](./09-multi-domain-memory.md) — full namespace rollout plan
 - [archive/design-essays/16-playbook-mirror-privatize.md](./archive/design-essays/16-playbook-mirror-privatize.md) — mirror + privatize Anthropic memory
 - [archive/design-essays/17-governed-memory-landscape.md](./archive/design-essays/17-governed-memory-landscape.md) — external projects survey

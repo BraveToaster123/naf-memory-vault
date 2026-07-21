@@ -34,6 +34,8 @@ import {
   searchNodes,
   openNodes,
   loadAiInventory,
+  planQaWorkflow,
+  buildTriagePlan,
   type Principal,
   type Role,
   type TestStatus,
@@ -57,7 +59,7 @@ const principal: Principal = {
 const AUDIT_ROLES: Role[] = ["qa_lead", "qc_analyst", "platform"];
 
 const server = new Server(
-  { name: "mortgage-qa-memory", version: "0.1.0" },
+  { name: "memory-vault", version: "0.1.0" },
   { capabilities: { tools: {}, resources: {}, prompts: {} } },
 );
 
@@ -103,7 +105,7 @@ server.setRequestHandler(ReadResourceRequestSchema, async (req) => {
   logAudit(db, {
     principal,
     actionClass: "memory_read",
-    toolServer: "mortgage-qa-memory",
+    toolServer: "memory-vault",
     toolName: "resource:knowledge-graph",
     argsSummary: `ns=${namespace}`,
     environment: process.env.MQM_ENV,
@@ -137,7 +139,7 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
     logAudit(db, {
       principal,
       actionClass: outcome === "blocked" ? "policy_block" : isRead ? "memory_read" : "memory_write",
-      toolServer: "mortgage-qa-memory",
+      toolServer: "memory-vault",
       toolName: name,
       argsSummary: summary,
       journeyId: typeof args.journey_id === "string" ? args.journey_id : undefined,
@@ -194,9 +196,21 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
       }
       case "plan_qa_investigation": {
         const skip = shouldSkipBrowser(db, { testId: String(args.test_id) });
-        const plan = buildPlan(String(args.test_id), Boolean(args.ci_failed), skip.skip);
+        const plan = buildTriagePlan(String(args.test_id), Boolean(args.ci_failed), skip.skip);
         audit("success", `test=${String(args.test_id)}`);
-        return ok({ ...plan, skip_browser: skip });
+        return ok({ ...plan, skip_browser: skip, ordered_plan: plan.ordered_plan });
+      }
+      case "plan_qa_workflow": {
+        const plan = planQaWorkflow(db, {
+          intent: str(args.intent) as never,
+          test_id: str(args.test_id),
+          user_story_id: str(args.user_story_id),
+          error_class: str(args.error_class),
+          ci_failed: args.ci_failed === true,
+          namespace: str(args.namespace),
+        });
+        audit("success", `intent=${plan.intent},stage=${plan.stage}`);
+        return ok(plan);
       }
 
       case "record_run_summary": {
@@ -370,22 +384,6 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
   }
 });
 
-function buildPlan(testId: string, ciFailed: boolean, skip: boolean) {
-  const steps = [
-    { step: 1, tool: "get_failure_signature", args: { test_id: testId } },
-    { step: 2, tool: "get_test_history", args: { test_id: testId } },
-    { step: 3, tool: "should_skip_browser", args: { test_id: testId } },
-  ];
-  if (!skip) {
-    steps.push(
-      { step: 4, tool: "get_journey_map", args: { journey_id: testId.split("/")[0] ?? "" } as never },
-      { step: 5, tool: "playwright:browser_navigate", args: { note: "staging allowlist only" } as never },
-      { step: 6, tool: "record_run_summary", args: { test_id: testId } as never },
-    );
-  }
-  return { ci_failed: ciFailed, ordered_plan: steps };
-}
-
 function num(v: unknown): number | undefined {
   return typeof v === "number" ? v : undefined;
 }
@@ -399,4 +397,4 @@ function arr<T>(v: unknown): T[] {
 const transport = new StdioServerTransport();
 await server.connect(transport);
 // eslint-disable-next-line no-console
-console.error(`[mortgage-qa-memory] MCP server ready (role=${principal.role}, policy=${policy.version}).`);
+console.error(`[memory-vault] MCP server ready (role=${principal.role}, policy=${policy.version}).`);

@@ -4,7 +4,7 @@
 
 **This repo:** `naf-memory-vault` (Mortgage QA Memory / MQM) — a **reference implementation** of the mirror-and-govern pattern. Copy the **pattern**, not necessarily the mortgage domain logic.
 
-**Last updated:** 2026-07-15
+**Last updated:** 2026-07-21
 
 ---
 
@@ -15,7 +15,7 @@
 | Should we use `@modelcontextprotocol/server-memory` in production? | **No** — reference only; ungoverned JSONL persistence |
 | Should we use `@modelcontextprotocol/sdk`? | **Yes** — protocol library; we pin **1.29.0** |
 | Should we use this repo as-is? | **Yes for QA pilot** — governed POC/MVP in `packages/*` |
-| Should we fork for another domain? | **Yes** — keep `core` engine; swap `qa` domain tools ([12-integration-mcp.md](./12-integration-mcp.md)) |
+| Should we fork for another domain? | **Yes** — keep `core` engine; swap `qa` domain tools ([tools.json](./tools.json), `packages/mcp-server/src/tools.ts`) |
 
 ---
 
@@ -128,7 +128,7 @@ flowchart LR
 | `compliance` | Locked | none | Compliance/QC — [14 §4](./14-operational-readiness.md) |
 | `product` | Defer | none | Product (later) |
 
-Detail: [09-multi-domain-memory.md](./09-multi-domain-memory.md).
+Detail: [PLAN.md](../PLAN.md) v3 namespace roadmap.
 
 ---
 
@@ -141,7 +141,7 @@ npm install && npm run seed:demo && npm run smoke   # expect SMOKE PASS
 npm run console   # http://127.0.0.1:4173
 ```
 
-Read: [11-implementation.md](./11-implementation.md), [18-official-mcp-packages-risk-brief.md](./18-official-mcp-packages-risk-brief.md).
+Read: [POC.md](./POC.md), [18-official-mcp-packages-risk-brief.md](./18-official-mcp-packages-risk-brief.md).
 
 ### Path B — Stakeholder demo (half day)
 
@@ -162,7 +162,7 @@ Follow [15-poc-demo.md](./15-poc-demo.md). Prove PII deny, namespace deny, audit
 4. Add namespace + roles in policy YAML
 5. Regenerate `docs/tools.json`; keep CI drift guard
 
-Seams documented in [12-integration-mcp.md](./12-integration-mcp.md).
+Seams: `packages/mcp-server/src/tools.ts`, [tools.json](./tools.json).
 
 ### Path E — Production hardening
 
@@ -170,8 +170,8 @@ Seams documented in [12-integration-mcp.md](./12-integration-mcp.md).
 |------|-----|
 | Compliance sign-off | [14 §6](./14-operational-readiness.md), [ai-inventory.yaml](../ai-inventory.yaml) |
 | Namespace owners | [14 §4](./14-operational-readiness.md) |
-| Gateway SSO | [12-integration-mcp.md §4](./12-integration-mcp.md), [08-integration-with-existing-stack.md](./08-integration-with-existing-stack.md) |
-| Postgres / HA | [06-build-from-scratch.md](./06-build-from-scratch.md) post-MVP notes |
+| Gateway SSO | [PLAN.md](../PLAN.md) v3 Phase 5, [14-operational-readiness.md](./14-operational-readiness.md) |
+| Postgres / HA | [PLAN.md](../PLAN.md) v3 Phase 5 |
 | Compare OSS peers | [archive/design-essays/17-governed-memory-landscape.md](./archive/design-essays/17-governed-memory-landscape.md) |
 
 ---
@@ -180,7 +180,7 @@ Seams documented in [12-integration-mcp.md](./12-integration-mcp.md).
 
 | Gate | Doc |
 |------|-----|
-| Engineering proof (tests, smoke, eval) | [13-definition-of-done.md](./13-definition-of-done.md) |
+| Engineering proof (tests, smoke, eval) | `npm test`, `npm run smoke`, `npm run eval`; [POC.md](./POC.md) |
 | Operational / compliance proof | [14-operational-readiness.md](./14-operational-readiness.md) |
 
 ---
@@ -200,28 +200,19 @@ When copying this pattern into another repo:
 
 ---
 
-## 8. Doc map (merged — no v1/v2 split)
+## 8. Doc map (POC-focused)
 
-| # | Document | Use when |
-|---|----------|----------|
-| **00** | [This guide](./00-adoption-guide.md) | Starting from zero; another AI/project |
-| — | [rollout/README.md](./rollout/README.md) | QA phased rollout Q1–Q5 |
-| — | [PROJECT-CONTEXT.md](./PROJECT-CONTEXT.md) | Why this repo exists |
-| 01–04 | Architecture, DoorDash pattern, Playwright, compliance | Design rationale |
-| 05 | [Data retention & privacy](./05-data-retention-and-privacy.md) | Tier philosophy |
-| 06–07 | Build from scratch, tools spec | Implementation planning |
-| 08 | [Enterprise stack integration](./08-integration-with-existing-stack.md) | Gateway, Azure, KB MCP |
-| 09 | [Multi-domain memory](./09-multi-domain-memory.md) | Namespace phases |
-| 10 | [DoorDash/Salesforce deep dive](./10-doordash-salesforce-memory-deep-dive.md) | Production reference |
-| 11 | [Implementation](./11-implementation.md) | Quickstart, packages |
-| 12 | [MCP integration](./12-integration-mcp.md) | Consume/extend MCP |
-| 13 | [Definition of done](./13-definition-of-done.md) | Engineering gates |
-| 14 | [Operational readiness](./14-operational-readiness.md) | Security/compliance gates |
-| 15 | [POC demo](./15-poc-demo.md) | Stakeholder demo |
-| 16 | [Playbook: mirror + privatize](./archive/design-essays/16-playbook-mirror-privatize.md) | Portable technical pattern |
-| 17 | [Governed memory landscape](./archive/design-essays/17-governed-memory-landscape.md) | OSS/production survey |
-| 18 | [Official MCP package risks](./18-official-mcp-packages-risk-brief.md) | Leadership decision |
-| — | [tools.json](./tools.json) | Machine-readable contract |
+| Document | Use when |
+|----------|----------|
+| [POC.md](./POC.md) | Run demo in 5 minutes |
+| [15-poc-demo.md](./15-poc-demo.md) | Stakeholder demo script |
+| [FLOW2-INTEGRATION.md](./FLOW2-INTEGRATION.md) | Wire Playwright CI |
+| [14-operational-readiness.md](./14-operational-readiness.md) | Security/compliance gates |
+| [18-official-mcp-packages-risk-brief.md](./18-official-mcp-packages-risk-brief.md) | Leadership decision |
+| [rollout/README.md](./rollout/README.md) | QA phased rollout Q4–Q5 |
+| [PLAN.md](../PLAN.md) | Design history and roadmap |
+| [tools.json](./tools.json) | Machine-readable MCP contract |
+| [archive/README.md](./archive/README.md) | Historical design essays, Flow 1 agents (not required for POC) |
 
 ---
 

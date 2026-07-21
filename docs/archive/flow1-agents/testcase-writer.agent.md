@@ -1,6 +1,6 @@
 ---
 description: "Use when: writing manual test cases from explored acceptance criteria, generating test steps with exact UI actions, creating detailed test case documents from memory data. Trigger: write test cases, manual test cases, generate test steps, create test case from exploration."
-tools: [mortgage-qa-memory/*, sequentialthinking/sequentialthinking]
+tools: [memory-vault/*, sequentialthinking/sequentialthinking]
 argument-hint: "Provide the user story ID, e.g. 'US 471244' or 'write test cases for AC2 of 471244'"
 ---
 

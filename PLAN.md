@@ -117,7 +117,7 @@ npm run console          # Flow 2 demo UI at http://127.0.0.1:4173
 ```
 
 Point Cursor at [`cursor/mcp.json`](./cursor/mcp.json) and add the
-[`mortgage-qa-triage`](./cursor/skills/mortgage-qa-triage/SKILL.md) skill.
+[`memory-vault-triage`](./cursor/skills/memory-vault-triage/SKILL.md) skill.
 Portable triage prompt also available via MCP `prompts/list` (`triage_qa_failure`).
 
 ### MCP tool surface
@@ -170,7 +170,7 @@ QA-specific: `queries.ts`, `reporter`.
 | Policy blocks SSN / denied fields pre-save (tested) | DONE |
 | Reporter → SQLite, ≥20 `test_runs` rows from a seeded run | DONE |
 | MCP read tools live in a client (`get_flaky_tests` returns real data) | DONE |
-| `mortgage-qa-triage` Cursor skill; Playwright MCP wired (staging allowlist, no `run_code_unsafe`) | DONE |
+| `memory-vault-triage` Cursor skill; Playwright MCP wired (staging allowlist, no `run_code_unsafe`) | DONE |
 | Thin, hash-chained audit per tool call; `get_audit_trail` RBAC-gated | DONE |
 | Purge removes expired Tier 1 rows; CI artifact + eval gate wired | DONE |
 | 2–3 journeys with TRID checkpoints | DONE — `le_generation`, `cd_generation`, `urla_data_entry` |
@@ -201,7 +201,7 @@ second, ungoverned store.
   `create_relations`, `delete_*`, `search_nodes`, `open_nodes`, `read_graph`.
 - Governance on every write: RBAC, PII/credential deny scan, 2000-char / 200-obs
   size guards (blocks raw-snapshot dumping), tiered retention + purge.
-- Hash-chained audit on every call; served as the `mortgage-qa-memory` MCP server.
+- Hash-chained audit on every call; served as the `memory-vault` MCP server.
 
 **Verify:** `npm run typecheck` · `npm test` (33 tests) · `npm run smoke`.
 
@@ -247,7 +247,7 @@ profile:
   app_url:        https://qa.ll.nafinc.com
   ado_project:    Lender Link Project Management
   login:          { method: pingone-sso, credential_ref: "naflink-qa" }  # a NAME, not the secret
-  memory_server:  mortgage-qa-memory
+  memory_server:  memory-vault
   automation:     naflink            # or "greenfield-e2e" (Profile B)
 ```
 
@@ -316,7 +316,7 @@ Non-blocking; do when multi-team reuse arrives.
 
 ### Namespace roadmap (from v1 design, still the plan for multi-domain growth)
 
-One `mortgage-qa-memory`-family server, namespaced rather than split, until
+One `memory-vault`-family server, namespaced rather than split, until
 compliance mandates physical separation:
 
 | Namespace | Scope | Phase |

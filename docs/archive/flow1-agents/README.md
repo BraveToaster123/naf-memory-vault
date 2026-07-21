@@ -1,6 +1,6 @@
 # QA Testing Agents
 
-Cursor agents for the NAF Link QA workflow: explore acceptance criteria in the browser, write manual test cases, publish them to Azure DevOps, and generate Playwright automation. All agents share exploration data through **`mortgage-qa-memory`** so downstream steps use real UI steps and locators—not guesses.
+Cursor agents for the NAF Link QA workflow: explore acceptance criteria in the browser, write manual test cases, publish them to Azure DevOps, and generate Playwright automation. All agents share exploration data through **`memory-vault`** so downstream steps use real UI steps and locators—not guesses.
 
 **Phased rollout:** [../../docs/rollout/README.md](../../docs/rollout/README.md) — Q1–Q5 delivery plan and per-feature specs.  
 **E2E code target:** `c:\Projects\greenfield-e2e\` (Profile B greenfield .NET) — not this repo.  
@@ -16,7 +16,7 @@ Cursor agents for the NAF Link QA workflow: explore acceptance criteria in the b
 flowchart LR
   ADO["Azure DevOps\nUser Story + ACs"]
   Explorer["ac-explorer"]
-  Memory["mortgage-qa-memory"]
+  Memory["memory-vault"]
   Writer["testcase-writer"]
   Publisher["ado-publisher"]
   Generator["automation-generator"]
@@ -180,7 +180,7 @@ flowchart LR
 
 ## Prerequisites
 
-- **Cursor** with `mortgage-qa-memory` MCP ([../../cursor/mcp.json](../../cursor/mcp.json))
+- **Cursor** with `memory-vault` MCP ([../../cursor/mcp.json](../../cursor/mcp.json))
 - **Optional:** Playwright MCP — merge [../../cursor/mcp.browser.json.example](../../cursor/mcp.browser.json.example)
 - **Optional:** Azure DevOps MCP — enable separately when running the story pipeline (org credentials required)
 - **ADO project:** Lender Link Project Management
@@ -192,5 +192,5 @@ flowchart LR
 ## Related docs
 
 - [QA rollout plan](../../docs/rollout/README.md)
-- [Playwright + MCP integration](../../docs/03-qa-automation-playwright.md)
+- [Playwright + MCP integration](../../FLOW2-INTEGRATION.md)
 - [POC demo guide](../../docs/15-poc-demo.md)

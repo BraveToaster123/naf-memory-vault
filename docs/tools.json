@@ -1,5 +1,5 @@
 {
-  "server": "mortgage-qa-memory",
+  "server": "memory-vault",
   "version": "0.1.0",
   "transport": "stdio",
   "policy_version": "mqm-policy-1",
@@ -173,7 +173,7 @@
     },
     {
       "name": "plan_qa_investigation",
-      "description": "Return an ordered tool plan (memory first, browser only if needed).",
+      "description": "Return an ordered tool plan (memory first, browser only if needed). Alias for plan_qa_workflow(intent=triage_failure).",
       "kind": "read",
       "tier": null,
       "domain": "qa",
@@ -190,6 +190,45 @@
         "required": [
           "test_id"
         ]
+      }
+    },
+    {
+      "name": "plan_qa_workflow",
+      "description": "Workflow assist — classify QA intent, inspect memory, return ordered_plan + suggested_prompt/skill + blockers. Start here for triage or story status.",
+      "kind": "read",
+      "tier": null,
+      "domain": "qa",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "intent": {
+            "type": "string",
+            "enum": [
+              "triage_failure",
+              "check_story_status",
+              "explore_story",
+              "write_test_cases",
+              "publish_test_cases",
+              "generate_automation"
+            ]
+          },
+          "test_id": {
+            "type": "string"
+          },
+          "user_story_id": {
+            "type": "string"
+          },
+          "error_class": {
+            "type": "string"
+          },
+          "ci_failed": {
+            "type": "boolean"
+          },
+          "namespace": {
+            "type": "string",
+            "description": "Default qa"
+          }
+        }
       }
     },
     {

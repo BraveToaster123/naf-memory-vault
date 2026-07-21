@@ -34,7 +34,7 @@ As a QA engineer, I want test cases generated from exploration memory so I can p
 ## Dependencies
 
 - Q1 exit + signed entity contract
-- `naf-qa-memory` or unified MCP with KG read tools
+- `memory-vault` (unified QA + KG tools)
 
 ---
 

@@ -1,6 +1,6 @@
 # naf-memory-vault
 
-Governed **Mortgage QA Memory MCP** (MQM). **Status:** working POC/MVP, now pivoting toward a governed knowledge-graph
+Governed **memory-vault** MCP (MQM). **Status:** working POC/MVP, now pivoting toward a governed knowledge-graph
 memory core. See [PLAN.md](./PLAN.md) for the full history (v1 design → v2
 build → v3 roadmap) — start there.
 
@@ -40,8 +40,8 @@ One-shot demo (seed + namespace seed + smoke + console):
 npm run demo
 ```
 
-Then point Cursor at [`cursor/mcp.json`](./cursor/mcp.json) (`mortgage-qa-memory` only) and add the
-[`mortgage-qa-triage`](./cursor/skills/mortgage-qa-triage/SKILL.md) skill.
+Then point Cursor at [`cursor/mcp.json`](./cursor/mcp.json) (`memory-vault` only) and add the
+[`memory-vault-triage`](./cursor/skills/memory-vault-triage/SKILL.md) skill.
 
 For browser repro, merge blocks from [`cursor/mcp.browser.json.example`](./cursor/mcp.browser.json.example).
 
@@ -56,7 +56,7 @@ See [docs/POC.md](./docs/POC.md) for 5-minute handoff. Full demo: [docs/15-poc-d
 | `packages/console` | Flow 2 demo UI (flake/journeys — not full KG browser) |
 | `journeys/*.yaml` | Tier 2 curated mortgage journeys |
 | `ai-inventory.yaml` | LL-2026-04 AI tool inventory |
-| `cursor/mcp.json`, `cursor/skills/mortgage-qa-triage/` | Cursor MCP + triage skill |
+| `cursor/mcp.json`, `cursor/skills/memory-vault-assist/`, `cursor/skills/memory-vault-triage/` | `memory-vault` MCP + skills |
 | `docs/archive/flow1-agents/` | Story-pipeline agents (deferred until Q1 pilot) |
 | `eval/` | Flake-classification eval gate |
 
