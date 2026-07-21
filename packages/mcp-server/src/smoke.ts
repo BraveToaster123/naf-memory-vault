@@ -6,7 +6,7 @@
  */
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
-import { openDb } from "@mqm/shared";
+import { openDb } from "@memory-vault/shared";
 
 function textOf(res: { content?: Array<{ type: string; text?: string }> }): string {
   return res.content?.find((c) => c.type === "text")?.text ?? "";
@@ -16,7 +16,7 @@ async function main(): Promise<void> {
   const transport = new StdioClientTransport({
     command: "npx",
     args: ["tsx", "packages/mcp-server/src/index.ts"],
-    env: { ...process.env, MQM_USER_ROLE: "qa_engineer", MQM_ENV: "local" } as Record<string, string>,
+    env: { ...process.env, MEMORY_VAULT_USER_ROLE: "qa_engineer", MEMORY_VAULT_ENV: "local" } as Record<string, string>,
   });
   const client = new Client({ name: "mqm-smoke", version: "0.1.0" });
   await client.connect(transport);

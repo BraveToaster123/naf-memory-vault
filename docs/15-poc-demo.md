@@ -8,7 +8,7 @@
 
 ## What is already proven (no extra build)
 
-Your POC gate passes locally. Evidence from [13-definition-of-done.md](./13-definition-of-done.md):
+Your POC gate passes locally. Evidence: `npm run smoke` → **SMOKE PASS**, `npm test`, `npm run eval`.
 
 | Story | Status | One-liner for the room |
 |-------|--------|------------------------|
@@ -18,7 +18,7 @@ Your POC gate passes locally. Evidence from [13-definition-of-done.md](./13-defi
 | Audit trail | ✅ | Every tool call logged; QC can query |
 | KG memory (Anthropic parity) | ✅ | Same 9 tools as `server-memory`, plus governance |
 | Namespace isolation | ✅ | `qa_engineer` cannot read `compliance` |
-| 30 tests green | ✅ | `npm test` |
+| Unit tests green | ✅ | `npm test` (33 tests) |
 
 You do **not** need staging, Playwright CI, or SSO for this demo.
 
@@ -50,17 +50,25 @@ One-shot prep + smoke + launch:
 npm run demo
 ```
 
-(`demo` seeds data, runs smoke, then starts the console — leave terminal open.)
+(`demo` seeds Tier 1 + namespace KG data, runs smoke, then starts the console — leave terminal open.)
 
 Optional: open these files in tabs for “show the policy” moments:
 
-- [packages/policy/mqm-policy.yaml](../packages/policy/mqm-policy.yaml) — namespaces + deny patterns
+- [packages/policy/memory-vault-policy.yaml](../packages/policy/memory-vault-policy.yaml) — namespaces + deny patterns
 - [journeys/le_generation.yaml](../journeys/le_generation.yaml) — Tier 2 curated journey
-- [17-governed-memory-landscape.md](./17-governed-memory-landscape.md) — how we compare to DoorDash / OSS peers
+- [archive/design-essays/17-governed-memory-landscape.md](./archive/design-essays/17-governed-memory-landscape.md) — how we compare to DoorDash / OSS peers
 
 ### Cursor setup (if demoing in IDE)
 
-Copy or symlink [cursor/mcp.json](../cursor/mcp.json) into your Cursor MCP config, or merge the `mortgage-qa-memory` block. Restart Cursor after changing MCP config.
+Copy or symlink [cursor/mcp.json](../cursor/mcp.json) into your Cursor MCP config (single `memory-vault` server). For Playwright repro, see [cursor/mcp.browser.json.example](../cursor/mcp.browser.json.example). Restart Cursor after changing MCP config.
+
+### Deploy to another machine
+
+1. Clone repo; Node 20+
+2. `npm install && npm run demo` (or `seed:demo` + `smoke` if you skip the console)
+3. Expect terminal **SMOKE PASS**; console at **http://127.0.0.1:4173** if you ran `demo`
+4. Merge `memory-vault` from `cursor/mcp.json` into Cursor; open repo as workspace
+5. **Optional:** real staging URLs in policy only when using Playwright MCP
 
 ---
 
@@ -102,9 +110,9 @@ Close with: “QA namespace is live; PR/ops/compliance namespaces are seeded for
 
 ## Demo script B — Cursor live (15–20 min)
 
-Use the [mortgage-qa-triage](../cursor/skills/mortgage-qa-triage/SKILL.md) skill or paste prompts below.
+Use the [memory-vault-triage](../cursor/skills/memory-vault-triage/SKILL.md) skill or paste prompts below.
 
-### Act 1 — QA engineer (default `MQM_USER_ROLE=qa_engineer`)
+### Act 1 — QA engineer (default `MEMORY_VAULT_USER_ROLE=qa_engineer`)
 
 1. **“Call `get_flaky_tests` with limit 5. Which test is flakiest?”**  
    → Shows ranked flake list from seeded DB.
@@ -126,7 +134,7 @@ Use the [mortgage-qa-triage](../cursor/skills/mortgage-qa-triage/SKILL.md) skill
 
 ### Act 2 — Engineer / dev memory (`pr` namespace)
 
-Temporarily set in MCP env: `MQM_USER_ROLE=engineer` (restart MCP).
+Temporarily set in MCP env: `MEMORY_VAULT_USER_ROLE=engineer` (restart MCP).
 
 7. **“Call `read_graph` with namespace `pr`. What does engineering memory know about loan-api?”**  
    → Seeded PR entities (review patterns, deploy correlation).
@@ -138,7 +146,7 @@ Reset role to `qa_engineer` after this act.
 
 ### Act 3 — Compliance / QC (`qc_analyst`)
 
-Set `MQM_USER_ROLE=qc_analyst`.
+Set `MEMORY_VAULT_USER_ROLE=qc_analyst`.
 
 9. **“Call `read_graph` with namespace `compliance`.”**  
    → Seeded RFP answer refs (metadata only).
@@ -174,7 +182,7 @@ Honest pitch: **“We POC’d the governed platform and QA layer; other team lay
 ## Architecture slide (30 seconds)
 
 ```
-Cursor / Claude  →  mortgage-qa-memory MCP  →  policy (mqm-policy.yaml)
+Cursor / Claude  →  memory-vault MCP  →  policy (memory-vault-policy.yaml)
                               ↓
                     Tier 1 SQLite (30d)  +  Tier 2 git YAML
                               ↓
@@ -192,9 +200,10 @@ Cursor / Claude  →  mortgage-qa-memory MCP  →  policy (mqm-policy.yaml)
 | Problem | Fix |
 |---------|-----|
 | `SMOKE FAIL` | Run `npm run seed:demo` first |
-| Empty `get_flaky_tests` | Re-run seed; check `MQM_DB_PATH` points at `./data/qa-memory.db` |
+| Empty `get_flaky_tests` | Re-run seed; check `MEMORY_VAULT_DB_PATH` points at `./data/memory-vault.db` |
 | MCP not in Cursor | Restart Cursor; verify `mcp.json` paths are relative to repo root |
-| `namespace_rbac_denied` when you expected allow | Check `MQM_USER_ROLE` matches [mqm-policy.yaml](../packages/policy/mqm-policy.yaml) `namespaces.*.readers` |
+| Legacy MCP name (`naf-qa-memory`, `mortgage-qa-memory`) | Remove from user MCP settings; use only `memory-vault` ([q4-unified-mcp-server.md](./rollout/q4-unified-mcp-server.md)) |
+| `namespace_rbac_denied` when you expected allow | Check `MEMORY_VAULT_USER_ROLE` matches [memory-vault-policy.yaml](../packages/policy/memory-vault-policy.yaml) `namespaces.*.readers` |
 | Windows `npx tsx` slow | First call may take ~10s — normal |
 
 ---
@@ -221,14 +230,14 @@ See [14-operational-readiness.md](./14-operational-readiness.md) for full checkl
 1. **Pilot on one journey** — wire real Playwright reporter to staging (NEEDS-ENV, [§5](./14-operational-readiness.md#5-real-staging-ci-data-needs-env)).
 2. **Name namespace owners** — fill §4 worksheet; open `ops`/`compliance` writers in policy.
 3. **Compliance sign-off** — [ai-inventory.yaml](../ai-inventory.yaml) (NEEDS-HUMAN, [§6](./14-operational-readiness.md#6-compliance-sign-off-needs-human)).
-4. **Caller identity** — replace `MQM_USER_ROLE` env with gateway SSO when shared server ([§3](./14-operational-readiness.md#3-auth-when-do-you-need-per-user-identity)).
+4. **Caller identity** — replace `MEMORY_VAULT_USER_ROLE` env with gateway SSO when shared server ([§3](./14-operational-readiness.md#3-auth-when-do-you-need-per-user-identity)).
 
 ---
 
 ## Related docs
 
-- [11-implementation.md](./11-implementation.md) — package map + quickstart
+- [POC.md](./POC.md) — 5-minute quickstart
+- [PLAN.md](../PLAN.md) — package map, roadmap, namespace plan
 - [14-operational-readiness.md](./14-operational-readiness.md) — production gates, namespace owners, non-savable list
-- [09-multi-domain-memory.md](./09-multi-domain-memory.md) — full namespace rollout plan
-- [16-playbook-mirror-privatize.md](./16-playbook-mirror-privatize.md) — mirror + privatize Anthropic memory
-- [17-governed-memory-landscape.md](./17-governed-memory-landscape.md) — external projects survey
+- [archive/design-essays/16-playbook-mirror-privatize.md](./archive/design-essays/16-playbook-mirror-privatize.md) — mirror + privatize Anthropic memory
+- [archive/design-essays/17-governed-memory-landscape.md](./archive/design-essays/17-governed-memory-landscape.md) — external projects survey

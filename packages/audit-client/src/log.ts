@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
-import type { DB, AuditEventRow, Principal } from "@mqm/shared";
+import type { DB, AuditEventRow, Principal } from "@memory-vault/shared";
 
 export interface AuditInput {
   principal: Principal;

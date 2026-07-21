@@ -1,6 +1,6 @@
 /**
  * Memory Console — read-only desktop inspector for governed memory (POC).
- * Static UI + thin JSON API over @mqm/shared (same data as the MCP server).
+ * Static UI + thin JSON API over @memory-vault/shared (same data as the MCP server).
  *
  *   npm run console
  *   open http://127.0.0.1:4173
@@ -18,12 +18,12 @@ import {
   getEnvFacts,
   getJourneyMap,
   type DB,
-} from "@mqm/shared";
+} from "@memory-vault/shared";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = join(__dirname, "../public");
-const PORT = Number(process.env.MQM_CONSOLE_PORT ?? 4173);
-const HOST = process.env.MQM_CONSOLE_HOST ?? "127.0.0.1";
+const PORT = Number(process.env.MEMORY_VAULT_CONSOLE_PORT ?? 4173);
+const HOST = process.env.MEMORY_VAULT_CONSOLE_HOST ?? "127.0.0.1";
 
 const MIME: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -58,7 +58,7 @@ async function handleApi(
 ): Promise<boolean> {
   if (pathname === "/api/health") {
     const runs = db.prepare("SELECT COUNT(*) AS n FROM test_runs").get() as { n: number };
-    json(res, 200, { ok: true, test_runs: runs.n, policy: process.env.MQM_POLICY_PATH ?? "default" });
+    json(res, 200, { ok: true, test_runs: runs.n, policy: process.env.MEMORY_VAULT_POLICY_PATH ?? "default" });
     return true;
   }
 
@@ -139,7 +139,7 @@ function main(): void {
     // eslint-disable-next-line no-console
     console.log(`[console] http://${HOST}:${PORT}  (memory desktop inspector; Ctrl+C to stop)`);
     // eslint-disable-next-line no-console
-    console.log(`[console] DB: ${process.env.MQM_DB_PATH ?? "./data/qa-memory.db"}`);
+    console.log(`[console] DB: ${process.env.MEMORY_VAULT_DB_PATH ?? "./data/memory-vault.db"}`);
   });
 }
 

@@ -14,8 +14,8 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@mqm/shared": ["packages/shared/src/index.ts"],
-      "@mqm/shared/*": ["packages/shared/src/*"]
+      "@memory-vault/shared": ["packages/shared/src/index.ts"],
+      "@memory-vault/shared/*": ["packages/shared/src/*"]
     }
   }
 }

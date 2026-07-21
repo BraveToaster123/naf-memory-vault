@@ -1,7 +1,7 @@
 import type { Tool } from "@modelcontextprotocol/sdk/types.js";
 
 /**
- * Tool catalog for the mortgage-qa-memory MCP server.
+ * Tool catalog for the memory-vault MCP server.
  *
  * ENGINE vs DOMAIN seam (for reuse across namespaces):
  *  - `domain: "core"`  -> generic memory-platform capability (policy, audit,
@@ -33,11 +33,13 @@ export const TOOL_META: Record<string, ToolMeta> = {
   get_journey_map: { kind: "read", tier: 2, domain: "qa" },
   get_compliance_checkpoint: { kind: "read", tier: 2, domain: "qa" },
   plan_qa_investigation: { kind: "read", tier: null, domain: "qa" },
+  plan_qa_workflow: { kind: "read", tier: null, domain: "qa" },
   record_run_summary: { kind: "write", tier: 1, domain: "qa" },
   tag_failure_signature: { kind: "write", tier: 1, domain: "qa" },
   remember_env_fact: { kind: "write", tier: 1, domain: "qa" },
   upsert_locator: { kind: "tier2_approval", tier: 2, domain: "qa" },
   get_audit_trail: { kind: "audit", tier: null, domain: "core" },
+  get_ai_inventory: { kind: "read", tier: null, domain: "core" },
 
   // Core knowledge-graph memory — generic engine (kg.ts), namespace-isolated.
   // Same tool surface as @modelcontextprotocol/server-memory, plus policy
@@ -130,11 +132,37 @@ export const tools: Tool[] = [
   },
   {
     name: "plan_qa_investigation",
-    description: "Return an ordered tool plan (memory first, browser only if needed).",
+    description: "Return an ordered tool plan (memory first, browser only if needed). Alias for plan_qa_workflow(intent=triage_failure).",
     inputSchema: {
       type: "object",
       properties: { test_id: { type: "string" }, ci_failed: { type: "boolean" } },
       required: ["test_id"],
+    },
+  },
+  {
+    name: "plan_qa_workflow",
+    description:
+      "Workflow assist — classify QA intent, inspect memory, return ordered_plan + suggested_prompt/skill + blockers. Start here for triage or story status.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        intent: {
+          type: "string",
+          enum: [
+            "triage_failure",
+            "check_story_status",
+            "explore_story",
+            "write_test_cases",
+            "publish_test_cases",
+            "generate_automation",
+          ],
+        },
+        test_id: { type: "string" },
+        user_story_id: { type: "string" },
+        error_class: { type: "string" },
+        ci_failed: { type: "boolean" },
+        namespace: { type: "string", description: "Default qa" },
+      },
     },
   },
   {
@@ -207,6 +235,12 @@ export const tools: Tool[] = [
       },
       required: ["start_date", "end_date"],
     },
+  },
+  {
+    name: "get_ai_inventory",
+    description:
+      "Read the LL-2026-04 AI tool inventory (ai-inventory.yaml). Metadata only — review_status, tools registered, data_stored / not_stored.",
+    inputSchema: { type: "object", properties: {} },
   },
 
   // ── Core knowledge-graph memory ──────────────────────────────────────

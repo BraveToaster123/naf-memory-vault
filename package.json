@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "naf-memory-vault — governed QA memory MCP for mortgage technology teams (POC/MVP).",
+  "description": "naf-memory-vault — governed memory-vault MCP for mortgage QA (POC/MVP).",
   "repository": {
     "type": "git",
     "url": "https://github.com/BraveToaster123/naf-memory-vault.git"
@@ -20,22 +20,18 @@
     "test": "npm run test --workspaces --if-present",
     "purge": "tsx packages/shared/src/purge.ts",
     "seed:demo": "tsx packages/reporter/src/seed-demo.ts",
+    "seed:demo:namespaces": "tsx packages/reporter/src/seed-demo-namespaces.ts",
+    "console": "npm run start -w @memory-vault/console",
+    "demo": "npm run seed:demo && npm run seed:demo:namespaces && npm run smoke && npm run console",
     "mcp": "tsx packages/mcp-server/src/index.ts",
-    "mcp:graph": "tsx packages/mcp-server/src/graph-index.ts",
     "manifest": "tsx packages/mcp-server/src/manifest.ts",
     "smoke": "tsx packages/mcp-server/src/smoke.ts",
-    "smoke:graph": "tsx packages/mcp-server/src/graph-smoke.ts",
-    "eval": "tsx eval/run-eval.ts",
-    "test:e2e": "playwright test"
+    "eval": "tsx eval/run-eval.ts"
   },
   "devDependencies": {
-    "@playwright/test": "^1.48.0",
     "@types/better-sqlite3": "^7.6.11",
     "@types/node": "^22.7.0",
     "tsx": "^4.19.0",
     "typescript": "^5.6.0"
-  },
-  "dependencies": {
-    "@modelcontextprotocol/server-memory": "^2026.7.4"
   }
 }

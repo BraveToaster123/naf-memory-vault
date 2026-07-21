@@ -12,7 +12,7 @@ import {
   createRelations,
   getPolicy,
   type WriteContext,
-} from "@mqm/shared";
+} from "@memory-vault/shared";
 
 const policy = getPolicy();
 
@@ -65,7 +65,7 @@ function main(): void {
         entityType: "rfp_answer_ref",
         observations: [
           "Cited answer: agent memory stores test metadata only — see ai-inventory.yaml",
-          "Policy version mqm-policy-1; annual review cadence",
+          "Policy version memory-vault-policy-1; annual review cadence",
         ],
       },
     ],

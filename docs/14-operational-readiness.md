@@ -7,12 +7,11 @@
 
 | Doc | Relationship |
 |-----|--------------|
-| [13-definition-of-done.md](./13-definition-of-done.md) | Engineering proof gates (DONE / NEEDS-ENV / NEEDS-HUMAN) |
+| [POC.md](./POC.md) | Quickstart and `memory-vault` MCP wiring |
 | [18-official-mcp-packages-risk-brief.md](./18-official-mcp-packages-risk-brief.md) | Why not vanilla `server-memory` |
-| [09-multi-domain-memory.md](./09-multi-domain-memory.md) | Namespace rollout phases and fact-key conventions |
-| [05-data-retention-and-privacy.md](./05-data-retention-and-privacy.md) | Tier 0/1/2 philosophy |
-| [packages/policy/mqm-policy.yaml](../../packages/policy/mqm-policy.yaml) | Enforced deny lists + namespace RBAC |
-| [ai-inventory.yaml](../../ai-inventory.yaml) | LL-2026-04 inventory (pending sign-off) |
+| [PLAN.md](../PLAN.md) | Tiers, namespaces, retention philosophy |
+| [packages/policy/memory-vault-policy.yaml](../packages/policy/memory-vault-policy.yaml) | Enforced deny lists + namespace RBAC |
+| [ai-inventory.yaml](../ai-inventory.yaml) | LL-2026-04 inventory (pending sign-off) |
 
 **Last updated:** 2026-07-15
 
@@ -25,7 +24,7 @@
 | **POC engineering proof** | DONE | Engineering | `npm test`, `npm run smoke` → SMOKE PASS |
 | **Interim non-savable list** | DONE (pending compliance review) | Engineering → Compliance | Use §2 below until compliance adds patterns |
 | **Namespace structure (KG + RBAC)** | DONE | Engineering | `qa`/`pr`/`ops`/`compliance`/`product` in policy + smoke |
-| **Namespace owners assigned** | NEEDS-HUMAN | Engineering manager | Fill §4 checklist; update `mqm-policy.yaml` writers |
+| **Namespace owners assigned** | NEEDS-HUMAN | Engineering manager | Fill §4 checklist; update `memory-vault-policy.yaml` writers |
 | **Compliance sign-off** | NEEDS-HUMAN | Compliance / security | Approve [ai-inventory.yaml](../../ai-inventory.yaml) |
 | **Real staging CI data** | NEEDS-ENV | QA + platform | Replace pilot URLs; wire Playwright reporter (§5) |
 | **Verified caller identity (SSO)** | NEEDS-ENV | Platform | Required only for shared team server (§3) |
@@ -34,7 +33,7 @@
 
 ## 2. Interim non-savable data list
 
-**Status:** enforced in code today via [mqm-policy.yaml](../../packages/policy/mqm-policy.yaml).  
+**Status:** enforced in code today via [memory-vault-policy.yaml](../../packages/policy/memory-vault-policy.yaml).  
 Compliance should review, add mortgage-specific patterns (MERS MIN, account formats), and sign off before calling this **production-approved**.
 
 ### 2a. Never persist — whole field types (`deny_fields`)
@@ -85,11 +84,11 @@ Auth controls **who can read/write which namespace**. It does **not** replace PI
 
 | Deployment stage | Per-user auth required? | What we use today |
 |------------------|-------------------------|-------------------|
-| **POC** — one dev, MCP on their laptop | No | `MQM_USER_ROLE` env var (honor system) |
+| **POC** — one dev, MCP on their laptop | No | `MEMORY_VAULT_USER_ROLE` env var (honor system) |
 | **Pilot** — small team, each on own laptop + own SQLite | Low urgency | Same; isolated DB per machine |
 | **Shared service** — one memory DB, many users/agents | **Yes, required** | Gateway SSO must assert role before MCP sees the call |
 
-**NEEDS-ENV item:** replace trust-on-honor `MQM_USER_ROLE` with cryptographically verified identity at the gateway. See [12-integration-mcp.md](./12-integration-mcp.md) and [16-playbook-mirror-privatize.md §6](./16-playbook-mirror-privatize.md).
+**NEEDS-ENV item:** replace trust-on-honor `MEMORY_VAULT_USER_ROLE` with cryptographically verified identity at the gateway. See [PLAN.md](../PLAN.md) v3 Phase 5 and [archive/design-essays/16-playbook-mirror-privatize.md §6](./archive/design-essays/16-playbook-mirror-privatize.md).
 
 ---
 
@@ -99,7 +98,7 @@ Each namespace is a **separate bucket** on one MCP server. Same policy pipeline 
 
 ### 4a. Current policy (source of truth)
 
-From [mqm-policy.yaml](../../packages/policy/mqm-policy.yaml):
+From [memory-vault-policy.yaml](../../packages/policy/memory-vault-policy.yaml):
 
 | Namespace | Purpose | Retention | Writers today | Readers today | Phase |
 |-----------|---------|-----------|---------------|---------------|-------|
@@ -131,7 +130,7 @@ Only the `platform` role can write to locked namespaces today (break-glass).
 | `compliance` | _________________ | _________________ | _________________ | _________________ | ☐ |
 | `product` | _________________ | _________________ | _________________ | Defer | ☐ |
 
-After sign-off: update `namespaces:` in [mqm-policy.yaml](../../packages/policy/mqm-policy.yaml) and re-run `npm run smoke`.
+After sign-off: update `namespaces:` in [memory-vault-policy.yaml](../../packages/policy/memory-vault-policy.yaml) and re-run `npm run smoke`.
 
 ---
 
@@ -142,11 +141,11 @@ After sign-off: update `namespaces:` in [mqm-policy.yaml](../../packages/policy/
 
 ### Checklist
 
-- [ ] Replace `*.pilot-mortgage.example` in [mqm-policy.yaml](../../packages/policy/mqm-policy.yaml) with real staging/UAT hostnames
-- [ ] Wire `@mqm/reporter` into staging Playwright CI job
+- [ ] Replace `*.pilot-mortgage.example` in [memory-vault-policy.yaml](../../packages/policy/memory-vault-policy.yaml) with real staging/UAT hostnames
+- [ ] Wire `@memory-vault/reporter` into staging Playwright CI job
 - [ ] Confirm `drop_run_on_pii_detected: true` drops bad rows (don't redact-in-place for CI errors)
 - [ ] Triage ≥5 real staging failures via MCP; confirm flake ranking helps
-- [ ] Re-run eval with `MQM_RUN_E2E=1` when real failure corpus exists
+- [ ] Re-run eval with `MEMORY_VAULT_RUN_E2E=1` when real failure corpus exists
 
 ---
 
@@ -203,5 +202,5 @@ flowchart TB
 ## Related docs
 
 - [15-poc-demo.md](./15-poc-demo.md) — live stakeholder demo script
-- [16-playbook-mirror-privatize.md](./16-playbook-mirror-privatize.md) — technical mirror + govern playbook
-- [11-implementation.md](./11-implementation.md) — package map + quickstart
+- [archive/design-essays/16-playbook-mirror-privatize.md](./archive/design-essays/16-playbook-mirror-privatize.md) — technical mirror + govern playbook
+- [PLAN.md](../PLAN.md) — package map, quickstart, roadmap

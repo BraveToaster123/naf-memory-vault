@@ -1,6 +1,6 @@
 # naf-memory-vault
 
-Governed **Mortgage QA Memory MCP** (MQM). **Status:** working POC/MVP, now pivoting toward a governed knowledge-graph
+Governed **memory-vault** MCP. **Status:** working POC/MVP, now pivoting toward a governed knowledge-graph
 memory core. See [PLAN.md](./PLAN.md) for the full history (v1 design → v2
 build → v3 roadmap) — start there.
 
@@ -30,25 +30,35 @@ npm install
 npm run typecheck
 npm test
 npm run seed:demo
-npm run smoke        # QA-domain MCP tools
-npm run smoke:graph  # governed knowledge-graph MCP tools
+npm run smoke          # expect SMOKE PASS
+npm run console        # http://127.0.0.1:4173
 ```
 
-Then point Cursor at [`cursor/mcp.json`](./cursor/mcp.json) and add the
-[`mortgage-qa-triage`](./cursor/skills/mortgage-qa-triage/SKILL.md) skill.
+One-shot demo (seed + namespace seed + smoke + console):
+
+```bash
+npm run demo
+```
+
+Then point Cursor at [`cursor/mcp.json`](./cursor/mcp.json) (`memory-vault` only) and add the
+[`memory-vault-triage`](./cursor/skills/memory-vault-triage/SKILL.md) skill.
+
+For browser repro, merge blocks from [`cursor/mcp.browser.json.example`](./cursor/mcp.browser.json.example).
+
+See [docs/POC.md](./docs/POC.md) for 5-minute handoff. Full demo: [docs/15-poc-demo.md](./docs/15-poc-demo.md).
 
 ## Layout
 
 | Path | Contents |
 |------|----------|
-| `packages/policy/mqm-policy.yaml` | The one enforced policy: retention, deny patterns, RBAC, write tiers |
-| `packages/shared`, `packages/reporter`, `packages/mcp-server`, `packages/audit-client` | The runnable monorepo — see [PLAN.md](./PLAN.md) v2 |
-| `journeys/le_generation.yaml` | Curated (Tier 2) mortgage journey with TRID checkpoints |
+| `packages/policy/memory-vault-policy.yaml` | The one enforced policy: retention, deny patterns, RBAC, write tiers |
+| `packages/shared`, `packages/reporter`, `packages/mcp-server`, `packages/audit-client` | Runnable monorepo — see [PLAN.md](./PLAN.md) |
+| `packages/console` | Flow 2 demo UI (flake/journeys — not full KG browser) |
+| `journeys/*.yaml` | Tier 2 curated mortgage journeys |
 | `ai-inventory.yaml` | LL-2026-04 AI tool inventory |
-| `cursor/mcp.json`, `cursor/skills/mortgage-qa-triage/` | Cursor MCP config + triage skill |
-| `cursor/qa-testing-agents/` | QA agent definitions (AC explorer, testcase writer, ADO publisher, automation generator, QA assistant) |
-| `eval/` | Golden CI-failure set for flake-classification accuracy |
-| `fixtures/loan-scenarios/` | Synthetic loan data used by tests |
+| `cursor/mcp.json`, `cursor/skills/memory-vault-assist/`, `cursor/skills/memory-vault-triage/` | `memory-vault` MCP + skills |
+| `docs/archive/flow1-agents/` | Story-pipeline agents (deferred until Q1 pilot) |
+| `eval/` | Flake-classification eval gate |
 
 ---
 

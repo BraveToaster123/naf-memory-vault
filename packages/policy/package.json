@@ -1,10 +1,10 @@
 {
-  "name": "@mqm/policy",
+  "name": "@memory-vault/policy",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Mortgage QA Memory policy template (enforced pre-save).",
+  "description": "Memory Vault Policy template (enforced pre-save).",
   "files": [
-    "mqm-policy.yaml"
+    "memory-vault-policy.yaml"
   ]
 }

@@ -1,38 +1,43 @@
-// MCP-native prompt catalog — makes the "memory before browser" QA triage
-// workflow (previously only available as the Cursor-specific
-// cursor/skills/mortgage-qa-triage/SKILL.md file) discoverable and runnable
-// by ANY MCP host via prompts/list + prompts/get. Cursor's skill file still
-// works as-is; this is the portable equivalent for other clients.
+// MCP-native prompt catalog — portable workflows for memory-vault MCP hosts.
 import type { Prompt, PromptMessage } from "@modelcontextprotocol/sdk/types.js";
 
 export const PROMPT_META: Record<string, { domain: "qa" | "core" }> = {
   triage_qa_failure: { domain: "qa" },
+  lookup_story_status: { domain: "qa" },
 };
 
 export const prompts: Prompt[] = [
   {
     name: "triage_qa_failure",
     description:
-      "Memory-before-browser triage for a failed/flaky Playwright test on a mortgage UI journey. Same hard rules as the mortgage-qa-triage Cursor skill, exposed natively over MCP so any host can run it.",
+      "Memory-before-browser triage for a failed/flaky Playwright test. Same hard rules as memory-vault-triage skill.",
     arguments: [
       { name: "test_id", description: "Full test id, e.g. le_generation/apr visible", required: true },
       { name: "ci_failed", description: "true|false — was this triggered by a CI failure?", required: false },
       { name: "journey_id", description: "Override; otherwise derived from the test_id's [journey] tag", required: false },
     ],
   },
+  {
+    name: "lookup_story_status",
+    description: "Read-only story pipeline status from memory-vault KG (US_{ID}_* entities).",
+    arguments: [
+      { name: "user_story_id", description: "ADO user story ID, e.g. 471244", required: true },
+    ],
+  },
 ];
 
 /** Render a prompt by name. Throws on an unknown prompt name. */
 export function renderPrompt(name: string, args: Record<string, string>): PromptMessage[] {
-  if (name !== "triage_qa_failure") throw new Error(`unknown_prompt: ${name}`);
+  if (name === "triage_qa_failure") {
+    const testId = args.test_id ?? "";
+    const journeyId = args.journey_id || testId.split("/")[0] || "";
+    const ciFailed = args.ci_failed === "true";
 
-  const testId = args.test_id ?? "";
-  const journeyId = args.journey_id || testId.split("/")[0] || "";
-  const ciFailed = args.ci_failed === "true";
-
-  const text = `Investigate this Playwright failure using mortgage-qa-memory before opening a browser.
+    const text = `Investigate this Playwright failure using memory-vault before opening a browser.
 
 Target: test_id="${testId}", journey_id="${journeyId}", ci_failed=${ciFailed}.
+
+Start with: plan_qa_workflow(intent=triage_failure, test_id="${testId}", ci_failed=${ciFailed})
 
 Hard rules (never violate):
 1. Memory before browser — call get_failure_signature / should_skip_browser / get_test_history first.
@@ -42,32 +47,27 @@ Hard rules (never violate):
 5. record_run_summary accepts only: test_id, status, duration_ms, journey_id, error_class, error_hint (redacted), loan_scenario_id.
 6. Synthetic loan scenarios only — never paste real borrower data.
 
-Step 1 — Recall (mortgage-qa-memory MCP):
-  get_failure_signature(test_id="${testId}")
-  get_test_history(test_id="${testId}", limit=10)
-  should_skip_browser(test_id="${testId}")
+Follow ordered_plan from plan_qa_workflow. Report flake vs regression and suggested human next step.`;
 
-If should_skip_browser.skip is true: stop here, report the known flake, and go to Step 5.
+    return [{ role: "user", content: { type: "text", text } }];
+  }
 
-Step 2 — Context (mortgage-qa-memory MCP):
-  get_journey_map(journey_id="${journeyId}")
-  get_env_facts(env, overlay_key)
-  plan_qa_investigation(test_id="${testId}", ci_failed=${ciFailed})
+  if (name === "lookup_story_status") {
+    const storyId = (args.user_story_id ?? "").replace(/^US\s*/i, "").trim();
+    const text = `Look up exploration and pipeline status for user story US ${storyId}.
 
-Step 3 — Reproduce (playwright MCP — only if Step 1 said investigate):
-  browser_navigate to the staging URL from the journey map; verify the failing checkpoint.
-  Do not save browser_snapshot output to any file or memory tool.
+Start with: plan_qa_workflow(intent=check_story_status, user_story_id="${storyId}")
 
-Step 4 — Record (mortgage-qa-memory MCP):
-  record_run_summary(test_id="${testId}", status, duration_ms, journey_id="${journeyId}", error_class, loan_scenario_id="synthetic-retail-01")
+Then:
+1. search_nodes(query="US_${storyId}", namespace=qa)
+2. open_nodes for US_${storyId}_Summary and US_${storyId}_AC* entities
+3. Report stage, AC count, locators found, and suggested next step
 
-Step 5 — Report to the user:
-  - Flake vs new-regression classification
-  - Which checkpoint failed (if any)
-  - Suggested human next step (fix locator PR, env issue, app bug)
-  - Audit note that this was a policy-compliant, memory-first investigation
+Read-only — do not write to memory unless user explicitly asks to note something.
+Never fabricate data; cite memory-vault as the source.`;
 
-Escalate instead of proceeding if: a blocking TRID checkpoint fails on a release branch (-> QA lead + compliance smoke owner), or PII is detected in a CI error (-> platform team; do not store the error).`;
+    return [{ role: "user", content: { type: "text", text } }];
+  }
 
-  return [{ role: "user", content: { type: "text", text } }];
+  throw new Error(`unknown_prompt: ${name}`);
 }

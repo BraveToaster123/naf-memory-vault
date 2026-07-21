@@ -1,5 +1,5 @@
 {
-  "name": "@mqm/mcp-server",
+  "name": "@memory-vault/mcp-server",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -9,14 +9,14 @@
     "./manifest": "./src/manifest.ts"
   },
   "bin": {
-    "mortgage-qa-memory": "src/index.ts"
+    "memory-vault": "src/index.ts"
   },
   "scripts": {
     "start": "tsx src/index.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.4.0",
-    "@mqm/audit-client": "*",
-    "@mqm/shared": "*"
+    "@memory-vault/audit-client": "*",
+    "@memory-vault/shared": "*"
   }
 }

@@ -1,17 +1,17 @@
 /**
- * Flake-classification eval. Compares MQM's memory-derived classification
+ * Flake-classification eval. Compares memory-vault memory-derived classification
  * against the human-labeled golden set. Run after `npm run seed:demo`.
  *
  *   npm run eval
  *
- * Exits non-zero if accuracy falls below MQM_EVAL_MIN (default 0.6) so it can
+ * Exits non-zero if accuracy falls below MEMORY_VAULT_EVAL_MIN (default 0.6) so it can
  * gate CI. MVP target: >= 3 of 5 correct.
  */
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
-import { openDb, getFailureSignature, type Classification } from "@mqm/shared";
+import { openDb, getFailureSignature, type Classification } from "@memory-vault/shared";
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -47,7 +47,7 @@ function main(): void {
   db.close();
 
   const accuracy = golden.length ? correct / golden.length : 0;
-  const min = Number(process.env.MQM_EVAL_MIN ?? "0.8");
+  const min = Number(process.env.MEMORY_VAULT_EVAL_MIN ?? "0.8");
 
   // eslint-disable-next-line no-console
   console.table(rows);

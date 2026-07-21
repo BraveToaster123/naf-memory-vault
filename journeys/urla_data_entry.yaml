@@ -62,7 +62,7 @@ checkpoints:
 
 playwright:
   test_title_tag: "[urla_data_entry]"
-  synthetic_loan_id_env: MQM_LOAN_SCENARIO
+  synthetic_loan_id_env: MEMORY_VAULT_LOAN_SCENARIO
   projects:
     - chromium
 

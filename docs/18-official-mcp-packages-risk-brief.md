@@ -8,11 +8,11 @@
 
 | Doc | Use when |
 |-----|----------|
-| [16-playbook-mirror-privatize.md](./16-playbook-mirror-privatize.md) | Technical playbook: mirror tool surface, own governance |
-| [05-data-retention-and-privacy.md](./05-data-retention-and-privacy.md) | Our retention and PII philosophy |
+| [archive/design-essays/16-playbook-mirror-privatize.md](./archive/design-essays/16-playbook-mirror-privatize.md) | Technical playbook: mirror tool surface, own governance |
+| [PLAN.md](../PLAN.md) | Our retention and PII philosophy (v1 tiers) |
 | [15-poc-demo.md](./15-poc-demo.md) | Live demo of governed memory for stakeholders |
 | [14-operational-readiness.md](./14-operational-readiness.md) | Non-savable list, auth stages, namespace owners, production checklist |
-| [17-governed-memory-landscape.md](./17-governed-memory-landscape.md) | How peers and production teams handle the same gap |
+| [archive/design-essays/17-governed-memory-landscape.md](./archive/design-essays/17-governed-memory-landscape.md) | How peers and production teams handle the same gap |
 
 **Last updated:** 2026-07-15
 
@@ -115,7 +115,7 @@ flowchart TB
 **Real risks (material for us):**
 
 1. **Uncontrolled persistence** — Agents routinely summarize errors, URLs, and field values into `observations`. Without a pre-save gate, sensitive data becomes a permanent local archive.
-2. **Compliance exposure** — Indefinite storage of personal or loan-adjacent data without documented retention, access control, or deletion workflow conflicts with how we treat QA and audit data ([05-data-retention-and-privacy.md](./05-data-retention-and-privacy.md)).
+2. **Compliance exposure** — Indefinite storage of personal or loan-adjacent data without documented retention, access control, or deletion workflow conflicts with how we treat QA and audit data ([PLAN.md](../PLAN.md) v1 tiers).
 3. **Shared blast radius** — One file, one graph. A personalization experiment and a compliance workflow must not share the same memory store.
 4. **Memory poisoning** — Adversarial or untrusted content in context can be written as "facts" and recalled in later sessions (documented MCP class of risk; see [Checkmarx MCP risk survey](https://checkmarx.com/zero-post/11-emerging-ai-security-risks-with-mcp-model-context-protocol/)).
 5. **Destructive tools by default** — Delete operations require no confirmation; accidental or injected deletes are possible.
@@ -126,7 +126,7 @@ flowchart TB
 | Scenario | Recommendation |
 |----------|----------------|
 | Individual engineer, local machine, no customer/staging data | Acceptable for **personal experimentation** with explicit file path outside repo |
-| QA, mortgage staging, CI failures, compliance, or any team-shared agent | **Do not use vanilla `server-memory`** — use governed memory ([16-playbook-mirror-privatize.md](./16-playbook-mirror-privatize.md), this repo) |
+| QA, mortgage staging, CI failures, compliance, or any team-shared agent | **Do not use vanilla `server-memory`** — use governed memory ([archive/design-essays/16-playbook-mirror-privatize.md](./archive/design-essays/16-playbook-mirror-privatize.md), this repo) |
 | "We just want memory fast" | Fast path is **not** upstream package; it is our POC (`npm run smoke`, [15-poc-demo.md](./15-poc-demo.md)) |
 
 ---
@@ -137,7 +137,7 @@ flowchart TB
 |------------|-------------------------|-----------|
 | Agent tool names | 9 KG tools | Same 9 tools + QA domain tools |
 | Storage | Flat JSONL | SQLite with TTL |
-| PII / secrets | None | `deny_patterns` in [mqm-policy.yaml](../../packages/policy/mqm-policy.yaml) |
+| PII / secrets | None | `deny_patterns` in [memory-vault-policy.yaml](../../packages/policy/memory-vault-policy.yaml) |
 | Who can write where | Anyone | Role + namespace RBAC |
 | Retention | Manual file edit | Auto purge ([purge.ts](../../packages/shared/src/purge.ts)) |
 | Audit | None | Hash-chained log |
@@ -152,7 +152,7 @@ Proof point for leadership: `npm run smoke` → **`SMOKE PASS`** (policy block, 
 ### Approve
 
 - `@modelcontextprotocol/sdk` in repos where **we implement and operate** the MCP server
-- Governed memory MCP (`mortgage-qa-memory`) for QA and adjacent namespaces per [mqm-policy.yaml](../../packages/policy/mqm-policy.yaml)
+- Governed memory MCP (`memory-vault`) for QA and adjacent namespaces per [memory-vault-policy.yaml](../../packages/policy/memory-vault-policy.yaml)
 - Local `server-memory` only under a **personal, non-production** exception with security acknowledgment
 
 ### Deny or require exception
@@ -165,7 +165,7 @@ Proof point for leadership: `npm run smoke` → **`SMOKE PASS`** (policy block, 
 
 See [14-operational-readiness.md](./14-operational-readiness.md) for the full checklist. Minimum:
 
-- [ ] Interim non-savable list (§2) reviewed by compliance; patterns updated in [mqm-policy.yaml](../../packages/policy/mqm-policy.yaml)
+- [ ] Interim non-savable list (§2) reviewed by compliance; patterns updated in [memory-vault-policy.yaml](../../packages/policy/memory-vault-policy.yaml)
 - [ ] Namespace owners assigned (§4 worksheet); locked namespaces opened in policy
 - [ ] [ai-inventory.yaml](../../ai-inventory.yaml) signed off (§6)
 - [ ] Real staging CI wired (§5) if not local-only pilot
@@ -182,7 +182,7 @@ See [14-operational-readiness.md](./14-operational-readiness.md) for the full ch
 No. It is intentionally minimal — a teaching reference. The risk is **misusing a demo component as production infrastructure**.
 
 **Can we wrap `server-memory` with our own policy later?**  
-Possible, but we already implemented the mirror-and-govern pattern in this repo. Forking upstream buys little; owning the storage and gate is the work ([16-playbook-mirror-privatize.md](./16-playbook-mirror-privatize.md) §2).
+Possible, but we already implemented the mirror-and-govern pattern in this repo. Forking upstream buys little; owning the storage and gate is the work ([archive/design-essays/16-playbook-mirror-privatize.md](./archive/design-essays/16-playbook-mirror-privatize.md) §2).
 
 **Does using the SDK mean our data goes to Anthropic?**  
 No. stdio MCP runs locally. Data leaves the machine only if **our** server or agent sends it elsewhere.
@@ -201,4 +201,4 @@ Migrate to governed MCP config ([cursor/mcp.json](../../cursor/mcp.json)), rotat
 - [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)
 - [MCP architecture overview](https://modelcontextprotocol.io/docs/learn/architecture)
 - [Upstream safer-defaults discussion (GitHub #4117)](https://github.com/modelcontextprotocol/servers/issues/4117)
-- Internal: [16-playbook-mirror-privatize.md](./16-playbook-mirror-privatize.md), [17-governed-memory-landscape.md](./17-governed-memory-landscape.md)
+- Internal: [archive/design-essays/16-playbook-mirror-privatize.md](./archive/design-essays/16-playbook-mirror-privatize.md), [archive/design-essays/17-governed-memory-landscape.md](./archive/design-essays/17-governed-memory-landscape.md)

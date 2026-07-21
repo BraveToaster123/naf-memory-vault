@@ -67,52 +67,44 @@ CREATE TABLE IF NOT EXISTS audit_events (
 );
 CREATE INDEX IF NOT EXISTS idx_audit_ts ON audit_events(timestamp_utc);
 
--- ── Governed knowledge graph (server-memory-compatible) ─────────────────────
--- Entities, observations, and relations that back the create_entities /
--- add_observations / create_relations / search_nodes / open_nodes / read_graph
--- tool surface. Every write is gated by evaluatePolicy first (see graph.ts).
-CREATE TABLE IF NOT EXISTS entities (
-  name TEXT PRIMARY KEY,
+-- ── Governed knowledge graph (namespaced — kg.ts) ───────────────────────────
+CREATE TABLE IF NOT EXISTS kg_entities (
+  namespace TEXT NOT NULL,
+  name TEXT NOT NULL,
   entity_type TEXT NOT NULL,
-  app_id TEXT,
-  tier INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL,
-  expires_at TEXT
+  expires_at TEXT NOT NULL,
+  PRIMARY KEY (namespace, name)
 );
-CREATE INDEX IF NOT EXISTS idx_entities_type ON entities(entity_type);
-CREATE INDEX IF NOT EXISTS idx_entities_expires ON entities(expires_at);
+CREATE INDEX IF NOT EXISTS idx_kg_entities_ns ON kg_entities(namespace);
+CREATE INDEX IF NOT EXISTS idx_kg_entities_expires ON kg_entities(expires_at);
 
-CREATE TABLE IF NOT EXISTS observations (
-  id TEXT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS kg_observations (
+  namespace TEXT NOT NULL,
   entity_name TEXT NOT NULL,
   content TEXT NOT NULL,
   created_at TEXT NOT NULL,
-  expires_at TEXT,
-  UNIQUE(entity_name, content),
-  FOREIGN KEY (entity_name) REFERENCES entities(name) ON DELETE CASCADE
+  expires_at TEXT NOT NULL,
+  PRIMARY KEY (namespace, entity_name, content)
 );
-CREATE INDEX IF NOT EXISTS idx_obs_entity ON observations(entity_name);
-CREATE INDEX IF NOT EXISTS idx_obs_expires ON observations(expires_at);
+CREATE INDEX IF NOT EXISTS idx_kg_obs_ns ON kg_observations(namespace, entity_name);
+CREATE INDEX IF NOT EXISTS idx_kg_obs_expires ON kg_observations(expires_at);
 
-CREATE TABLE IF NOT EXISTS relations (
-  id TEXT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS kg_relations (
+  namespace TEXT NOT NULL,
   from_entity TEXT NOT NULL,
   to_entity TEXT NOT NULL,
   relation_type TEXT NOT NULL,
   created_at TEXT NOT NULL,
-  expires_at TEXT,
-  UNIQUE(from_entity, to_entity, relation_type),
-  FOREIGN KEY (from_entity) REFERENCES entities(name) ON DELETE CASCADE,
-  FOREIGN KEY (to_entity) REFERENCES entities(name) ON DELETE CASCADE
+  expires_at TEXT NOT NULL,
+  PRIMARY KEY (namespace, from_entity, to_entity, relation_type)
 );
-CREATE INDEX IF NOT EXISTS idx_rel_from ON relations(from_entity);
-CREATE INDEX IF NOT EXISTS idx_rel_to ON relations(to_entity);
-CREATE INDEX IF NOT EXISTS idx_rel_expires ON relations(expires_at);
+CREATE INDEX IF NOT EXISTS idx_kg_rel_ns ON kg_relations(namespace);
+CREATE INDEX IF NOT EXISTS idx_kg_rel_expires ON kg_relations(expires_at);
 `;
 
 export function dbPath(): string {
-  return process.env.MQM_DB_PATH ?? "./data/qa-memory.db";
+  return process.env.MEMORY_VAULT_DB_PATH ?? "./data/memory-vault.db";
 }
 
 /** Open (and migrate) the Tier 1 + audit SQLite store. */

@@ -1,4 +1,4 @@
-// Shared type contracts for Mortgage QA Memory (MQM).
+// Shared type contracts for Memory Vault.
 // See design docs 05 (retention), 07 (tools), 04 (audit).
 
 export type Tier = 0 | 1 | 2;
@@ -29,6 +29,8 @@ export interface WriteContext {
   principal: Principal;
   agent?: string;
   policyVersion?: string;
+  /** Knowledge-graph namespace (doc 09). Defaults to `qa` in kg.ts when omitted. */
+  namespace?: string;
 }
 
 /** Raw run info handed to the reporter/pipeline. `errorMessage` is NEVER stored raw. */
@@ -114,79 +116,52 @@ export interface PolicyDecision {
   matchedPattern?: string;
 }
 
-// ── Governed knowledge graph (server-memory-compatible) ─────────────────────
+// ── Namespaced knowledge graph (kg.ts — server-memory-compatible) ───────────
 
-/** Input to create_entities. `observations` are scanned for PII pre-save. */
-export interface EntityInput {
+export interface KgEntityInput {
   name: string;
   entityType: string;
   observations?: string[];
-  /** Optional project tag; falls back to MQM_APP_ID. */
-  appId?: string;
 }
 
-/** Input to add_observations. */
-export interface ObservationInput {
-  entityName: string;
-  contents: string[];
-}
-
-/** Input to create_relations. */
-export interface RelationInput {
+export interface KgRelationInput {
   from: string;
   to: string;
   relationType: string;
 }
 
-export interface EntityRow {
-  name: string;
-  entity_type: string;
-  app_id: string | null;
-  tier: number;
-  created_at: string;
-  updated_at: string;
-  expires_at: string | null;
+export interface KgObservationAdd {
+  entityName: string;
+  contents: string[];
 }
 
-export interface ObservationRow {
-  id: string;
-  entity_name: string;
-  content: string;
-  created_at: string;
-  expires_at: string | null;
+export interface KgObservationDelete {
+  entityName: string;
+  observations: string[];
 }
 
-export interface RelationRow {
-  id: string;
-  from_entity: string;
-  to_entity: string;
-  relation_type: string;
-  created_at: string;
-  expires_at: string | null;
-}
-
-/** server-memory-compatible node shape returned by read/search/open. */
-export interface GraphNode {
+export interface KgEntity {
   name: string;
   entityType: string;
   observations: string[];
 }
 
-export interface GraphRelation {
-  from: string;
-  to: string;
-  relationType: string;
+export interface KgGraph {
+  entities: KgEntity[];
+  relations: KgRelationInput[];
 }
 
-export interface KnowledgeGraph {
-  entities: GraphNode[];
-  relations: GraphRelation[];
+export interface KgDenied {
+  key: string;
+  reason: string;
+  matchedPattern?: string;
 }
 
-/** Per-item outcome of a gated graph write. */
-export interface GraphWriteResult<T> {
+export interface KgWriteResult<T> {
+  outcome: "allow";
   created: T[];
-  denied: Array<{ item: T; reason: string; matchedPattern?: string }>;
+  skippedExisting: string[];
+  denied: KgDenied[];
 }
 
 /** Thrown when a write is blocked pre-save. */

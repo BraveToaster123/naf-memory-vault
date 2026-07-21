@@ -210,3 +210,36 @@ test("namespace isolation: writes to qa are invisible from another namespace's r
   const prGraph = readGraph(db, "pr");
   assert.equal(prGraph.entities.length, 0);
 });
+
+test("credential observation is denied pre-save", () => {
+  const db = freshDb();
+  const res = createEntities(
+    db,
+    [{ name: "app_credentials", entityType: "secret", observations: ["password: hunter2"] }],
+    qaEngineer,
+    policy,
+  );
+  assert.equal(res.created.length, 0);
+  assert.equal(res.denied.length, 1);
+  assert.equal(res.denied[0]?.reason, "pii_pattern");
+});
+
+test("tier-2 graph write requires human approval", () => {
+  const db = freshDb();
+  const res = createEntities(
+    db,
+    [{ name: "curated", entityType: "journey", observations: ["step 1"] }],
+    { ...qaEngineer, tier: 2 },
+    policy,
+  );
+  assert.equal(res.created.length, 0);
+  assert.match(res.denied[0]?.reason ?? "", /require|approval|pr/i);
+});
+
+test("oversized observation is blocked", () => {
+  const db = freshDb();
+  const huge = "x".repeat(2001);
+  const res = createEntities(db, [{ name: "e", entityType: "t", observations: [huge] }], qaEngineer, policy);
+  assert.equal(res.created.length, 0);
+  assert.match(res.denied[0]?.reason ?? "", /exceeds/);
+});
