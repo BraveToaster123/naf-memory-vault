@@ -38,6 +38,7 @@ export const TOOL_META: Record<string, ToolMeta> = {
   remember_env_fact: { kind: "write", tier: 1, domain: "qa" },
   upsert_locator: { kind: "tier2_approval", tier: 2, domain: "qa" },
   get_audit_trail: { kind: "audit", tier: null, domain: "core" },
+  get_ai_inventory: { kind: "read", tier: null, domain: "core" },
 
   // Core knowledge-graph memory — generic engine (kg.ts), namespace-isolated.
   // Same tool surface as @modelcontextprotocol/server-memory, plus policy
@@ -207,6 +208,12 @@ export const tools: Tool[] = [
       },
       required: ["start_date", "end_date"],
     },
+  },
+  {
+    name: "get_ai_inventory",
+    description:
+      "Read the LL-2026-04 AI tool inventory (ai-inventory.yaml). Metadata only — review_status, tools registered, data_stored / not_stored.",
+    inputSchema: { type: "object", properties: {} },
   },
 
   // ── Core knowledge-graph memory ──────────────────────────────────────

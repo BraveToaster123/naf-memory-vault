@@ -38,4 +38,4 @@ These items are documented in [PLAN.md](../../PLAN.md) and [09-multi-domain-memo
 ## Related
 
 - [00-scope-and-principles.md](./00-scope-and-principles.md)
-- [17-governed-memory-landscape.md](../17-governed-memory-landscape.md) Option C hybrid
+- [archive/design-essays/17-governed-memory-landscape.md](../archive/design-essays/17-governed-memory-landscape.md) Option C hybrid

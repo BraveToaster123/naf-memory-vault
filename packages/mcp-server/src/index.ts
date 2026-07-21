@@ -33,6 +33,7 @@ import {
   readGraph,
   searchNodes,
   openNodes,
+  loadAiInventory,
   type Principal,
   type Role,
   type TestStatus,
@@ -57,10 +58,20 @@ const AUDIT_ROLES: Role[] = ["qa_lead", "qc_analyst", "platform"];
 
 const server = new Server(
   { name: "mortgage-qa-memory", version: "0.1.0" },
-  { capabilities: { tools: {}, resources: {} } },
+  { capabilities: { tools: {}, resources: {}, prompts: {} } },
 );
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools }));
+
+server.setRequestHandler(ListPromptsRequestSchema, async () => ({ prompts }));
+
+server.setRequestHandler(GetPromptRequestSchema, async (req) => {
+  const name = req.params.name;
+  const args = Object.fromEntries(
+    Object.entries(req.params.arguments ?? {}).map(([k, v]) => [k, String(v)]),
+  );
+  return { messages: renderPrompt(name, args) };
+});
 
 const KG_NAMESPACES = ["qa", "pr", "ops", "compliance", "product"] as const;
 
@@ -257,6 +268,16 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
           loanScenarioId: str(args.loan_scenario_id),
         });
         audit("success", `rows=${data.length}`);
+        return ok(data);
+      }
+
+      case "get_ai_inventory": {
+        if (!AUDIT_ROLES.includes(principal.role)) {
+          audit("blocked", "rbac_denied");
+          return fail("rbac_denied", { required_roles: AUDIT_ROLES });
+        }
+        const data = loadAiInventory();
+        audit("success", `review_status=${String((data as { review_status?: string }).review_status ?? "unknown")}`);
         return ok(data);
       }
 

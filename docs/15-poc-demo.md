@@ -18,7 +18,7 @@ Your POC gate passes locally. Evidence from [13-definition-of-done.md](./13-defi
 | Audit trail | ✅ | Every tool call logged; QC can query |
 | KG memory (Anthropic parity) | ✅ | Same 9 tools as `server-memory`, plus governance |
 | Namespace isolation | ✅ | `qa_engineer` cannot read `compliance` |
-| 30 tests green | ✅ | `npm test` |
+| Unit tests green | ✅ | `npm test` (33 tests) |
 
 You do **not** need staging, Playwright CI, or SSO for this demo.
 
@@ -50,17 +50,25 @@ One-shot prep + smoke + launch:
 npm run demo
 ```
 
-(`demo` seeds data, runs smoke, then starts the console — leave terminal open.)
+(`demo` seeds Tier 1 + namespace KG data, runs smoke, then starts the console — leave terminal open.)
 
 Optional: open these files in tabs for “show the policy” moments:
 
 - [packages/policy/mqm-policy.yaml](../packages/policy/mqm-policy.yaml) — namespaces + deny patterns
 - [journeys/le_generation.yaml](../journeys/le_generation.yaml) — Tier 2 curated journey
-- [17-governed-memory-landscape.md](./17-governed-memory-landscape.md) — how we compare to DoorDash / OSS peers
+- [archive/design-essays/17-governed-memory-landscape.md](./archive/design-essays/17-governed-memory-landscape.md) — how we compare to DoorDash / OSS peers
 
 ### Cursor setup (if demoing in IDE)
 
-Copy or symlink [cursor/mcp.json](../cursor/mcp.json) into your Cursor MCP config, or merge the `mortgage-qa-memory` block. Restart Cursor after changing MCP config.
+Copy or symlink [cursor/mcp.json](../cursor/mcp.json) into your Cursor MCP config (single `mortgage-qa-memory` server). For Playwright repro, see [cursor/mcp.browser.json.example](../cursor/mcp.browser.json.example). Restart Cursor after changing MCP config.
+
+### Deploy to another machine
+
+1. Clone repo; Node 20+
+2. `npm install && npm run demo` (or `seed:demo` + `smoke` if you skip the console)
+3. Expect terminal **SMOKE PASS**; console at **http://127.0.0.1:4173** if you ran `demo`
+4. Merge `mortgage-qa-memory` from `cursor/mcp.json` into Cursor; open repo as workspace
+5. **Optional:** real staging URLs in policy only when using Playwright MCP
 
 ---
 
@@ -230,5 +238,5 @@ See [14-operational-readiness.md](./14-operational-readiness.md) for full checkl
 - [11-implementation.md](./11-implementation.md) — package map + quickstart
 - [14-operational-readiness.md](./14-operational-readiness.md) — production gates, namespace owners, non-savable list
 - [09-multi-domain-memory.md](./09-multi-domain-memory.md) — full namespace rollout plan
-- [16-playbook-mirror-privatize.md](./16-playbook-mirror-privatize.md) — mirror + privatize Anthropic memory
-- [17-governed-memory-landscape.md](./17-governed-memory-landscape.md) — external projects survey
+- [archive/design-essays/16-playbook-mirror-privatize.md](./archive/design-essays/16-playbook-mirror-privatize.md) — mirror + privatize Anthropic memory
+- [archive/design-essays/17-governed-memory-landscape.md](./archive/design-essays/17-governed-memory-landscape.md) — external projects survey

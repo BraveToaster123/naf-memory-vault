@@ -1,6 +1,6 @@
 # Q4 — CI triage
 
-**Phase:** Q4 · **Status:** not_started  
+**Phase:** Q4 · **Status:** in_progress (POC skill + unified MCP done; pilot CI pending)  
 **Owner:** QA + platform  
 **Flow:** 2  
 **Duration:** 3–4 weeks (can overlap Q3)  
@@ -27,10 +27,10 @@ Flow 2 live: CI writes flake history; agents triage real staging failures with m
 
 ## Phase exit criteria
 
+- [x] Single MCP server entry in pilot config
 - [ ] Real `test_runs` from their CI (not seed-only)
 - [ ] 5 staging failures triaged with skill; ≥1 `should_skip_browser` save
-- [ ] 3 journeys with TRID checkpoints
-- [ ] Single MCP server entry in pilot config
+- [ ] 3 journeys with TRID checkpoints (YAML exist; content QA pending)
 
 ---
 

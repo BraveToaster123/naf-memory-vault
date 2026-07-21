@@ -33,7 +33,8 @@ packages/reporter/          Playwright MqmReporter
 packages/mcp-server/        QA-domain MCP + governed knowledge-graph MCP
 packages/audit-client/      hash-chained audit log
 journeys/                   Tier 2 curated YAML
-cursor/qa-testing-agents/    QA agent definitions
+cursor/skills/mortgage-qa-triage/  CI triage skill (Flow 2)
+docs/archive/flow1-agents/         Story-pipeline agents (deferred Flow 1)
 eval/                        golden CI failure labels
 ```
 

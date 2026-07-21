@@ -89,7 +89,7 @@ Auth controls **who can read/write which namespace**. It does **not** replace PI
 | **Pilot** — small team, each on own laptop + own SQLite | Low urgency | Same; isolated DB per machine |
 | **Shared service** — one memory DB, many users/agents | **Yes, required** | Gateway SSO must assert role before MCP sees the call |
 
-**NEEDS-ENV item:** replace trust-on-honor `MQM_USER_ROLE` with cryptographically verified identity at the gateway. See [12-integration-mcp.md](./12-integration-mcp.md) and [16-playbook-mirror-privatize.md §6](./16-playbook-mirror-privatize.md).
+**NEEDS-ENV item:** replace trust-on-honor `MQM_USER_ROLE` with cryptographically verified identity at the gateway. See [12-integration-mcp.md](./12-integration-mcp.md) and [archive/design-essays/16-playbook-mirror-privatize.md §6](./archive/design-essays/16-playbook-mirror-privatize.md).
 
 ---
 
@@ -203,5 +203,5 @@ flowchart TB
 ## Related docs
 
 - [15-poc-demo.md](./15-poc-demo.md) — live stakeholder demo script
-- [16-playbook-mirror-privatize.md](./16-playbook-mirror-privatize.md) — technical mirror + govern playbook
+- [archive/design-essays/16-playbook-mirror-privatize.md](./archive/design-essays/16-playbook-mirror-privatize.md) — technical mirror + govern playbook
 - [11-implementation.md](./11-implementation.md) — package map + quickstart

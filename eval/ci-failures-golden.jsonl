@@ -1,5 +1,0 @@
-{"test_id": "le_generation/apr visible", "label": "flake", "signature": "fs_8a2c91", "error_class": "TimeoutError", "notes": "Firefox staging only; stable 15% flake rate"}
-{"test_id": "cd_generation/fee table", "label": "regression", "signature": "fs_def456", "error_class": "AssertionError", "notes": "Broke on deploy 18440; fee section selector changed"}
-{"test_id": "urla_data_entry/required fields", "label": "regression", "signature": "fs_abc123", "error_class": "AssertionError", "notes": "New validation rule 2026-07-01"}
-{"test_id": "le_generation/issue date", "label": "flake", "signature": "fs_9912aa", "error_class": "TimeoutError", "notes": "UAT only when SSO slow"}
-{"test_id": "eclose_package/consent", "label": "regression", "signature": "fs_ec01", "error_class": "Error", "notes": "Third-party e-sign iframe load failure — env fact candidate"}

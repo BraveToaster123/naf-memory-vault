@@ -11,6 +11,15 @@
         "MQM_USER_ROLE": "qa_engineer",
         "MQM_USER_ID": "local-user"
       }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--headless",
+        "--isolated",
+        "--browser=chromium"
+      ]
     }
   }
 }

@@ -8,11 +8,11 @@
 
 | Doc | Use when |
 |-----|----------|
-| [16-playbook-mirror-privatize.md](./16-playbook-mirror-privatize.md) | Technical playbook: mirror tool surface, own governance |
+| [archive/design-essays/16-playbook-mirror-privatize.md](./archive/design-essays/16-playbook-mirror-privatize.md) | Technical playbook: mirror tool surface, own governance |
 | [05-data-retention-and-privacy.md](./05-data-retention-and-privacy.md) | Our retention and PII philosophy |
 | [15-poc-demo.md](./15-poc-demo.md) | Live demo of governed memory for stakeholders |
 | [14-operational-readiness.md](./14-operational-readiness.md) | Non-savable list, auth stages, namespace owners, production checklist |
-| [17-governed-memory-landscape.md](./17-governed-memory-landscape.md) | How peers and production teams handle the same gap |
+| [archive/design-essays/17-governed-memory-landscape.md](./archive/design-essays/17-governed-memory-landscape.md) | How peers and production teams handle the same gap |
 
 **Last updated:** 2026-07-15
 
@@ -126,7 +126,7 @@ flowchart TB
 | Scenario | Recommendation |
 |----------|----------------|
 | Individual engineer, local machine, no customer/staging data | Acceptable for **personal experimentation** with explicit file path outside repo |
-| QA, mortgage staging, CI failures, compliance, or any team-shared agent | **Do not use vanilla `server-memory`** — use governed memory ([16-playbook-mirror-privatize.md](./16-playbook-mirror-privatize.md), this repo) |
+| QA, mortgage staging, CI failures, compliance, or any team-shared agent | **Do not use vanilla `server-memory`** — use governed memory ([archive/design-essays/16-playbook-mirror-privatize.md](./archive/design-essays/16-playbook-mirror-privatize.md), this repo) |
 | "We just want memory fast" | Fast path is **not** upstream package; it is our POC (`npm run smoke`, [15-poc-demo.md](./15-poc-demo.md)) |
 
 ---
@@ -182,7 +182,7 @@ See [14-operational-readiness.md](./14-operational-readiness.md) for the full ch
 No. It is intentionally minimal — a teaching reference. The risk is **misusing a demo component as production infrastructure**.
 
 **Can we wrap `server-memory` with our own policy later?**  
-Possible, but we already implemented the mirror-and-govern pattern in this repo. Forking upstream buys little; owning the storage and gate is the work ([16-playbook-mirror-privatize.md](./16-playbook-mirror-privatize.md) §2).
+Possible, but we already implemented the mirror-and-govern pattern in this repo. Forking upstream buys little; owning the storage and gate is the work ([archive/design-essays/16-playbook-mirror-privatize.md](./archive/design-essays/16-playbook-mirror-privatize.md) §2).
 
 **Does using the SDK mean our data goes to Anthropic?**  
 No. stdio MCP runs locally. Data leaves the machine only if **our** server or agent sends it elsewhere.
@@ -201,4 +201,4 @@ Migrate to governed MCP config ([cursor/mcp.json](../../cursor/mcp.json)), rotat
 - [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)
 - [MCP architecture overview](https://modelcontextprotocol.io/docs/learn/architecture)
 - [Upstream safer-defaults discussion (GitHub #4117)](https://github.com/modelcontextprotocol/servers/issues/4117)
-- Internal: [16-playbook-mirror-privatize.md](./16-playbook-mirror-privatize.md), [17-governed-memory-landscape.md](./17-governed-memory-landscape.md)
+- Internal: [archive/design-essays/16-playbook-mirror-privatize.md](./archive/design-essays/16-playbook-mirror-privatize.md), [archive/design-essays/17-governed-memory-landscape.md](./archive/design-essays/17-governed-memory-landscape.md)

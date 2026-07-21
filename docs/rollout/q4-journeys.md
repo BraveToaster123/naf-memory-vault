@@ -9,7 +9,7 @@
 
 ## Problem
 
-Triage and compliance checks need curated journey maps with TRID checkpoints. Only `le_generation` is complete today.
+Triage and compliance checks need curated journey maps with TRID checkpoints. Three Tier 2 YAML files exist today (`le_generation`, `cd_generation`, `urla_data_entry`); content quality varies — treat as pilot seed, not production-complete.
 
 ## User story
 

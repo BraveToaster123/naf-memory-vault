@@ -30,7 +30,7 @@
 | **We use it in** | `packages/mcp-server` (server), `smoke.ts` (client) |
 | **Security stance** | Low inherent risk; **you own what your server stores and who can call tools** |
 | **Supply chain** | Pin version in lockfile; review upgrades |
-| **Known gaps we accept** | No built-in auth; no resource subscriptions yet — see [16-playbook §5](./16-playbook-mirror-privatize.md) |
+| **Known gaps we accept** | No built-in auth; no resource subscriptions yet — see [archive/design-essays/16-playbook §5](./archive/design-essays/16-playbook-mirror-privatize.md) |
 
 **Do not depend on** upstream `@modelcontextprotocol/server-memory`. We reimplemented its 9-tool surface in `packages/shared/src/kg.ts` with governance.
 
@@ -156,7 +156,7 @@ Follow [15-poc-demo.md](./15-poc-demo.md). Prove PII deny, namespace deny, audit
 
 ### Path D — Fork for another domain
 
-1. Copy **core** pattern from [16-playbook-mirror-privatize.md](./16-playbook-mirror-privatize.md) §4 checklist
+1. Copy **core** pattern from [archive/design-essays/16-playbook-mirror-privatize.md](./archive/design-essays/16-playbook-mirror-privatize.md) §4 checklist
 2. Keep `packages/shared/kg.ts`, `policy.ts`, `audit-client`
 3. Replace `domain: "qa"` tools in `packages/mcp-server/src/tools.ts`
 4. Add namespace + roles in policy YAML
@@ -172,7 +172,7 @@ Seams documented in [12-integration-mcp.md](./12-integration-mcp.md).
 | Namespace owners | [14 §4](./14-operational-readiness.md) |
 | Gateway SSO | [12-integration-mcp.md §4](./12-integration-mcp.md), [08-integration-with-existing-stack.md](./08-integration-with-existing-stack.md) |
 | Postgres / HA | [06-build-from-scratch.md](./06-build-from-scratch.md) post-MVP notes |
-| Compare OSS peers | [17-governed-memory-landscape.md](./17-governed-memory-landscape.md) |
+| Compare OSS peers | [archive/design-essays/17-governed-memory-landscape.md](./archive/design-essays/17-governed-memory-landscape.md) |
 
 ---
 
@@ -218,8 +218,8 @@ When copying this pattern into another repo:
 | 13 | [Definition of done](./13-definition-of-done.md) | Engineering gates |
 | 14 | [Operational readiness](./14-operational-readiness.md) | Security/compliance gates |
 | 15 | [POC demo](./15-poc-demo.md) | Stakeholder demo |
-| 16 | [Playbook: mirror + privatize](./16-playbook-mirror-privatize.md) | Portable technical pattern |
-| 17 | [Governed memory landscape](./17-governed-memory-landscape.md) | OSS/production survey |
+| 16 | [Playbook: mirror + privatize](./archive/design-essays/16-playbook-mirror-privatize.md) | Portable technical pattern |
+| 17 | [Governed memory landscape](./archive/design-essays/17-governed-memory-landscape.md) | OSS/production survey |
 | 18 | [Official MCP package risks](./18-official-mcp-packages-risk-brief.md) | Leadership decision |
 | — | [tools.json](./tools.json) | Machine-readable contract |
 

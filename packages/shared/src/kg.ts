@@ -38,6 +38,14 @@ function ttlFor(policy: Policy, namespace: string): string {
   return isoPlusDays(namespaceRetentionDays(namespace, 30, policy));
 }
 
+function graphLimits(policy: Policy): { maxObsChars: number; maxObsPerEntity: number } {
+  const g = (policy.raw?.graph ?? {}) as Record<string, unknown>;
+  return {
+    maxObsChars: typeof g.max_observation_chars === "number" ? g.max_observation_chars : 2000,
+    maxObsPerEntity: typeof g.max_observations_per_entity === "number" ? g.max_observations_per_entity : 200,
+  };
+}
+
 interface EntityRow {
   namespace: string;
   name: string;
@@ -76,13 +84,26 @@ export function createEntities(
   const created: KgEntity[] = [];
   const skippedExisting: string[] = [];
   const denied: KgDenied[] = [];
+  const { maxObsChars, maxObsPerEntity } = graphLimits(policy);
 
   for (const e of entities) {
     if (entityExists(db, namespace, e.name, now)) {
       skippedExisting.push(e.name);
       continue;
     }
-    const observations = [...new Set(e.observations ?? [])];
+    const observations = [...new Set((e.observations ?? []).filter((o) => o.length > 0))];
+    const tooLong = observations.find((o) => o.length > maxObsChars);
+    if (tooLong !== undefined) {
+      denied.push({
+        key: e.name,
+        reason: `observation exceeds ${maxObsChars} chars (raw content not allowed)`,
+      });
+      continue;
+    }
+    if (observations.length > maxObsPerEntity) {
+      denied.push({ key: e.name, reason: `too many observations (> ${maxObsPerEntity})` });
+      continue;
+    }
     const decision = evaluatePolicy({ name: e.name, entityType: e.entityType, observations }, ctx, policy);
     if (decision.outcome !== "allow") {
       denied.push({ key: e.name, reason: decision.reason, matchedPattern: decision.matchedPattern });
@@ -168,6 +189,7 @@ export function addObservations(
   const results: ObservationAddResult[] = [];
   const notFound: string[] = [];
   const denied: KgDenied[] = [];
+  const { maxObsChars } = graphLimits(policy);
 
   for (const add of adds) {
     if (!entityExists(db, namespace, add.entityName, now)) {
@@ -176,8 +198,15 @@ export function addObservations(
     }
     const existing = new Set(loadObservations(db, namespace, add.entityName, now));
     const addedForEntity: string[] = [];
-    for (const content of [...new Set(add.contents)]) {
+    for (const content of [...new Set((add.contents ?? []).filter((c) => c.length > 0))]) {
       if (existing.has(content)) continue;
+      if (content.length > maxObsChars) {
+        denied.push({
+          key: `${add.entityName}:${content}`,
+          reason: `observation exceeds ${maxObsChars} chars (raw content not allowed)`,
+        });
+        continue;
+      }
       const decision = evaluatePolicy({ entityName: add.entityName, content }, ctx, policy);
       if (decision.outcome !== "allow") {
         denied.push({ key: `${add.entityName}:${content}`, reason: decision.reason, matchedPattern: decision.matchedPattern });

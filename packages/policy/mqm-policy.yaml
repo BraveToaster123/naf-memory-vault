@@ -21,6 +21,26 @@ metadata:
     - role: security
     - role: compliance
 
+# ─── Namespace isolation (doc 09) ───────────────────────────────────────────
+
+namespaces:
+  qa:
+    retention_days: 30
+    writers: [qa_engineer, qa_lead]
+    readers: [qa_engineer, qa_lead, engineer, qc_analyst, platform]
+  pr:
+    retention_days: 30
+    writers: [engineer, qa_lead, platform]
+    readers: [engineer, qa_lead, platform]
+  compliance:
+    retention_days: 365
+    writers: [platform]
+    readers: [qc_analyst, qa_lead, platform]
+  ops:
+    retention_days: 30
+    writers: [platform]
+    readers: [platform, qc_analyst]
+
 # ─── URL / environment boundaries ───────────────────────────────────────────
 
 urls:
@@ -124,7 +144,6 @@ write_permissions:
 
   tier2_approval_required:
     - upsert_locator
-    - propose_checkpoint
 
   tier2_workflow: git_pr_approval  # opens PR; no direct write
 
@@ -141,7 +160,7 @@ roles:
     read: all_read_tools
     write: tier0_automatic
   qc_analyst:
-    read: all_read_tools + get_audit_trail + export_qc_sample
+    read: all_read_tools + get_audit_trail + get_ai_inventory
     write: []
   platform:
     read: all

@@ -1,10 +1,10 @@
 # QA Testing Agents
 
-Cursor agents for the NAF Link QA workflow: explore acceptance criteria in the browser, write manual test cases, publish them to Azure DevOps, and generate Playwright automation. All agents share exploration data through **NAF QA Memory** so downstream steps use real UI steps and locators—not guesses.
+Cursor agents for the NAF Link QA workflow: explore acceptance criteria in the browser, write manual test cases, publish them to Azure DevOps, and generate Playwright automation. All agents share exploration data through **`mortgage-qa-memory`** so downstream steps use real UI steps and locators—not guesses.
 
-**Phased rollout:** [../docs/rollout/README.md](../docs/rollout/README.md) — Q1–Q5 delivery plan and per-feature specs.  
+**Phased rollout:** [../../docs/rollout/README.md](../../docs/rollout/README.md) — Q1–Q5 delivery plan and per-feature specs.  
 **E2E code target:** `c:\Projects\greenfield-e2e\` (Profile B greenfield .NET) — not this repo.  
-**Automation profile:** `automation-generator` targets Profile A (NAFLink) today; Profile B may require hand-authored tests or agent update — see [../docs/rollout/q3-automation-generator.md](../docs/rollout/q3-automation-generator.md) and [../docs/rollout/q3-qa-profile.md](../docs/rollout/q3-qa-profile.md).
+**Automation profile:** `automation-generator` targets Profile A (NAFLink) today; Profile B may require hand-authored tests or agent update — see [../../docs/rollout/q3-automation-generator.md](../../docs/rollout/q3-automation-generator.md) and [../../docs/rollout/q3-qa-profile.md](../../docs/rollout/q3-qa-profile.md).
 
 **Reference:** [AgentHelper.docx](https://naf365-my.sharepoint.com/:w:/r/personal/monique_thibodeaux_nafinc_com/_layouts/15/Doc.aspx?sourcedoc=%7B266EA0C3-B7F6-4964-AE9B-E9B9FD23BAD7%7D&file=AgentHelper.docx&action=default&mobileredirect=true)
 
@@ -16,7 +16,7 @@ Cursor agents for the NAF Link QA workflow: explore acceptance criteria in the b
 flowchart LR
   ADO["Azure DevOps\nUser Story + ACs"]
   Explorer["ac-explorer"]
-  Memory["NAF QA Memory"]
+  Memory["mortgage-qa-memory"]
   Writer["testcase-writer"]
   Publisher["ado-publisher"]
   Generator["automation-generator"]
@@ -180,15 +180,17 @@ flowchart LR
 
 ## Prerequisites
 
-- **Cursor** with browser MCP (Playwright) and Azure DevOps MCP enabled
-- **NAF QA Memory** configured for shared agent state
+- **Cursor** with `mortgage-qa-memory` MCP ([../../cursor/mcp.json](../../cursor/mcp.json))
+- **Optional:** Playwright MCP — merge [../../cursor/mcp.browser.json.example](../../cursor/mcp.browser.json.example)
+- **Optional:** Azure DevOps MCP — enable separately when running the story pipeline (org credentials required)
 - **ADO project:** Lender Link Project Management
 - **App URL:** `https://qa.ll.nafinc.com` (QA only—never production)
-- **Login credentials** stored in NAF QA Memory (not in repo or chat)
+- **Login credentials** stored in memory MCP (not in repo or chat)
 
 ---
 
 ## Related docs
 
-- [Cursor Browser Automation Architecture](../docs/architecture/cursor-browser-automation.md) — MCP vs committed Playwright tests
-- [Playwright E2E Framework Architecture](../docs/architecture/playwright-e2e-framework.md) — repo layout and CI
+- [QA rollout plan](../../docs/rollout/README.md)
+- [Playwright + MCP integration](../../docs/03-qa-automation-playwright.md)
+- [POC demo guide](../../docs/15-poc-demo.md)

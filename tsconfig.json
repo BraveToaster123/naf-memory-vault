@@ -2,9 +2,7 @@
   "extends": "./tsconfig.base.json",
   "include": [
     "packages/**/*.ts",
-    "eval/**/*.ts",
-    "tests/**/*.ts",
-    "playwright.config.ts"
+    "eval/**/*.ts"
   ],
   "exclude": ["**/node_modules", "**/dist"]
 }

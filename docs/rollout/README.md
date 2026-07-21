@@ -35,7 +35,7 @@ flowchart TB
 
 | Flow | Memory surface | Primary docs |
 |------|----------------|--------------|
-| **Flow 1** | KG entities (`US_{ID}_*`) in `qa` namespace | Q1–Q3 |
+| **Flow 1** | KG entities (`US_{ID}_*`) in `qa` namespace | [archive/rollout-q1-q3](../archive/rollout-q1-q3/) (deferred) |
 | **Flow 2** | `test_runs`, signatures, journeys, env facts | Q4, console |
 
 ---
@@ -56,33 +56,9 @@ Q4 can overlap Q3 if a separate engineer owns CI reporter wiring.
 
 ## Feature index
 
-### Q1 — Exploration memory pilot
+### Q1–Q3 — Story pipeline (archived)
 
-| Doc | Feature |
-|-----|---------|
-| [q1-exploration-pilot.md](./q1-exploration-pilot.md) | Phase umbrella |
-| [q1-ac-explorer-pilot.md](./q1-ac-explorer-pilot.md) | External QA `ac-explorer` on 2–3 stories |
-| [q1-entity-schema-contract.md](./q1-entity-schema-contract.md) | `US_{ID}_*` entity shape |
-| [q1-kg-console-read.md](./q1-kg-console-read.md) | Console KG browse (read-only) |
-| [q1-staging-and-credentials.md](./q1-staging-and-credentials.md) | Policy URLs + `credential_ref` |
-
-### Q2 — Story pipeline
-
-| Doc | Feature |
-|-----|---------|
-| [q2-story-pipeline.md](./q2-story-pipeline.md) | Phase umbrella |
-| [q2-testcase-writer.md](./q2-testcase-writer.md) | Manual TCs from exploration memory |
-| [q2-ado-publisher.md](./q2-ado-publisher.md) | Publish TCs to ADO |
-| [q2-tier2-locators.md](./q2-tier2-locators.md) | Durable locators via PR |
-
-### Q3 — Automation + lookup
-
-| Doc | Feature |
-|-----|---------|
-| [q3-automation-and-assistant.md](./q3-automation-and-assistant.md) | Phase umbrella |
-| [q3-automation-generator.md](./q3-automation-generator.md) | Playwright C# from memory |
-| [q3-qa-assistant.md](./q3-qa-assistant.md) | Read-only status / locator lookup |
-| [q3-qa-profile.md](./q3-qa-profile.md) | Injected app/ADO/memory config |
+Specs moved to [../archive/rollout-q1-q3/](../archive/rollout-q1-q3/). Agent defs: [../archive/flow1-agents/](../archive/flow1-agents/).
 
 ### Q4 — CI triage
 
@@ -122,7 +98,7 @@ Q4 can overlap Q3 if a separate engineer owns CI reporter wiring.
 | Q5 | Phase 2 polish + operational readiness |
 | Deferred | Phase 4–5 + namespace roadmap |
 
-**Already done:** PLAN v3 Phase 1 (governed memory core) — `npm run smoke:graph`.
+**Already done:** PLAN v3 Phase 1 (governed memory core) — `npm run smoke`. Unified MCP — [q4-unified-mcp-server.md](./q4-unified-mcp-server.md).
 
 ---
 
@@ -150,4 +126,4 @@ Every `q*-*.md` feature doc uses:
 | [03-qa-automation-playwright.md](../03-qa-automation-playwright.md) | Playwright MCP |
 | [07-mcp-tools-specification.md](../07-mcp-tools-specification.md) | Tool catalog |
 | [14-operational-readiness.md](../14-operational-readiness.md) | Compliance gates |
-| [cursor/qa-testing-agents/README.md](../../cursor/qa-testing-agents/README.md) | Agent pipeline |
+| [docs/archive/flow1-agents/README.md](../archive/flow1-agents/README.md) | Story-pipeline agents (deferred) |

@@ -1,6 +1,6 @@
 ---
 description: "Use when: publishing manual test cases to Azure DevOps, creating test case work items, adding test steps to ADO, linking test cases to user stories. Trigger: publish test cases, create ADO test cases, push to ADO, link test cases."
-tools: [Azure DevOps/*, naf-qa-memory/*]
+tools: [microsoft/azure-devops-mcp/*, mortgage-qa-memory/*]
 argument-hint: "Provide the user story ID, e.g. 'publish test cases for US 471244'"
 ---
 
@@ -57,7 +57,7 @@ Proceed? (yes/no)
    - **State**: Design
    - **Automation Status**: Not Automated
 8. Link each test case to the parent user story as a child/tested-by relation
-9. Store the created TC IDs back in memory for `test-generator` to reference
+9. Store the created TC IDs back in memory for `automation-generator` to reference
 
 ### Step 4: Report Results
 10. Present creation results:

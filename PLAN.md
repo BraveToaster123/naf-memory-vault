@@ -30,7 +30,7 @@ Salesforce's Agentic Memory pattern.
 | Memory Policy enforced pre-save | `mqm-policy.yaml` — deny fields/patterns, retention, RBAC — is code, not documentation |
 | Write gates / read gates (Salesforce) | Deny-by-default writes; read tools scoped by role |
 | Namespace isolation | `qa`, `pr`, `ops`, `compliance`, `product` namespaces on one server (see v3) |
-| Eval platform (completeness/accuracy/freshness) | Golden CI-failure set (`eval/ci-failures-golden.jsonl`) |
+| Eval platform (completeness/accuracy/freshness) | Golden CI-failure set (`eval/ci-failures.jsonl`) |
 
 **Explicitly skipped:** consumer behavioral profiling, dense embeddings/vector
 search (v1 doesn't need it), unstructured conversational memory, auto-promotion
@@ -76,7 +76,7 @@ made lending decisions.
 - `ai-inventory.yaml` documents every AI tool touching this workflow (MQM
   server, Playwright MCP, Gemini gateway, Cursor); reviewed at least annually.
 - QC/compliance query audit by `loan_scenario_id`, `journey_id`, or principal
-  via `get_audit_trail` / `export_qc_sample`, RBAC-limited to
+  via `get_audit_trail` / `get_ai_inventory`, RBAC-limited to
   `qa_lead` / `qc_analyst` / `platform`.
 
 ### What we explicitly do not build
@@ -98,7 +98,7 @@ What got implemented first, turning the v1 design into a runnable
 | Package | Role |
 |---------|------|
 | `packages/policy` | `mqm-policy.yaml` — retention, deny patterns, write tiers, RBAC |
-| `packages/shared` | types, redact, signature, policy engine, save pipeline, SQLite, queries, purge, graph store |
+| `packages/shared` | types, redact, signature, policy engine, save pipeline, SQLite, queries, purge, kg store |
 | `packages/reporter` | Playwright `MqmReporter` → Tier 1 SQLite |
 | `packages/mcp-server` | MCP tools (QA read/write + governed knowledge-graph tools) |
 | `packages/audit-client` | append-only, hash-chained audit log + QC query |
@@ -110,27 +110,27 @@ npm install
 npm run typecheck        # type-check the whole monorepo
 npm test                 # policy / redact / pipeline / graph unit tests
 npm run seed:demo        # populate ./data/qa-memory.db with synthetic history
-npm run smoke            # exercise the QA-domain MCP tools
-npm run smoke:graph      # exercise the governed graph MCP tools
-npm run eval             # flake-classification accuracy gate (>= 0.6)
+npm run smoke            # QA + KG MCP tools (expect SMOKE PASS)
+npm run eval             # flake-classification accuracy gate (>= 0.8)
 npm run purge            # hard-delete expired Tier 1 rows
+npm run console          # Flow 2 demo UI at http://127.0.0.1:4173
 ```
 
 Point Cursor at [`cursor/mcp.json`](./cursor/mcp.json) and add the
-[`mortgage-qa-triage`](./cursor/skills/mortgage-qa-triage/SKILL.md) skill to
-enforce memory-before-browser.
+[`mortgage-qa-triage`](./cursor/skills/mortgage-qa-triage/SKILL.md) skill.
+Portable triage prompt also available via MCP `prompts/list` (`triage_qa_failure`).
 
 ### MCP tool surface
 
 Read: `get_flaky_tests`, `get_test_history`, `get_failure_signature`,
 `should_skip_browser`, `get_env_facts`, `get_journey_map`,
 `get_compliance_checkpoint`, `plan_qa_investigation`, `get_ai_inventory`,
-`get_audit_trail`, `export_qc_sample`.
+`get_audit_trail`, plus KG reads (`read_graph`, `search_nodes`, `open_nodes`).
 
 Gated writes: `record_run_summary`, `tag_failure_signature`,
-`remember_env_fact` (Tier 1, auto). `upsert_locator` / `propose_checkpoint`
-(Tier 2) return `require_approval` — a human opens a PR; the agent never
-writes curated memory directly.
+`remember_env_fact` (Tier 1, auto). `upsert_locator` (Tier 2) returns
+`require_approval` — a human opens a PR; the agent never writes curated memory
+directly.
 
 Denied by design (never implement): `remember_raw_snapshot`,
 `remember_network_body`, `remember_prompt`, `export_full_error`.
@@ -142,14 +142,14 @@ RBAC (`MQM_USER_ROLE`, wired from SSO at the gateway):
 | `get_flaky_tests` etc. (read) | ✓ | ✓ | ✓ | ✓ |
 | `record_run_summary` / `remember_env_fact` | ✓ | ✓ | — | — |
 | `get_audit_trail` | — | ✓ | ✓ | ✓ |
-| `upsert_locator` / `propose_checkpoint` | draft | approve | — | ✓ |
+| `upsert_locator` | draft | approve | — | ✓ |
 | Policy edit | — | — | — | ✓ |
 
 ### Integration contract (for other tools/agents)
 
 | Surface | Contract |
 |---------|----------|
-| MCP server (stdio) | `packages/mcp-server/src/index.ts` (QA tools), `src/graph-index.ts` (graph tools) |
+| MCP server (stdio) | `packages/mcp-server/src/index.ts` (QA + KG tools) |
 | npm packages | `@mqm/shared`, `@mqm/reporter`, `@mqm/audit-client` — safe to embed without the MCP server |
 | Policy | `packages/policy/mqm-policy.yaml` — the one enforced copy (see v3, "reconcile policy files") |
 
@@ -159,7 +159,7 @@ Env vars: `MQM_POLICY_PATH`, `MQM_DB_PATH`, `MQM_JOURNEYS_DIR`, `MQM_ENV`,
 Engine vs domain seam: each tool is tagged `domain: "core" | "qa"` in
 `packages/mcp-server/src/tools.ts`. Generic, reusable modules in
 `@mqm/shared`: `policy.ts`, `pipeline.ts` (row shape is QA-specific),
-`db.ts` (schema is QA-specific), `redact.ts`, `signature.ts`, `graph.ts`.
+`db.ts` (schema is QA-specific), `redact.ts`, `signature.ts`, `kg.ts`.
 QA-specific: `queries.ts`, `reporter`.
 
 ### POC/MVP definition-of-done (as shipped)
@@ -173,7 +173,7 @@ QA-specific: `queries.ts`, `reporter`.
 | `mortgage-qa-triage` Cursor skill; Playwright MCP wired (staging allowlist, no `run_code_unsafe`) | DONE |
 | Thin, hash-chained audit per tool call; `get_audit_trail` RBAC-gated | DONE |
 | Purge removes expired Tier 1 rows; CI artifact + eval gate wired | DONE |
-| 2–3 journeys with TRID checkpoints | PARTIAL — 1 shipped (`le_generation`); add `cd_generation`, `urla_data_entry` |
+| 2–3 journeys with TRID checkpoints | DONE — `le_generation`, `cd_generation`, `urla_data_entry` |
 | Compliance sign-off on `ai-inventory.yaml` | NEEDS-HUMAN — still `draft_pending_signoff` |
 | 5 real CI failures triaged on staging | NEEDS-ENV — eval currently uses the synthetic golden set |
 
@@ -196,26 +196,19 @@ second, ungoverned store.
 
 ### Phase 1 — Governed memory core ✅ (done)
 
-- SQLite-backed graph: `entities` / `observations` / `relations` (+ FK cascade).
+- SQLite-backed graph: `kg_entities` / `kg_observations` / `kg_relations` (namespaced).
 - `server-memory`-compatible tools: `create_entities`, `add_observations`,
   `create_relations`, `delete_*`, `search_nodes`, `open_nodes`, `read_graph`.
 - Governance on every write: RBAC, PII/credential deny scan, 2000-char / 200-obs
   size guards (blocks raw-snapshot dumping), tiered retention + purge.
-- Hash-chained audit on every call; served as the `naf-qa-memory` MCP server.
+- Hash-chained audit on every call; served as the `mortgage-qa-memory` MCP server.
 
-**Verify:** `npm run typecheck` · `npm test` (31/31) · `npm run smoke:graph`.
+**Verify:** `npm run typecheck` · `npm test` (33 tests) · `npm run smoke`.
 
-### Phase 2 — Read-only UI (next)
+### Phase 2 — Read-only UI (Flow 2 console)
 
-Once QA has generated real graph data worth looking at.
-
-- Local web app served by the Node service, reading SQLite live.
-- Browse/search entities & relations, view observations + tiers + expiry.
-- View the audit trail (who wrote what, when, allowed/blocked).
-- Honors `MQM_USER_ROLE` for the audit view.
-
-*Deliberately read-only first — Phase 1 usage shapes what the UI needs before
-we give it write power.*
+- Local web app: flaky tests, skip-browser, journeys, policy blocks ([`packages/console`](packages/console/)).
+- KG entity browse deferred — see [archive/rollout-q1-q3/q1-kg-console-read.md](docs/archive/rollout-q1-q3/q1-kg-console-read.md).
 
 ### QA rollout (Q1–Q5) — detailed delivery plan
 
@@ -234,14 +227,13 @@ Phased rollout for **external QA pilot**, story pipeline (Flow 1), CI triage
 
 Start at [docs/rollout/README.md](./docs/rollout/README.md).
 
-### Phase 3 — QA agent integration (SUGGESTED — validate with QA team)
+### Phase 3 — QA agent integration (deferred — Flow 1)
 
-The five agents in `cursor/qa-testing-agents/` (`ac-explorer`,
-`testcase-writer`, `ado-publisher`, `automation-generator`, `qa-assistant`)
-**stay as-is** and keep working — they already call the same tool names the
-governed server exposes, so at the tool-contract level they're a drop-in. The
-unsolved work is the *seams* below; none should be built until QA confirms the
-workflow.
+Story-pipeline agents archived at
+[`docs/archive/flow1-agents/`](./docs/archive/flow1-agents/) (`ac-explorer`,
+`testcase-writer`, `ado-publisher`, `automation-generator`, `qa-assistant`).
+They call the same tool names the governed server exposes. Unsolved work is
+workflow seams below — do not build until QA confirms pilot scope.
 
 **Mechanism (to assess): generalize the agents via a "QA profile."** The
 agents are currently hard-wired to NAF specifics, and that hard-wiring is *why*
@@ -255,7 +247,7 @@ profile:
   app_url:        https://qa.ll.nafinc.com
   ado_project:    Lender Link Project Management
   login:          { method: pingone-sso, credential_ref: "naflink-qa" }  # a NAME, not the secret
-  memory_server:  naf-qa-memory
+  memory_server:  mortgage-qa-memory
   automation:     naflink            # or "greenfield-e2e" (Profile B)
 ```
 

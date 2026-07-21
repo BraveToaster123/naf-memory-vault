@@ -25,7 +25,7 @@ ado_project: Lender Link Project Management
 login:
   method: pingone-sso
   credential_ref: naflink-qa    # name only — host resolves secret
-memory_server: naf-qa-memory    # or mortgage-qa-memory after Q4
+memory_server: mortgage-qa-memory
 automation: naflink             # or greenfield-e2e (Profile B)
 playwright_mcp: playwright
 ado_mcp: azure-devops-mcp
