@@ -7,8 +7,8 @@ Wire governed memory into a **consumer** Playwright repo so `get_flaky_tests` an
 ```mermaid
 flowchart LR
   CI[Playwright CI job]
-  REP[MqmReporter]
-  DB[(qa-memory.db)]
+  REP[MemoryVaultReporter]
+  DB[(memory-vault.db)]
   MCP[memory-vault MCP]
   QA[QA in Cursor]
   CI --> REP --> DB
@@ -21,24 +21,24 @@ From your Playwright project (not this repo):
 
 ```bash
 # Option A: npm workspace file dependency (monorepo)
-# package.json: "@mqm/reporter": "file:../naf-memory-vault/packages/reporter"
+# package.json: "@memory-vault/reporter": "file:../naf-memory-vault/packages/reporter"
 
-# Option B: copy packages/reporter + @mqm/shared until published
+# Option B: copy packages/reporter + @memory-vault/shared until published
 ```
 
 ## 2. playwright.config.ts
 
 ```typescript
 import { defineConfig } from "@playwright/test";
-import MqmReporter from "@mqm/reporter";
+import MemoryVaultReporter from "@memory-vault/reporter";
 
 export default defineConfig({
   reporter: [
     ["list"],
-    [MqmReporter, {
-      env: process.env.MQM_ENV ?? "staging",
-      appId: process.env.MQM_APP_ID ?? "loan-origination-portal",
-      loanScenarioId: process.env.MQM_LOAN_SCENARIO ?? "synthetic-retail-01",
+    [MemoryVaultReporter, {
+      env: process.env.MEMORY_VAULT_ENV ?? "staging",
+      appId: process.env.MEMORY_VAULT_APP_ID ?? "loan-origination-portal",
+      loanScenarioId: process.env.MEMORY_VAULT_LOAN_SCENARIO ?? "synthetic-retail-01",
     }],
   ],
 });
@@ -48,17 +48,17 @@ export default defineConfig({
 
 | Variable | Example | Purpose |
 |----------|---------|---------|
-| `MQM_DB_PATH` | `./data/qa-memory.db` | Shared SQLite path (artifact or mounted volume) |
-| `MQM_POLICY_PATH` | `../naf-memory-vault/packages/policy/mqm-policy.yaml` | Policy pre-save |
-| `MQM_ENV` | `staging` | Env tag on runs |
-| `MQM_LOAN_SCENARIO` | `synthetic-retail-01` | Must be in policy allowlist |
+| `MEMORY_VAULT_DB_PATH` | `./data/memory-vault.db` | Shared SQLite path (artifact or mounted volume) |
+| `MEMORY_VAULT_POLICY_PATH` | `../naf-memory-vault/packages/policy/memory-vault-policy.yaml` | Policy pre-save |
+| `MEMORY_VAULT_ENV` | `staging` | Env tag on runs |
+| `MEMORY_VAULT_LOAN_SCENARIO` | `synthetic-retail-01` | Must be in policy allowlist |
 | `CI_COMMIT_SHA` | `${{ github.sha }}` | Run correlation |
 
 **Important:** Reporter never stores raw error text — only `error_class` + normalized signature.
 
 ## 4. Policy — staging URLs
 
-Replace pilot placeholders in [`mqm-policy.yaml`](../packages/policy/mqm-policy.yaml):
+Replace pilot placeholders in [`memory-vault-policy.yaml`](../packages/policy/memory-vault-policy.yaml):
 
 ```yaml
 urls:
@@ -74,7 +74,7 @@ Playwright MCP (optional repro) must use the same allowlist.
 In `cursor/mcp.json` for the QA engineer:
 
 ```json
-"MQM_DB_PATH": "./data/qa-memory.db"
+"MEMORY_VAULT_DB_PATH": "./data/memory-vault.db"
 ```
 
 Use the same path CI writes to (copy artifact locally, or shared team volume when gateway exists).
@@ -97,5 +97,5 @@ Pilot exit gate: triage ≥5 real staging failures via MCP ([q4-ci-triage.md](./
 
 ## Not in scope here
 
-- Publishing `@mqm/reporter` to npm (internal registry TBD)
+- Publishing `@memory-vault/reporter` to npm (internal registry TBD)
 - Shared remote MCP server / SSO ([14-operational-readiness.md](./14-operational-readiness.md) §3)

@@ -16,7 +16,7 @@ import {
   type TestRunInput,
   type TestStatus,
   type WriteContext,
-} from "@mqm/shared";
+} from "@memory-vault/shared";
 
 const ctx: WriteContext = {
   tier: 1,

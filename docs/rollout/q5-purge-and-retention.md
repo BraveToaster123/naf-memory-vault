@@ -35,7 +35,7 @@ As a platform engineer, I want automated hard-delete of expired rows so we don't
 | Item | Path |
 |------|------|
 | Purge job | `packages/shared/src/purge.ts` |
-| Policy schedule | `mqm-policy.yaml` → `retention.auto_purge` |
+| Policy schedule | `memory-vault-policy.yaml` → `retention.auto_purge` |
 | CI optional | `.github/workflows/qa-memory.yml` |
 
 ---

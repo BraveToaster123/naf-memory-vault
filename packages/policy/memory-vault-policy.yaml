@@ -1,5 +1,5 @@
-# Mortgage QA Memory Policy
-# Version: mqm-policy-1
+# Memory Vault Policy
+# Version: memory-vault-policy-1
 # Owner: platform-team@yourcompany.com
 # Review cadence: annual (LL-2026-04 alignment)
 # Last updated: 2026-07-14
@@ -7,10 +7,10 @@
 # POC NOTE: allowed_prefixes below are pilot placeholders. Replace with your
 # real staging/UAT hostnames before wiring Playwright MCP. deny_prod stays true.
 
-version: mqm-policy-1
+version: memory-vault-policy-1
 
 metadata:
-  name: Mortgage QA Memory Policy
+  name: Memory Vault Policy
   description: >
     Governs what QA memory MCP may store, for how long, and who may write.
     Enforced pre-save on every write path (reporter pipeline + MCP tools).
@@ -87,9 +87,9 @@ retention:
 
 storage:
   tier0_session: redis://localhost:6379/0
-  tier1_operational: ./data/qa-memory.db
+  tier1_operational: ./data/memory-vault.db
   tier2_curated: ./journeys/
-  audit_metadata: ./data/qa-memory.db   # POC: same SQLite file; Postgres in prod
+  audit_metadata: ./data/memory-vault.db   # POC: same SQLite file; Postgres in prod
   audit_evidence: azure://your-storage-account/playwright-traces
 
 # ─── Deny lists (never persist) ─────────────────────────────────────────────
@@ -219,7 +219,7 @@ audit:
 # ─── Policy statement (external) ───────────────────────────────────────────
 
 public_statement: >
-  Mortgage QA Memory stores test intelligence, not loan data.
+  Memory Vault stores test intelligence, not loan data.
   Long-term retention is limited to human-approved journey definitions
   and aggregated flake metrics (30 days). Session data expires in 8 hours.
   Evidence blobs expire in 90 days. Raw snapshots, prompts, network bodies,

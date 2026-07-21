@@ -2,9 +2,9 @@
   "server": "memory-vault",
   "version": "0.1.0",
   "transport": "stdio",
-  "policy_version": "mqm-policy-1",
+  "policy_version": "memory-vault-policy-1",
   "rbac": {
-    "role_env": "MQM_USER_ROLE",
+    "role_env": "MEMORY_VAULT_USER_ROLE",
     "audit_roles": [
       "qa_lead",
       "qc_analyst",

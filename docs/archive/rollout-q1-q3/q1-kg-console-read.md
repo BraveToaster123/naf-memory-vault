@@ -23,8 +23,8 @@ As a QA lead, I want to browse exploration entities in a local web UI so I can r
   - **Story explorer** — `search_nodes` on `qa` namespace, filter `US_*`
   - **Entity detail** — observations + relations for selected entity
   - **Graph summary** — entity/relation counts for `qa`
-- Reuse `@mqm/shared`: `readGraph`, `searchNodes`, `openNodes` from `kg.ts`
-- Same DB path as MCP (`MQM_DB_PATH`)
+- Reuse `@memory-vault/shared`: `readGraph`, `searchNodes`, `openNodes` from `kg.ts`
+- Same DB path as MCP (`MEMORY_VAULT_DB_PATH`)
 
 ## Out of scope
 
@@ -47,7 +47,7 @@ As a QA lead, I want to browse exploration entities in a local web UI so I can r
 |------|------|
 | API routes | `packages/console/src/server.ts` |
 | UI panels | `packages/console/public/index.html`, `styles.css` |
-| Shared imports | `readGraph`, `searchNodes`, `openNodes` from `@mqm/shared` |
+| Shared imports | `readGraph`, `searchNodes`, `openNodes` from `@memory-vault/shared` |
 
 ### Proposed API
 

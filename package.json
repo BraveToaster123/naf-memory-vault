@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "naf-memory-vault — governed QA memory MCP for mortgage technology teams (POC/MVP).",
+  "description": "naf-memory-vault — governed memory-vault MCP for mortgage QA (POC/MVP).",
   "repository": {
     "type": "git",
     "url": "https://github.com/BraveToaster123/naf-memory-vault.git"
@@ -21,7 +21,7 @@
     "purge": "tsx packages/shared/src/purge.ts",
     "seed:demo": "tsx packages/reporter/src/seed-demo.ts",
     "seed:demo:namespaces": "tsx packages/reporter/src/seed-demo-namespaces.ts",
-    "console": "npm run start -w @mqm/console",
+    "console": "npm run start -w @memory-vault/console",
     "demo": "npm run seed:demo && npm run seed:demo:namespaces && npm run smoke && npm run console",
     "mcp": "tsx packages/mcp-server/src/index.ts",
     "manifest": "tsx packages/mcp-server/src/manifest.ts",

@@ -1,6 +1,6 @@
 # naf-memory-vault
 
-Governed **memory-vault** MCP (MQM). **Status:** working POC/MVP, now pivoting toward a governed knowledge-graph
+Governed **memory-vault** MCP. **Status:** working POC/MVP, now pivoting toward a governed knowledge-graph
 memory core. See [PLAN.md](./PLAN.md) for the full history (v1 design → v2
 build → v3 roadmap) — start there.
 
@@ -51,7 +51,7 @@ See [docs/POC.md](./docs/POC.md) for 5-minute handoff. Full demo: [docs/15-poc-d
 
 | Path | Contents |
 |------|----------|
-| `packages/policy/mqm-policy.yaml` | The one enforced policy: retention, deny patterns, RBAC, write tiers |
+| `packages/policy/memory-vault-policy.yaml` | The one enforced policy: retention, deny patterns, RBAC, write tiers |
 | `packages/shared`, `packages/reporter`, `packages/mcp-server`, `packages/audit-client` | Runnable monorepo — see [PLAN.md](./PLAN.md) |
 | `packages/console` | Flow 2 demo UI (flake/journeys — not full KG browser) |
 | `journeys/*.yaml` | Tier 2 curated mortgage journeys |

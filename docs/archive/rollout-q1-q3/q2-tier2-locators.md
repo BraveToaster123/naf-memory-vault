@@ -36,7 +36,7 @@ As a QA lead, I want stable locators curated in git so automation and journeys d
 |------|------|
 | MCP tool | `upsert_locator` in `packages/mcp-server/src/tools.ts` |
 | Curated locators | `journeys/locators/` |
-| Policy | `tier2_approval_required` in `mqm-policy.yaml` |
+| Policy | `tier2_approval_required` in `memory-vault-policy.yaml` |
 
 ---
 

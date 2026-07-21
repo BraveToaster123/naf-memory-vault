@@ -44,16 +44,16 @@ import {
   type KgRelationInput,
   type KgObservationAdd,
   type KgObservationDelete,
-} from "@mqm/shared";
-import { logAudit, getAuditTrail } from "@mqm/audit-client";
+} from "@memory-vault/shared";
+import { logAudit, getAuditTrail } from "@memory-vault/audit-client";
 
 const policy = getPolicy();
 const db = openDb();
 
 const principal: Principal = {
-  userId: process.env.MQM_USER_ID ?? "local-user",
-  role: (process.env.MQM_USER_ROLE as Role) ?? "qa_engineer",
-  displayName: process.env.MQM_USER_NAME,
+  userId: process.env.MEMORY_VAULT_USER_ID ?? "local-user",
+  role: (process.env.MEMORY_VAULT_USER_ROLE as Role) ?? "qa_engineer",
+  displayName: process.env.MEMORY_VAULT_USER_NAME,
 };
 
 const AUDIT_ROLES: Role[] = ["qa_lead", "qc_analyst", "platform"];
@@ -108,7 +108,7 @@ server.setRequestHandler(ReadResourceRequestSchema, async (req) => {
     toolServer: "memory-vault",
     toolName: "resource:knowledge-graph",
     argsSummary: `ns=${namespace}`,
-    environment: process.env.MQM_ENV,
+    environment: process.env.MEMORY_VAULT_ENV,
     policyVersion: policy.version,
     outcome: "success",
   });
@@ -144,7 +144,7 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
       argsSummary: summary,
       journeyId: typeof args.journey_id === "string" ? args.journey_id : undefined,
       loanScenarioId: typeof args.loan_scenario_id === "string" ? args.loan_scenario_id : undefined,
-      environment: process.env.MQM_ENV,
+      environment: process.env.MEMORY_VAULT_ENV,
       policyVersion: policy.version,
       outcome,
     });
@@ -224,7 +224,7 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
             errorClass: str(args.error_class),
             errorMessage: str(args.error_hint),
             loanScenarioId: str(args.loan_scenario_id),
-            env: process.env.MQM_ENV,
+            env: process.env.MEMORY_VAULT_ENV,
           },
           { tier: 1, tool: name, principal, policyVersion: policy.version },
         );

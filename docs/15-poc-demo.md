@@ -54,7 +54,7 @@ npm run demo
 
 Optional: open these files in tabs for “show the policy” moments:
 
-- [packages/policy/mqm-policy.yaml](../packages/policy/mqm-policy.yaml) — namespaces + deny patterns
+- [packages/policy/memory-vault-policy.yaml](../packages/policy/memory-vault-policy.yaml) — namespaces + deny patterns
 - [journeys/le_generation.yaml](../journeys/le_generation.yaml) — Tier 2 curated journey
 - [archive/design-essays/17-governed-memory-landscape.md](./archive/design-essays/17-governed-memory-landscape.md) — how we compare to DoorDash / OSS peers
 
@@ -112,7 +112,7 @@ Close with: “QA namespace is live; PR/ops/compliance namespaces are seeded for
 
 Use the [memory-vault-triage](../cursor/skills/memory-vault-triage/SKILL.md) skill or paste prompts below.
 
-### Act 1 — QA engineer (default `MQM_USER_ROLE=qa_engineer`)
+### Act 1 — QA engineer (default `MEMORY_VAULT_USER_ROLE=qa_engineer`)
 
 1. **“Call `get_flaky_tests` with limit 5. Which test is flakiest?”**  
    → Shows ranked flake list from seeded DB.
@@ -134,7 +134,7 @@ Use the [memory-vault-triage](../cursor/skills/memory-vault-triage/SKILL.md) ski
 
 ### Act 2 — Engineer / dev memory (`pr` namespace)
 
-Temporarily set in MCP env: `MQM_USER_ROLE=engineer` (restart MCP).
+Temporarily set in MCP env: `MEMORY_VAULT_USER_ROLE=engineer` (restart MCP).
 
 7. **“Call `read_graph` with namespace `pr`. What does engineering memory know about loan-api?”**  
    → Seeded PR entities (review patterns, deploy correlation).
@@ -146,7 +146,7 @@ Reset role to `qa_engineer` after this act.
 
 ### Act 3 — Compliance / QC (`qc_analyst`)
 
-Set `MQM_USER_ROLE=qc_analyst`.
+Set `MEMORY_VAULT_USER_ROLE=qc_analyst`.
 
 9. **“Call `read_graph` with namespace `compliance`.”**  
    → Seeded RFP answer refs (metadata only).
@@ -182,7 +182,7 @@ Honest pitch: **“We POC’d the governed platform and QA layer; other team lay
 ## Architecture slide (30 seconds)
 
 ```
-Cursor / Claude  →  memory-vault MCP  →  policy (mqm-policy.yaml)
+Cursor / Claude  →  memory-vault MCP  →  policy (memory-vault-policy.yaml)
                               ↓
                     Tier 1 SQLite (30d)  +  Tier 2 git YAML
                               ↓
@@ -200,10 +200,10 @@ Cursor / Claude  →  memory-vault MCP  →  policy (mqm-policy.yaml)
 | Problem | Fix |
 |---------|-----|
 | `SMOKE FAIL` | Run `npm run seed:demo` first |
-| Empty `get_flaky_tests` | Re-run seed; check `MQM_DB_PATH` points at `./data/qa-memory.db` |
+| Empty `get_flaky_tests` | Re-run seed; check `MEMORY_VAULT_DB_PATH` points at `./data/memory-vault.db` |
 | MCP not in Cursor | Restart Cursor; verify `mcp.json` paths are relative to repo root |
 | Legacy MCP name (`naf-qa-memory`, `mortgage-qa-memory`) | Remove from user MCP settings; use only `memory-vault` ([q4-unified-mcp-server.md](./rollout/q4-unified-mcp-server.md)) |
-| `namespace_rbac_denied` when you expected allow | Check `MQM_USER_ROLE` matches [mqm-policy.yaml](../packages/policy/mqm-policy.yaml) `namespaces.*.readers` |
+| `namespace_rbac_denied` when you expected allow | Check `MEMORY_VAULT_USER_ROLE` matches [memory-vault-policy.yaml](../packages/policy/memory-vault-policy.yaml) `namespaces.*.readers` |
 | Windows `npx tsx` slow | First call may take ~10s — normal |
 
 ---
@@ -230,7 +230,7 @@ See [14-operational-readiness.md](./14-operational-readiness.md) for full checkl
 1. **Pilot on one journey** — wire real Playwright reporter to staging (NEEDS-ENV, [§5](./14-operational-readiness.md#5-real-staging-ci-data-needs-env)).
 2. **Name namespace owners** — fill §4 worksheet; open `ops`/`compliance` writers in policy.
 3. **Compliance sign-off** — [ai-inventory.yaml](../ai-inventory.yaml) (NEEDS-HUMAN, [§6](./14-operational-readiness.md#6-compliance-sign-off-needs-human)).
-4. **Caller identity** — replace `MQM_USER_ROLE` env with gateway SSO when shared server ([§3](./14-operational-readiness.md#3-auth-when-do-you-need-per-user-identity)).
+4. **Caller identity** — replace `MEMORY_VAULT_USER_ROLE` env with gateway SSO when shared server ([§3](./14-operational-readiness.md#3-auth-when-do-you-need-per-user-identity)).
 
 ---
 

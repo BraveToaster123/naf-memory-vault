@@ -104,7 +104,7 @@ CREATE INDEX IF NOT EXISTS idx_kg_rel_expires ON kg_relations(expires_at);
 `;
 
 export function dbPath(): string {
-  return process.env.MQM_DB_PATH ?? "./data/qa-memory.db";
+  return process.env.MEMORY_VAULT_DB_PATH ?? "./data/memory-vault.db";
 }
 
 /** Open (and migrate) the Tier 1 + audit SQLite store. */

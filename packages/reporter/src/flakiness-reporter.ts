@@ -12,16 +12,16 @@ import {
   type TestRunInput,
   type TestStatus,
   type WriteContext,
-} from "@mqm/shared";
+} from "@memory-vault/shared";
 
 /**
- * MqmReporter — deterministic CI memory writer.
+ * MemoryVaultReporter — deterministic CI memory writer.
  *
  * Runs inside `playwright test` (never an agent). Extracts the journey id from
  * the test title tag `[journey_id]`, then writes an allowlisted, policy-gated
  * Tier 1 run summary. Raw errors, snapshots and stack traces never reach disk.
  */
-export default class MqmReporter implements Reporter {
+export default class MemoryVaultReporter implements Reporter {
   private db!: DB;
   private readonly ctx: WriteContext;
   private written = 0;
@@ -31,7 +31,7 @@ export default class MqmReporter implements Reporter {
     this.ctx = {
       tier: 1,
       tool: "record_run_summary",
-      principal: { userId: process.env.MQM_USER_ID ?? "ci", role: "qa_engineer" },
+      principal: { userId: process.env.MEMORY_VAULT_USER_ID ?? "ci", role: "qa_engineer" },
       policyVersion: getPolicy().version,
     };
   }
@@ -47,12 +47,12 @@ export default class MqmReporter implements Reporter {
       status: mapStatus(result.status, test.outcome()),
       durationMs: result.duration,
       journeyId,
-      appId: process.env.MQM_APP_ID,
+      appId: process.env.MEMORY_VAULT_APP_ID,
       browser: test.parent.project()?.name,
       os: process.platform,
-      env: process.env.MQM_ENV ?? "ci",
+      env: process.env.MEMORY_VAULT_ENV ?? "ci",
       commitSha: process.env.CI_COMMIT_SHA,
-      loanScenarioId: process.env.MQM_LOAN_SCENARIO,
+      loanScenarioId: process.env.MEMORY_VAULT_LOAN_SCENARIO,
       errorClass: classifyError(result.error?.message),
       errorMessage: result.error?.message,
     };
@@ -64,7 +64,7 @@ export default class MqmReporter implements Reporter {
 
   onEnd(): void {
     // eslint-disable-next-line no-console
-    console.log(`[MqmReporter] wrote ${this.written} run summaries, dropped ${this.dropped} (policy).`);
+    console.log(`[MemoryVaultReporter] wrote ${this.written} run summaries, dropped ${this.dropped} (policy).`);
     this.db?.close();
   }
 }

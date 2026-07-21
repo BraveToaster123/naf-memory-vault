@@ -137,7 +137,7 @@ flowchart TB
 |------------|-------------------------|-----------|
 | Agent tool names | 9 KG tools | Same 9 tools + QA domain tools |
 | Storage | Flat JSONL | SQLite with TTL |
-| PII / secrets | None | `deny_patterns` in [mqm-policy.yaml](../../packages/policy/mqm-policy.yaml) |
+| PII / secrets | None | `deny_patterns` in [memory-vault-policy.yaml](../../packages/policy/memory-vault-policy.yaml) |
 | Who can write where | Anyone | Role + namespace RBAC |
 | Retention | Manual file edit | Auto purge ([purge.ts](../../packages/shared/src/purge.ts)) |
 | Audit | None | Hash-chained log |
@@ -152,7 +152,7 @@ Proof point for leadership: `npm run smoke` → **`SMOKE PASS`** (policy block, 
 ### Approve
 
 - `@modelcontextprotocol/sdk` in repos where **we implement and operate** the MCP server
-- Governed memory MCP (`memory-vault`) for QA and adjacent namespaces per [mqm-policy.yaml](../../packages/policy/mqm-policy.yaml)
+- Governed memory MCP (`memory-vault`) for QA and adjacent namespaces per [memory-vault-policy.yaml](../../packages/policy/memory-vault-policy.yaml)
 - Local `server-memory` only under a **personal, non-production** exception with security acknowledgment
 
 ### Deny or require exception
@@ -165,7 +165,7 @@ Proof point for leadership: `npm run smoke` → **`SMOKE PASS`** (policy block, 
 
 See [14-operational-readiness.md](./14-operational-readiness.md) for the full checklist. Minimum:
 
-- [ ] Interim non-savable list (§2) reviewed by compliance; patterns updated in [mqm-policy.yaml](../../packages/policy/mqm-policy.yaml)
+- [ ] Interim non-savable list (§2) reviewed by compliance; patterns updated in [memory-vault-policy.yaml](../../packages/policy/memory-vault-policy.yaml)
 - [ ] Namespace owners assigned (§4 worksheet); locked namespaces opened in policy
 - [ ] [ai-inventory.yaml](../../ai-inventory.yaml) signed off (§6)
 - [ ] Real staging CI wired (§5) if not local-only pilot

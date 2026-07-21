@@ -11,7 +11,7 @@
 | [PLAN.md](../../PLAN.md) | DoorDash/Salesforce patterns (v1) and retention / PII philosophy |
 | [18-official-mcp-packages-risk-brief.md](./18-official-mcp-packages-risk-brief.md) | Leadership risk brief: official SDK vs server-memory |
 | [14-operational-readiness.md](./14-operational-readiness.md) | Production gates: non-savable list, auth, namespace owners |
-| [packages/policy/mqm-policy.yaml](../../../packages/policy/mqm-policy.yaml) | Our policy config |
+| [packages/policy/memory-vault-policy.yaml](../../../packages/policy/memory-vault-policy.yaml) | Our policy config |
 | [packages/mcp-server/src/tools.ts](../../../packages/mcp-server/src/tools.ts) | Our tool surface |
 | [packages/shared/src/kg.ts](../../../packages/shared/src/kg.ts) | Our governed KG engine |
 
@@ -285,7 +285,7 @@ Legend: ✅ done · ⚠️ partial · ❌ gap · — not applicable
 |------------|-------------------------|--------------|---------------|-------|-----------|-----------------|---------------------|
 | KG tool parity (9 tools) | ✅ | ✅ | ✅ | ⚠️ different API | — (proxy) | ⚠️ custom | ✅ |
 | PII / secret deny on write | ❌ | ❌ | ❌ | ❌ | — | ✅ | ✅ `policy.ts` |
-| Namespace isolation | ❌ | ✅ RBAC | ✅ RBAC | ✅ project | — | ✅ | ✅ `mqm-policy.yaml` |
+| Namespace isolation | ❌ | ✅ RBAC | ✅ RBAC | ✅ project | — | ✅ | ✅ `memory-vault-policy.yaml` |
 | TTL / retention purge | ❌ | ✅ decay | ❌ | ✅ 3-zone | — | ✅ | ✅ `purge.ts` |
 | Hash-chained audit | ❌ | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ `audit-client` |
 | Referential integrity | ❌ | ? | ? | ? | — | — | ✅ `kg.ts` |
@@ -293,7 +293,7 @@ Legend: ✅ done · ⚠️ partial · ❌ gap · — not applicable
 | Domain QA tools | ❌ | ❌ | ❌ | ❌ | — | ✅ (food) | ✅ flake/journey/TRID |
 | Semantic / vector search | ❌ | ✅ | ✅ | ✅ | — | ✅ | ❌ v1 substring only |
 | Resource subscriptions | ✅ | ? | ? | ? | — | — | ❌ poll only |
-| Verified caller identity | ❌ | ✅ OAuth | ⚠️ RBAC | ❌ | ✅ JWT | ✅ platform IdP | ⚠️ `MQM_USER_ROLE` env |
+| Verified caller identity | ❌ | ✅ OAuth | ⚠️ RBAC | ❌ | ✅ JWT | ✅ platform IdP | ⚠️ `MEMORY_VAULT_USER_ROLE` env |
 | REST / admin UI | ❌ | ✅ | ❌ | ❌ | ✅ reports | — | ❌ tools only |
 | Open source server | ✅ | ✅ | ✅ | ✅ | ✅ proxy | ❌ | ✅ |
 
@@ -305,7 +305,7 @@ Use this table in planning meetings. Link to our code where we already have the 
 
 | Idea | Source | Our status | Action if we want it |
 |------|--------|------------|----------------------|
-| Namespace group RBAC (owner/editor/viewer) | FlarelyLegal | Partial (role + namespace lists) | Extend `mqm-policy.yaml` `namespaces:` with group grants |
+| Namespace group RBAC (owner/editor/viewer) | FlarelyLegal | Partial (role + namespace lists) | Extend `memory-vault-policy.yaml` `namespaces:` with group grants |
 | Audit archive to SIEM (S3/R2 NDJSON) | FlarelyLegal | SQLite `audit_events` only | Export job or stream to gateway |
 | FTS5 / semantic `search_nodes` | danielsimonjr, j0hanz, memcp | Substring only | Phase 2 search upgrade |
 | Retention dry-run preview tool | memcp | `purge.ts` runs blind | Add `retention_preview` read tool |

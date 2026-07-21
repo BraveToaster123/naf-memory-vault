@@ -52,8 +52,8 @@ export function compilePattern(pattern: string): RegExp {
 
 function defaultPolicyPath(): string {
   return (
-    process.env.MQM_POLICY_PATH ??
-    resolve(__dirname, "../../policy/mqm-policy.yaml")
+    process.env.MEMORY_VAULT_POLICY_PATH ??
+    resolve(__dirname, "../../policy/memory-vault-policy.yaml")
   );
 }
 
@@ -62,7 +62,7 @@ let cached: Policy | null = null;
 export function loadPolicy(path: string = defaultPolicyPath()): Policy {
   const raw = parseYaml(readFileSync(path, "utf8")) as Record<string, unknown>;
   const policy: Policy = {
-    version: String(raw.version ?? "mqm-policy-unknown"),
+    version: String(raw.version ?? "memory-vault-policy-unknown"),
     urls: raw.urls as Policy["urls"],
     environments: raw.environments as Policy["environments"],
     deny_fields: (raw.deny_fields as string[]) ?? [],

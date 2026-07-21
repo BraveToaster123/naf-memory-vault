@@ -28,7 +28,7 @@
 ## Principles
 
 1. **Memory before browser** — triage and exploration consult memory MCP first ([memory-vault-triage skill](../../cursor/skills/memory-vault-triage/SKILL.md)).
-2. **Policy pre-save on every write** — no bypass ([mqm-policy.yaml](../../packages/policy/mqm-policy.yaml)).
+2. **Policy pre-save on every write** — no bypass ([memory-vault-policy.yaml](../../packages/policy/memory-vault-policy.yaml)).
 3. **Tier 1 by default** — agent exploration expires in 30d; promote to Tier 2 only via human PR.
 4. **Credentials never in graph** — `credential_ref` names a secret the host resolves ([q1-staging-and-credentials.md](./q1-staging-and-credentials.md)).
 5. **One team, one namespace** — cross-namespace work deferred until platform phase.

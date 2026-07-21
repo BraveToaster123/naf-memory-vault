@@ -9,7 +9,7 @@
 import { writeFileSync, mkdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { getPolicy } from "@mqm/shared";
+import { getPolicy } from "@memory-vault/shared";
 import { tools, TOOL_META } from "./tools.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -30,7 +30,7 @@ export interface ToolManifest {
   transport: "stdio";
   policy_version: string;
   /** How another tool authenticates the caller's role. */
-  rbac: { role_env: "MQM_USER_ROLE"; audit_roles: string[] };
+  rbac: { role_env: "MEMORY_VAULT_USER_ROLE"; audit_roles: string[] };
   domains: string[];
   tools: ToolManifestEntry[];
 }
@@ -52,7 +52,7 @@ export function buildManifest(): ToolManifest {
     version: "0.1.0",
     transport: "stdio",
     policy_version: getPolicy().version,
-    rbac: { role_env: "MQM_USER_ROLE", audit_roles: ["qa_lead", "qc_analyst", "platform"] },
+    rbac: { role_env: "MEMORY_VAULT_USER_ROLE", audit_roles: ["qa_lead", "qc_analyst", "platform"] },
     domains: [...new Set(entries.map((e) => e.domain))],
     tools: entries,
   };

@@ -2,7 +2,7 @@
 
 **Read this first** if you are another AI, another repo, or a team deciding how to use, fork, or replace governed agent memory — especially around Anthropic's official MCP packages.
 
-**This repo:** `naf-memory-vault` (Mortgage QA Memory / MQM) — a **reference implementation** of the mirror-and-govern pattern. Copy the **pattern**, not necessarily the mortgage domain logic.
+**This repo:** `naf-memory-vault` (Memory Vault) — a **reference implementation** of the mirror-and-govern pattern. Copy the **pattern**, not necessarily the mortgage domain logic.
 
 **Last updated:** 2026-07-21
 
@@ -38,7 +38,7 @@
 
 | Risk | Severity | Our mitigation |
 |------|----------|----------------|
-| PII/secrets persisted verbatim | High | `deny_patterns` pre-save in [mqm-policy.yaml](../packages/policy/mqm-policy.yaml) |
+| PII/secrets persisted verbatim | High | `deny_patterns` pre-save in [memory-vault-policy.yaml](../packages/policy/memory-vault-policy.yaml) |
 | No TTL / retention | High | Per-namespace `retention_days` + purge job |
 | No RBAC | High | Role + namespace RBAC |
 | No audit | High | Hash-chained audit log |
@@ -74,13 +74,13 @@ flowchart LR
 | Control | Status | Where |
 |---------|--------|-------|
 | Policy pre-save on every write | Done | `packages/shared/src/policy.ts` |
-| PII / secret deny patterns | Done | `mqm-policy.yaml` — list in [14-operational-readiness §2](./14-operational-readiness.md) |
+| PII / secret deny patterns | Done | `memory-vault-policy.yaml` — list in [14-operational-readiness §2](./14-operational-readiness.md) |
 | Namespace RBAC (deny unknown) | Done | `isNamespaceWriteAllowed` / `isNamespaceReadAllowed` |
 | Tier 2 human PR only | Done | `upsert_locator` → `require_approval` |
 | Hash-chained audit | Done | `packages/audit-client` |
 | Staging URL allowlist | Done | `urls.allowed_prefixes` in policy |
 | Playwright MCP sandbox | Done | no `run_code_unsafe`; isolated headless |
-| Verified caller identity (SSO) | **Gap** | `MQM_USER_ROLE` env — OK for POC; required for shared server |
+| Verified caller identity (SSO) | **Gap** | `MEMORY_VAULT_USER_ROLE` env — OK for POC; required for shared server |
 | Encryption at rest | **Gap** | Local SQLite; use OS/disk encryption in prod |
 
 **Auth is not optional forever:** POC can trust env vars; **shared team server requires gateway SSO** — [14-operational-readiness §3](./14-operational-readiness.md).
@@ -113,7 +113,7 @@ flowchart LR
 | Flake ranking / skip-browser | Done | `get_flaky_tests`, `should_skip_browser` |
 | Failure signatures (no raw errors) | Done | pipeline + redact |
 | Tier 2 journeys (TRID/URLA/ECOA) | Done | `journeys/*.yaml` |
-| Playwright reporter → SQLite | Done | `@mqm/reporter` |
+| Playwright reporter → SQLite | Done | `@memory-vault/reporter` |
 | Memory console (read-only UI) | Done | `npm run console` |
 | Real staging CI ingestion | Gap | NEEDS-ENV |
 | 5 real failures triaged on staging | Gap | NEEDS-ENV |
@@ -149,7 +149,7 @@ Follow [15-poc-demo.md](./15-poc-demo.md). Prove PII deny, namespace deny, audit
 
 ### Path C — Pilot on staging (needs environment)
 
-1. Replace pilot URLs in `mqm-policy.yaml`
+1. Replace pilot URLs in `memory-vault-policy.yaml`
 2. Wire Playwright reporter to staging CI
 3. Triage 5 real failures — [14 §5](./14-operational-readiness.md)
 4. Compliance review — [14 §6](./14-operational-readiness.md)
@@ -191,7 +191,7 @@ When copying this pattern into another repo:
 
 - [ ] Remove `@modelcontextprotocol/server-memory` from MCP config if present
 - [ ] Pin `@modelcontextprotocol/sdk`; do not float to latest without review
-- [ ] Copy `mqm-policy.yaml` and customize deny patterns + URLs for your domain
+- [ ] Copy `memory-vault-policy.yaml` and customize deny patterns + URLs for your domain
 - [ ] Set `MEMORY`/DB path outside `node_modules` and repo root
 - [ ] Never commit `data/*.db` with real staging data
 - [ ] Regenerate and CI-check `docs/tools.json`
@@ -224,6 +224,6 @@ When copying this pattern into another repo:
 | KG engine | `packages/shared/src/kg.ts` |
 | Policy gate | `packages/shared/src/policy.ts` |
 | PII detection | `packages/shared/src/redact.ts` |
-| Policy config | `packages/policy/mqm-policy.yaml` |
+| Policy config | `packages/policy/memory-vault-policy.yaml` |
 | Audit | `packages/audit-client/src/log.ts` |
 | Manifest | `packages/mcp-server/src/manifest.ts` → `docs/tools.json` |

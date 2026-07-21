@@ -1,4 +1,4 @@
-# naf-memory-vault — MQM Plan (v1 Design → v2 POC/MVP → v3 Roadmap)
+# naf-memory-vault — Memory Vault Plan (v1 Design → v2 POC/MVP → v3 Roadmap)
 
 One document, three chapters: why this was designed the way it was (v1), what
 got built first (v2), and where it's going now (v3). Older per-topic docs (10
@@ -15,7 +15,7 @@ direction.
 history, journey maps, env quirks) **without** creating a second store of loan
 NPI, raw snapshots, or unbounded logs.
 
-**Solution name:** Mortgage QA Memory (MQM) — one governed memory platform,
+**Solution name:** Memory Vault — one governed memory platform,
 adapted from DoorDash's "Ask DoorDash" agentic memory architecture and
 Salesforce's Agentic Memory pattern.
 
@@ -23,11 +23,11 @@ Salesforce's Agentic Memory pattern.
 
 ### What we took from DoorDash / Salesforce
 
-| Pattern | MQM adaptation |
+| Pattern | Memory Vault adaptation |
 |---------|----------------|
 | Three memory layers (long-term / session / conversational) | Tier 0 session (8h) / Tier 1 operational (30d) / Tier 2 curated (git, human-approved) |
 | Shared save pipeline (sanitize → extract → dedupe) | Same shape, + **policy pre-save** as a fourth, non-optional stage |
-| Memory Policy enforced pre-save | `mqm-policy.yaml` — deny fields/patterns, retention, RBAC — is code, not documentation |
+| Memory Policy enforced pre-save | `memory-vault-policy.yaml` — deny fields/patterns, retention, RBAC — is code, not documentation |
 | Write gates / read gates (Salesforce) | Deny-by-default writes; read tools scoped by role |
 | Namespace isolation | `qa`, `pr`, `ops`, `compliance`, `product` namespaces on one server (see v3) |
 | Eval platform (completeness/accuracy/freshness) | Golden CI-failure set (`eval/ci-failures.jsonl`) |
@@ -97,9 +97,9 @@ What got implemented first, turning the v1 design into a runnable
 
 | Package | Role |
 |---------|------|
-| `packages/policy` | `mqm-policy.yaml` — retention, deny patterns, write tiers, RBAC |
+| `packages/policy` | `memory-vault-policy.yaml` — retention, deny patterns, write tiers, RBAC |
 | `packages/shared` | types, redact, signature, policy engine, save pipeline, SQLite, queries, purge, kg store |
-| `packages/reporter` | Playwright `MqmReporter` → Tier 1 SQLite |
+| `packages/reporter` | Playwright `MemoryVaultReporter` → Tier 1 SQLite |
 | `packages/mcp-server` | MCP tools (QA read/write + governed knowledge-graph tools) |
 | `packages/audit-client` | append-only, hash-chained audit log + QC query |
 
@@ -109,7 +109,7 @@ What got implemented first, turning the v1 design into a runnable
 npm install
 npm run typecheck        # type-check the whole monorepo
 npm test                 # policy / redact / pipeline / graph unit tests
-npm run seed:demo        # populate ./data/qa-memory.db with synthetic history
+npm run seed:demo        # populate ./data/memory-vault.db with synthetic history
 npm run smoke            # QA + KG MCP tools (expect SMOKE PASS)
 npm run eval             # flake-classification accuracy gate (>= 0.8)
 npm run purge            # hard-delete expired Tier 1 rows
@@ -135,7 +135,7 @@ directly.
 Denied by design (never implement): `remember_raw_snapshot`,
 `remember_network_body`, `remember_prompt`, `export_full_error`.
 
-RBAC (`MQM_USER_ROLE`, wired from SSO at the gateway):
+RBAC (`MEMORY_VAULT_USER_ROLE`, wired from SSO at the gateway):
 
 | Tool | qa_engineer | qa_lead | qc_analyst | platform |
 |------|-------------|---------|------------|----------|
@@ -150,15 +150,15 @@ RBAC (`MQM_USER_ROLE`, wired from SSO at the gateway):
 | Surface | Contract |
 |---------|----------|
 | MCP server (stdio) | `packages/mcp-server/src/index.ts` (QA + KG tools) |
-| npm packages | `@mqm/shared`, `@mqm/reporter`, `@mqm/audit-client` — safe to embed without the MCP server |
-| Policy | `packages/policy/mqm-policy.yaml` — the one enforced copy (see v3, "reconcile policy files") |
+| npm packages | `@memory-vault/shared`, `@memory-vault/reporter`, `@memory-vault/audit-client` — safe to embed without the MCP server |
+| Policy | `packages/policy/memory-vault-policy.yaml` — the one enforced copy (see v3, "reconcile policy files") |
 
-Env vars: `MQM_POLICY_PATH`, `MQM_DB_PATH`, `MQM_JOURNEYS_DIR`, `MQM_ENV`,
-`MQM_USER_ROLE`, `MQM_USER_ID`, `MQM_APP_ID`.
+Env vars: `MEMORY_VAULT_POLICY_PATH`, `MEMORY_VAULT_DB_PATH`, `MEMORY_VAULT_JOURNEYS_DIR`, `MEMORY_VAULT_ENV`,
+`MEMORY_VAULT_USER_ROLE`, `MEMORY_VAULT_USER_ID`, `MEMORY_VAULT_APP_ID`.
 
 Engine vs domain seam: each tool is tagged `domain: "core" | "qa"` in
 `packages/mcp-server/src/tools.ts`. Generic, reusable modules in
-`@mqm/shared`: `policy.ts`, `pipeline.ts` (row shape is QA-specific),
+`@memory-vault/shared`: `policy.ts`, `pipeline.ts` (row shape is QA-specific),
 `db.ts` (schema is QA-specific), `redact.ts`, `signature.ts`, `kg.ts`.
 QA-specific: `queries.ts`, `reporter`.
 
@@ -299,13 +299,13 @@ Non-blocking; do when multi-team reuse arrives.
   extend to cover `loan_scenario_id`, `environment`, `evidence_ref`,
   `args_summary`, `principal_role`, and add a chain-verify routine.
 - **Reconcile the two policy files** — runtime loads
-  `packages/policy/mqm-policy.yaml`; that is now the *only* policy file in the
+  `packages/policy/memory-vault-policy.yaml`; that is now the *only* policy file in the
   repo (the root `policies/` template was removed in this cleanup pass —
-  customize `packages/policy/mqm-policy.yaml` directly going forward).
+  customize `packages/policy/memory-vault-policy.yaml` directly going forward).
 - **Park the flake MQM tools** (`get_flaky_tests`, `record_run_summary`, …) as
   an optional `qa` domain pack on the same core.
-- Split `@mqm/shared` into `@mqm/core` (policy/redact/audit/retention/graph) +
-  `@mqm/qa`.
+- Split `@memory-vault/shared` into `@memory-vault/core` (policy/redact/audit/retention/graph) +
+  `@memory-vault/qa`.
 
 ### Open questions for the QA team
 

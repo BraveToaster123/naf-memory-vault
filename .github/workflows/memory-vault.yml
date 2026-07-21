@@ -1,4 +1,4 @@
-name: qa-memory
+name: memory-vault
 
 on:
   push:
@@ -9,10 +9,10 @@ jobs:
   build-test-eval:
     runs-on: ubuntu-latest
     env:
-      MQM_DB_PATH: ${{ github.workspace }}/data/qa-memory.db
-      MQM_ENV: ci
-      MQM_LOAN_SCENARIO: synthetic-retail-01
-      MQM_APP_ID: loan-origination-portal
+      MEMORY_VAULT_DB_PATH: ${{ github.workspace }}/data/memory-vault.db
+      MEMORY_VAULT_ENV: ci
+      MEMORY_VAULT_LOAN_SCENARIO: synthetic-retail-01
+      MEMORY_VAULT_APP_ID: loan-origination-portal
       CI_COMMIT_SHA: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
@@ -37,11 +37,11 @@ jobs:
         run: npm run eval
       - name: Purge expired Tier 1 rows
         run: npm run purge
-      - name: Publish qa-memory snapshot
+      - name: Publish memory-vault snapshot
         uses: actions/upload-artifact@v4
         with:
-          name: qa-memory-snapshot-${{ github.run_id }}
-          path: ${{ github.workspace }}/data/qa-memory.db
+          name: memory-vault-snapshot-${{ github.run_id }}
+          path: ${{ github.workspace }}/data/memory-vault.db
           if-no-files-found: warn
           retention-days: 7
 
@@ -58,5 +58,5 @@ jobs:
   #     - run: npx playwright install --with-deps chromium
   #     - run: npm run test:e2e
   #       env:
-  #         MQM_RUN_E2E: "1"
-  #         MQM_BASE_URL: ${{ secrets.MQM_STAGING_URL }}
+  #         MEMORY_VAULT_RUN_E2E: "1"
+  #         MEMORY_VAULT_BASE_URL: ${{ secrets.MEMORY_VAULT_STAGING_URL }}

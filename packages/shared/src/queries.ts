@@ -146,7 +146,7 @@ export function getEnvFacts(db: DB, env: string, overlayKey?: string): EnvFactRo
 }
 
 function journeysDir(): string {
-  return process.env.MQM_JOURNEYS_DIR ?? "./journeys";
+  return process.env.MEMORY_VAULT_JOURNEYS_DIR ?? "./journeys";
 }
 
 /** Load a Tier 2 curated journey (read-only). */

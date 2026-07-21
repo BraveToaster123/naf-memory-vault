@@ -13,7 +13,7 @@ Prefer starting with `plan_qa_workflow(intent=triage_failure, test_id=..., ci_fa
 
 - MCP servers: `memory-vault`, `playwright` (optional until repro needed)
 - Synthetic loan scenarios only — never paste real borrower data
-- Policy: `mqm-policy-1`
+- Policy: `memory-vault-policy-1`
 
 ## Hard rules (never violate)
 

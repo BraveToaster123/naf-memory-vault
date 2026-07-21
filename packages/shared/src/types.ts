@@ -1,4 +1,4 @@
-// Shared type contracts for Mortgage QA Memory (MQM).
+// Shared type contracts for Memory Vault.
 // See design docs 05 (retention), 07 (tools), 04 (audit).
 
 export type Tier = 0 | 1 | 2;

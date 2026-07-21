@@ -4,12 +4,12 @@
       "command": "npx",
       "args": ["tsx", "packages/mcp-server/src/index.ts"],
       "env": {
-        "MQM_POLICY_PATH": "./packages/policy/mqm-policy.yaml",
-        "MQM_DB_PATH": "./data/qa-memory.db",
-        "MQM_JOURNEYS_DIR": "./journeys",
-        "MQM_ENV": "local",
-        "MQM_USER_ROLE": "qa_engineer",
-        "MQM_USER_ID": "local-user"
+        "MEMORY_VAULT_POLICY_PATH": "./packages/policy/memory-vault-policy.yaml",
+        "MEMORY_VAULT_DB_PATH": "./data/memory-vault.db",
+        "MEMORY_VAULT_JOURNEYS_DIR": "./journeys",
+        "MEMORY_VAULT_ENV": "local",
+        "MEMORY_VAULT_USER_ROLE": "qa_engineer",
+        "MEMORY_VAULT_USER_ID": "local-user"
       }
     }
   }

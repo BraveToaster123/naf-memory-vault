@@ -23,7 +23,7 @@ These items are documented in [PLAN.md](../../PLAN.md) but **intentionally defer
 | Gateway SSO | Per-machine env OK until shared DB | Phase 4 RBAC |
 | HTTP/SSE MCP transport | Shared service prerequisite | Adoption guide gaps |
 | Semantic / vector search | Substring OK at QA volume | Phase 5 / landscape §9 |
-| `@mqm/core` / `@mqm/qa` package split | No multi-team consumers yet | Phase 5 |
+| `@memory-vault/core` / `@memory-vault/qa` package split | No multi-team consumers yet | Phase 5 |
 
 ---
 

@@ -19,10 +19,10 @@ As a platform engineer, I want staging allowlisted and credentials resolved outs
 
 ## In scope
 
-- Replace pilot placeholders in `mqm-policy.yaml` → `urls.allowed_prefixes`
+- Replace pilot placeholders in `memory-vault-policy.yaml` → `urls.allowed_prefixes`
 - Document `credential_ref` pattern for pilot hosts (Cursor env / vault — not graph)
 - Playwright MCP: `browser_run_code_unsafe` stays disabled
-- `MQM_ENV` set per pilot machine (`staging` or `uat`)
+- `MEMORY_VAULT_ENV` set per pilot machine (`staging` or `uat`)
 
 ## Out of scope
 
@@ -36,7 +36,7 @@ As a platform engineer, I want staging allowlisted and credentials resolved outs
 
 | Item | Path |
 |------|------|
-| Policy URLs | `packages/policy/mqm-policy.yaml` |
+| Policy URLs | `packages/policy/memory-vault-policy.yaml` |
 | Pilot env example | `.env.example` comments |
 | Host resolver | Cursor/user env: `CREDENTIAL_REF_NAFLINK_QA` or team standard |
 

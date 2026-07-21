@@ -39,7 +39,7 @@ npm run smoke
 
 ## 4. Optional browser repro
 
-Merge [`cursor/mcp.browser.json.example`](../cursor/mcp.browser.json.example) for Playwright MCP. Requires real staging URLs in [`packages/policy/mqm-policy.yaml`](../packages/policy/mqm-policy.yaml).
+Merge [`cursor/mcp.browser.json.example`](../cursor/mcp.browser.json.example) for Playwright MCP. Requires real staging URLs in [`packages/policy/memory-vault-policy.yaml`](../packages/policy/memory-vault-policy.yaml).
 
 ## What you do NOT need
 

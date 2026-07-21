@@ -72,7 +72,7 @@ tools:
       - No production URLs
       - No persistent snapshot storage
     monitoring:
-      - Per-tool audit logging via MQM audit client
+      - Per-tool audit logging via memory-vault audit client
 
   - id: cursor
     name: Cursor IDE Agent

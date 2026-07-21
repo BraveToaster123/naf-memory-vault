@@ -19,8 +19,8 @@ As a QA engineer, I want every CI run summarized in memory so triage ranks real 
 
 ## In scope
 
-- Wire `@mqm/reporter` (`MqmReporter`) into pilot team's Playwright CI
-- Allowed columns only per `mqm-policy.yaml` `reporter.allowed_columns`
+- Wire `@memory-vault/reporter` (`MemoryVaultReporter`) into pilot team's Playwright CI
+- Allowed columns only per `memory-vault-policy.yaml` `reporter.allowed_columns`
 - `drop_run_on_pii_detected: true` — drop row if PII in error path
 - Synthetic `loan_scenario_id` only
 
@@ -36,7 +36,7 @@ As a QA engineer, I want every CI run summarized in memory so triage ranks real 
 | Item | Path |
 |------|------|
 | Reporter package | `packages/reporter/src/index.ts` |
-| Policy allowlist | `packages/policy/mqm-policy.yaml` → `reporter:` |
+| Policy allowlist | `packages/policy/memory-vault-policy.yaml` → `reporter:` |
 | Consumer CI config | Pilot repo `playwright.config.ts` (their repo) |
 
 ---
@@ -46,7 +46,7 @@ As a QA engineer, I want every CI run summarized in memory so triage ranks real 
 - [ ] ≥20 `test_runs` rows from real CI (or sustained daily runs)
 - [ ] `get_flaky_tests` returns their tests, not only seed data
 - [ ] PII in simulated error → row dropped (unit test + spot-check)
-- [ ] `MQM_DB_PATH` documented for shared vs per-machine DB
+- [ ] `MEMORY_VAULT_DB_PATH` documented for shared vs per-machine DB
 
 ---
 
