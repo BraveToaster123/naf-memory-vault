@@ -13,7 +13,8 @@ pivoting to a governed knowledge-graph memory core (see PLAN.md v3).
 
 1. [README.md](./README.md) — index
 2. [PLAN.md](./PLAN.md) — design rationale (v1), what's built (v2), roadmap (v3)
-3. [packages/policy/mqm-policy.yaml](./packages/policy/mqm-policy.yaml) — enforce before any write path
+3. [docs/rollout/README.md](./docs/rollout/README.md) — QA phased rollout (Q1–Q5 feature docs)
+4. [packages/policy/mqm-policy.yaml](./packages/policy/mqm-policy.yaml) — enforce before any write path
 
 ## Hard rules for agents working here
 

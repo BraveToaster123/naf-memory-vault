@@ -12,8 +12,11 @@ Single doc tree: design, implementation, security, adoption, and operational gat
 | **Engineer shipping code** | [11-implementation.md](./11-implementation.md) → [13-definition-of-done.md](./13-definition-of-done.md) |
 | **Leadership / security** | [18-official-mcp-packages-risk-brief.md](./18-official-mcp-packages-risk-brief.md) → [14-operational-readiness.md](./14-operational-readiness.md) |
 | **Stakeholder demo** | [15-poc-demo.md](./15-poc-demo.md) |
+| **QA phased rollout** | [rollout/README.md](./rollout/README.md) |
 
 **Stakeholder path:** 18 → 14 → 15 → live `npm run smoke`
+
+**QA delivery path:** [rollout/README.md](./rollout/README.md) → Q1 umbrella → feature docs
 
 ---
 
@@ -56,6 +59,23 @@ Single doc tree: design, implementation, security, adoption, and operational gat
 | 08 | [Integration with existing stack](./08-integration-with-existing-stack.md) |
 | 09 | [Multi-domain memory](./09-multi-domain-memory.md) |
 | 10 | [DoorDash & Salesforce deep dive](./10-doordash-salesforce-memory-deep-dive.md) |
+
+---
+
+## QA rollout (Q1–Q5)
+
+Phased delivery for external QA pilot, story pipeline, CI triage, and hardening.
+**`qa` namespace only** — see [rollout/00-scope-and-principles.md](./rollout/00-scope-and-principles.md).
+
+| Phase | Umbrella |
+|-------|----------|
+| Q1 | [rollout/q1-exploration-pilot.md](./rollout/q1-exploration-pilot.md) |
+| Q2 | [rollout/q2-story-pipeline.md](./rollout/q2-story-pipeline.md) |
+| Q3 | [rollout/q3-automation-and-assistant.md](./rollout/q3-automation-and-assistant.md) |
+| Q4 | [rollout/q4-ci-triage.md](./rollout/q4-ci-triage.md) |
+| Q5 | [rollout/q5-qa-hardening.md](./rollout/q5-qa-hardening.md) |
+
+Full feature index: [rollout/README.md](./rollout/README.md).
 
 ---
 

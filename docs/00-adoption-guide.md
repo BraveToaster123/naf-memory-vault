@@ -205,6 +205,7 @@ When copying this pattern into another repo:
 | # | Document | Use when |
 |---|----------|----------|
 | **00** | [This guide](./00-adoption-guide.md) | Starting from zero; another AI/project |
+| — | [rollout/README.md](./rollout/README.md) | QA phased rollout Q1–Q5 |
 | — | [PROJECT-CONTEXT.md](./PROJECT-CONTEXT.md) | Why this repo exists |
 | 01–04 | Architecture, DoorDash pattern, Playwright, compliance | Design rationale |
 | 05 | [Data retention & privacy](./05-data-retention-and-privacy.md) | Tier philosophy |

@@ -217,6 +217,23 @@ Once QA has generated real graph data worth looking at.
 *Deliberately read-only first — Phase 1 usage shapes what the UI needs before
 we give it write power.*
 
+### QA rollout (Q1–Q5) — detailed delivery plan
+
+Phased rollout for **external QA pilot**, story pipeline (Flow 1), CI triage
+(Flow 2), and hardening. Each phase and feature has its own doc under
+[`docs/rollout/`](./docs/rollout/README.md). Scope is **`qa` namespace only**;
+`pr` / `ops` / `compliance` are deferred.
+
+| Rollout | Summary |
+|---------|---------|
+| **Q1** | Exploration memory pilot — `ac-explorer`, entity contract, KG console read |
+| **Q2** | Story pipeline — writer, ADO publisher, Tier 2 locators |
+| **Q3** | Automation generator, qa-assistant, QA profile |
+| **Q4** | CI reporter, triage skill, journeys, unified MCP server |
+| **Q5** | ai-inventory sign-off, purge, console polish |
+
+Start at [docs/rollout/README.md](./docs/rollout/README.md).
+
 ### Phase 3 — QA agent integration (SUGGESTED — validate with QA team)
 
 The five agents in `cursor/qa-testing-agents/` (`ac-explorer`,

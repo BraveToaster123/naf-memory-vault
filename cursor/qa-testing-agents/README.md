@@ -2,10 +2,9 @@
 
 Cursor agents for the NAF Link QA workflow: explore acceptance criteria in the browser, write manual test cases, publish them to Azure DevOps, and generate Playwright automation. All agents share exploration data through **NAF QA Memory** so downstream steps use real UI steps and locators—not guesses.
 
-**Build-out:** [../docs/build-out/README.md](../docs/build-out/README.md) — implementation tasks for another agent.  
-**Platform architecture:** [../docs/architecture/qa-agent-platform.md](../docs/architecture/qa-agent-platform.md)  
+**Phased rollout:** [../docs/rollout/README.md](../docs/rollout/README.md) — Q1–Q5 delivery plan and per-feature specs.  
 **E2E code target:** `c:\Projects\greenfield-e2e\` (Profile B greenfield .NET) — not this repo.  
-**Automation profile:** `automation-generator` targets Profile A (NAFLink) today; Profile B may require hand-authored tests or agent update — see [../docs/decisions/ADR-001-automation-profiles.md](../docs/decisions/ADR-001-automation-profiles.md).
+**Automation profile:** `automation-generator` targets Profile A (NAFLink) today; Profile B may require hand-authored tests or agent update — see [../docs/rollout/q3-automation-generator.md](../docs/rollout/q3-automation-generator.md) and [../docs/rollout/q3-qa-profile.md](../docs/rollout/q3-qa-profile.md).
 
 **Reference:** [AgentHelper.docx](https://naf365-my.sharepoint.com/:w:/r/personal/monique_thibodeaux_nafinc_com/_layouts/15/Doc.aspx?sourcedoc=%7B266EA0C3-B7F6-4964-AE9B-E9B9FD23BAD7%7D&file=AgentHelper.docx&action=default&mobileredirect=true)
 
