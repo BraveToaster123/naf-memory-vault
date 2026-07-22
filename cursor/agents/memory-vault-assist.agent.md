@@ -15,4 +15,6 @@ Follow [memory-vault-assist](../../skills/memory-vault-assist/SKILL.md) exactly:
 
 For CI failures, `suggested_skill` may be `memory-vault-triage` — follow that skill's hard rules (memory before browser).
 
+For story pipeline, route to: `memory-vault-explore`, `memory-vault-write-tcs`, `memory-vault-publish`, or `memory-vault-generate` per the plan.
+
 Never persist raw snapshots, prompts, or network bodies. Synthetic loan scenarios only.

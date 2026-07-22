@@ -1,0 +1,129 @@
+# QA Pilot Intake — response file
+# Copy from docs/templates/qa-pilot-intake-response.yaml
+# Guide: docs/qa-pilot-intake.md
+# Do NOT commit secrets, PII, or full stack traces.
+
+meta:
+  engineer_name: ""
+  date: ""                    # YYYY-MM-DD
+  team: ""                    # e.g. NAFLink QA
+  cursor_version: ""
+  vault_repo_path: ""
+  consumer_repo_path: ""      # e.g. NAFTech.NAFLink.UITestAutomation
+  return_to: ""               # QA lead / platform contact
+
+# ─── Exercise 1 — Terminal & integration ─────────────────────────────────────
+
+exercise_1:
+  E1_1_node:
+    result: ""                # PASS | FAIL
+    output: ""
+  E1_2_install:
+    result: ""
+    output: ""
+  E1_3_unit_tests:
+    result: ""
+    output: ""
+  E1_4_seed_demo:
+    result: ""
+    output: ""
+  E1_5_smoke:
+    result: ""
+    output: ""                # expect: SMOKE PASS
+  E1_6_eval:
+    result: ""
+    accuracy: ""              # e.g. 0.8
+  E1_7_console:
+    result: ""                # PASS | SKIP
+    notes: ""
+  E1_8_demo:
+    result: ""                # PASS | SKIP
+    notes: ""
+  E1_9_naflink_validate:
+    result: ""                # PASS | FAIL | SKIP
+    output: ""
+  E1_10_reporter_dotnet_test:
+    result: ""                # PASS | FAIL | SKIP
+    test_runs_added: ""
+    suite_run: ""
+  E1_11_mcp_connected:
+    result: ""
+  E1_12_get_flaky_tests:
+    result: ""
+    notes: ""
+
+# ─── Exercise 2 — Cursor MCP prompts ─────────────────────────────────────────
+
+exercise_2:
+  E2_1_flaky_list:
+    result: ""
+    agent_summary: ""
+  E2_2_skip_browser:
+    result: ""
+    agent_summary: ""
+  E2_3_plan_workflow:
+    real_test_id_used: ""
+    result: ""
+    agent_summary: ""
+  E2_4_journey_map:
+    result: ""
+    checkpoints_accurate: ""  # yes | no | partial
+    agent_summary: ""
+  E2_5_policy_deny:
+    result: ""
+    agent_summary: ""
+  E2_6_real_failure_triage:
+    test_id: ""
+    error_class: ""
+    classification: ""        # flake | regression | unknown | infra
+    skip_browser_correct: ""  # yes | no | n/a
+    result: ""
+    agent_summary: ""
+  E2_7_story_status:
+    pilot_story_id: ""
+    result: ""                # PASS | FAIL | NOT_RUN
+    agent_summary: ""
+  E2_8_search_summary_entity:
+    result: ""                # PASS | FAIL | NOT_RUN
+    agent_summary: ""
+  E2_9_testcase_writer:
+    result: ""                # PASS | FAIL | NOT_RUN
+    agent_summary: ""
+
+# ─── Section 3 — Decision questions ──────────────────────────────────────────
+
+decisions:
+  Q3_1_pilot_story_ids: []
+  Q3_1_why: ""
+  Q3_2_use_flow1_when: ""
+  Q3_2_use_consolidate_nl_when: ""
+  Q3_3_ci_suites_first: []
+  Q3_3_target_test_runs_30d: ""
+  Q3_4_qa_urls: []
+  Q3_5_uat_in_scope: ""       # yes | no
+  Q3_6_repro_default: ""     # playwright_mcp | browserstack | manual
+  Q3_7_sso_automatable: ""    # yes | no | partial
+  Q3_8_test_id_examples: []
+  Q3_8_matches_reporter: ""   # yes | no
+  Q3_9_le_generation_accurate: ""
+  Q3_9_cd_generation_accurate: ""
+  Q3_9_urla_data_entry_accurate: ""
+  Q3_10_missing_journeys: []
+  Q3_11_skip_browser_rule: ""
+  Q3_12_triage_labels: []
+  Q3_13_retention_ok: ""      # yes | promote_sooner
+  Q3_14_login_on_every_tc: ""
+  Q3_14_ado_publish_approver: ""
+  Q3_15_tc_naming_still_valid: ""
+  Q3_15_one_test_per_story: ""
+
+blockers: []
+
+requests_to_platform: []
+
+overall:
+  setup_unassisted: ""        # yes | partial | no
+  ready_for_flow2_ci: ""      # yes | no | blocked
+  ready_for_flow1_pilot: ""   # yes | no | blocked
+  confidence_1_to_5: ""
+  notes: ""

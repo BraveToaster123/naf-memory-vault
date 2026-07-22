@@ -1,0 +1,16 @@
+# QA profile — copy to qa-profile.yaml in consumer repo (gitignore secrets).
+# Host resolves credential_ref from env — never store passwords in memory-vault.
+
+app_url: https://qa.ll.nafinc.com
+ado_project: Lender Link Project Management
+login:
+  method: pingone-sso
+  credential_ref: naflink-qa
+memory_server: memory-vault
+automation: naflink
+playwright_mcp: playwright
+ado_mcp: azure-devops-mcp
+
+# Host env mapping (example):
+# CREDENTIAL_REF_NAFLINK_QA_USERNAME=...
+# CREDENTIAL_REF_NAFLINK_QA_PASSWORD=...

@@ -28,6 +28,8 @@ All entities use `namespace: qa`, Tier 1 (30d TTL) unless promoted to Tier 2.
 | `US_{ID}_AC{N}` | ac-explorer | Per-acceptance-criterion exploration |
 | `US_{ID}_TC{TestCaseID}` | ac-explorer (TC mode) | Executed TC results |
 | `US_{ID}_Summary` | ac-explorer | Story summary + locator catalog |
+| `US_{ID}_TestCasesDraft` | testcase-writer | Draft manual TCs before ADO publish |
+| `US_{ID}_TestCases` | ado-publisher | Published ADO TC IDs |
 
 `{ID}` = ADO user story work item ID. `{N}` = AC index (1-based).
 
@@ -51,6 +53,22 @@ All entities use `namespace: qa`, Tier 1 (30d TTL) unless promoted to Tier 2.
 | `acs_covered` | List of AC indices explored |
 | `locator_catalog` | Consolidated locators for the story |
 | `notes` | Free text; no credentials |
+
+### `US_{ID}_TestCasesDraft` — required observations (testcase-writer)
+
+| Key | Purpose |
+|-----|---------|
+| `tc_count` | Number of draft test cases |
+| `tc_{N}_title` | TC title |
+| `tc_{N}_ac_index` | Source AC index |
+| `tc_{N}_steps` | ADO Action / Expected Result steps |
+
+### `US_{ID}_TestCases` — required observations (ado-publisher)
+
+| Key | Purpose |
+|-----|---------|
+| `published_tc_ids` | Comma-separated ADO work item IDs |
+| `published_at` | ISO timestamp |
 
 ### Relations (optional Q1)
 

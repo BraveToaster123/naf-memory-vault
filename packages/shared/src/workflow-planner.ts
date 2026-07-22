@@ -37,6 +37,14 @@ export interface PlanQaWorkflowInput {
   namespace?: string;
 }
 
+export interface StoryStageInfo {
+  stage: string;
+  acCount: number;
+  hasSummary: boolean;
+  hasDraftTestCases: boolean;
+  hasTestCases: boolean;
+}
+
 const POLICY_REMINDERS = [
   "credentials never in graph — use host credential_ref",
   "no raw snapshots, stack traces, or network bodies in memory writes",
@@ -55,22 +63,33 @@ export function storyEntityPrefix(storyId: string): string {
   return `US_${storyId.replace(/^US\s*/i, "").trim()}_`;
 }
 
-export function detectStoryStage(
-  storyId: string,
-  entityNames: string[],
-): { stage: string; acCount: number; hasSummary: boolean; hasTestCases: boolean } {
+export function detectStoryStage(storyId: string, entityNames: string[]): StoryStageInfo {
   const id = storyId.replace(/^US\s*/i, "").trim();
   const prefix = `US_${id}_`;
   const relevant = entityNames.filter((n) => n.startsWith(prefix) || n === `US_${id}`);
   if (relevant.length === 0) {
-    return { stage: "not_explored", acCount: 0, hasSummary: false, hasTestCases: false };
+    return {
+      stage: "not_explored",
+      acCount: 0,
+      hasSummary: false,
+      hasDraftTestCases: false,
+      hasTestCases: false,
+    };
   }
   const acCount = relevant.filter((n) => /^US_\d+_AC\d+$/i.test(n)).length;
   const hasSummary = relevant.includes(`US_${id}_Summary`);
+  const hasDraftTestCases = relevant.includes(`US_${id}_TestCasesDraft`);
   const hasTestCases = relevant.includes(`US_${id}_TestCases`);
-  if (hasTestCases) return { stage: "test_cases_published", acCount, hasSummary, hasTestCases };
-  if (acCount > 0 || hasSummary) return { stage: "explored", acCount, hasSummary, hasTestCases };
-  return { stage: "partial", acCount, hasSummary, hasTestCases };
+  if (hasTestCases) {
+    return { stage: "test_cases_published", acCount, hasSummary, hasDraftTestCases, hasTestCases };
+  }
+  if (hasDraftTestCases) {
+    return { stage: "test_cases_drafted", acCount, hasSummary, hasDraftTestCases, hasTestCases };
+  }
+  if (acCount > 0 || hasSummary) {
+    return { stage: "explored", acCount, hasSummary, hasDraftTestCases, hasTestCases };
+  }
+  return { stage: "partial", acCount, hasSummary, hasDraftTestCases, hasTestCases };
 }
 
 export function buildTriagePlan(testId: string, ciFailed: boolean, skipBrowser: boolean): WorkflowPlan {
@@ -101,26 +120,33 @@ export function buildTriagePlan(testId: string, ciFailed: boolean, skipBrowser: 
   };
 }
 
-function storyStatusPlan(
-  storyId: string,
-  namespace: string,
-  stageInfo: ReturnType<typeof detectStoryStage>,
-): WorkflowPlan {
+function nextStorySkill(stage: string): string | undefined {
+  switch (stage) {
+    case "not_explored":
+      return "memory-vault-explore";
+    case "explored":
+      return "memory-vault-write-tcs";
+    case "test_cases_drafted":
+      return "memory-vault-publish";
+    case "test_cases_published":
+      return "memory-vault-generate";
+    default:
+      return "memory-vault-assist";
+  }
+}
+
+function storyStatusPlan(storyId: string, namespace: string, stageInfo: StoryStageInfo): WorkflowPlan {
   const id = storyId.replace(/^US\s*/i, "").trim();
   const steps: WorkflowPlanStep[] = [
     { step: 1, tool: "search_nodes", args: { query: `US_${id}`, namespace } },
     { step: 2, tool: "open_nodes", args: { names: [`US_${id}_Summary`], namespace } },
   ];
   const blockers: string[] = [];
-  let suggested_skill: string | undefined;
-  let suggested_prompt: string | undefined;
+  let suggested_prompt: string | undefined = "lookup_story_status";
+  const suggested_skill = nextStorySkill(stageInfo.stage);
 
   if (stageInfo.stage === "not_explored") {
-    blockers.push(`No exploration data for US ${id}. Run explore_story when Flow 1 pilot is active.`);
-    suggested_skill = "memory-vault-assist";
-  } else if (stageInfo.stage === "explored") {
-    suggested_skill = "memory-vault-assist";
-    suggested_prompt = "lookup_story_status";
+    blockers.push(`No exploration data for US ${id}. Run explore_story next.`);
   }
 
   return {
@@ -140,7 +166,7 @@ function flow1Plan(
   intent: WorkflowIntent,
   storyId: string,
   namespace: string,
-  stageInfo: ReturnType<typeof detectStoryStage>,
+  stageInfo: StoryStageInfo,
 ): WorkflowPlan {
   const id = storyId.replace(/^US\s*/i, "").trim();
   const blockers: string[] = [];
@@ -153,13 +179,19 @@ function flow1Plan(
 
   if (intent === "explore_story") {
     suggested_prompt = "explore_acceptance_criteria";
+    suggested_skill = "memory-vault-explore";
     if (stageInfo.stage !== "not_explored") {
       blockers.push(`US ${id} already has exploration data (${stageInfo.acCount} AC entities).`);
     }
-    steps.push({ step: 2, tool: "playwright:browser_navigate", args: { note: "AC-only exploration; staging allowlist" } });
+    steps.push({
+      step: 2,
+      tool: "playwright:browser_navigate",
+      args: { note: "AC-only exploration; staging allowlist" },
+    });
     stage = "explore_pending";
   } else if (intent === "write_test_cases") {
     suggested_prompt = "write_test_cases";
+    suggested_skill = "memory-vault-write-tcs";
     if (stageInfo.acCount === 0 && !stageInfo.hasSummary) {
       blockers.push(`No US_${id}_AC* entities. Run explore_story first.`);
     }
@@ -167,15 +199,31 @@ function flow1Plan(
     stage = "write_test_cases";
   } else if (intent === "publish_test_cases") {
     suggested_prompt = "publish_test_cases";
-    blockers.push("Flow 1 ADO publisher deferred until QA profile + ADO MCP are wired.");
-    stage = "publish_blocked";
+    suggested_skill = "memory-vault-publish";
+    if (!stageInfo.hasDraftTestCases) {
+      blockers.push(`No US_${id}_TestCasesDraft entity. Run write_test_cases first.`);
+    }
+    steps.push({
+      step: 2,
+      tool: "open_nodes",
+      args: { names: [`US_${id}_TestCasesDraft`], namespace },
+    });
+    stage = "publish_pending";
   } else if (intent === "generate_automation") {
     suggested_prompt = "generate_automation";
-    if (!stageInfo.hasTestCases && stageInfo.acCount === 0) {
+    suggested_skill = "memory-vault-generate";
+    if (!stageInfo.hasTestCases && stageInfo.acCount === 0 && !stageInfo.hasSummary) {
       blockers.push(`No exploration or test case data for US ${id}.`);
     }
-    stage = "automation_blocked";
-    blockers.push("Flow 1 automation generator deferred until pilot confirms scope.");
+    steps.push({
+      step: 2,
+      tool: "open_nodes",
+      args: {
+        names: [`US_${id}_Summary`, `US_${id}_TestCases`],
+        namespace,
+      },
+    });
+    stage = "generate_automation";
   }
 
   return {

@@ -63,11 +63,16 @@ test("detectStoryStage classifies exploration entities", () => {
     stage: "not_explored",
     acCount: 0,
     hasSummary: false,
+    hasDraftTestCases: false,
     hasTestCases: false,
   });
   assert.equal(
     detectStoryStage("471244", ["US_471244_AC1", "US_471244_Summary"]).stage,
     "explored",
+  );
+  assert.equal(
+    detectStoryStage("471244", ["US_471244_TestCasesDraft", "US_471244_AC1"]).stage,
+    "test_cases_drafted",
   );
   assert.equal(
     detectStoryStage("471244", ["US_471244_TestCases", "US_471244_AC1"]).stage,
@@ -96,6 +101,7 @@ test("planQaWorkflow check_story_status finds explored story", () => {
   const plan = planQaWorkflow(db, { intent: "check_story_status", user_story_id: "471244" });
   assert.equal(plan.workflow, "story_pipeline");
   assert.equal(plan.stage, "explored");
+  assert.equal(plan.suggested_skill, "memory-vault-write-tcs");
   assert.equal(plan.ordered_plan[0]?.tool, "search_nodes");
 });
 
@@ -103,4 +109,58 @@ test("planQaWorkflow write_test_cases blocks without exploration", () => {
   const db = freshDb();
   const plan = planQaWorkflow(db, { intent: "write_test_cases", user_story_id: "999" });
   assert.ok(plan.blockers.some((b) => b.includes("explore_story")));
+  assert.equal(plan.suggested_skill, "memory-vault-write-tcs");
+});
+
+test("planQaWorkflow explore_story suggests memory-vault-explore", () => {
+  const db = freshDb();
+  const plan = planQaWorkflow(db, { intent: "explore_story", user_story_id: "471244" });
+  assert.equal(plan.suggested_skill, "memory-vault-explore");
+  assert.equal(plan.suggested_prompt, "explore_acceptance_criteria");
+  assert.equal(plan.blockers.length, 0);
+});
+
+test("planQaWorkflow publish_test_cases unblocked with draft entity", () => {
+  const db = freshDb();
+  createEntities(
+    db,
+    [
+      { name: "US_471244_AC1", entityType: "acceptance_criterion", observations: ["status: PASS"] },
+      {
+        name: "US_471244_TestCasesDraft",
+        entityType: "test_cases_draft",
+        observations: ["tc_count: 1"],
+      },
+    ],
+    ctx,
+    policy,
+  );
+  const plan = planQaWorkflow(db, { intent: "publish_test_cases", user_story_id: "471244" });
+  assert.equal(plan.suggested_skill, "memory-vault-publish");
+  assert.equal(plan.blockers.length, 0);
+});
+
+test("planQaWorkflow publish_test_cases blocks without draft", () => {
+  const db = freshDb();
+  createEntities(
+    db,
+    [{ name: "US_471244_AC1", entityType: "acceptance_criterion", observations: ["status: PASS"] }],
+    ctx,
+    policy,
+  );
+  const plan = planQaWorkflow(db, { intent: "publish_test_cases", user_story_id: "471244" });
+  assert.ok(plan.blockers.some((b) => b.includes("TestCasesDraft")));
+});
+
+test("planQaWorkflow generate_automation unblocked with exploration", () => {
+  const db = freshDb();
+  createEntities(
+    db,
+    [{ name: "US_471244_AC1", entityType: "acceptance_criterion", observations: ["status: PASS"] }],
+    ctx,
+    policy,
+  );
+  const plan = planQaWorkflow(db, { intent: "generate_automation", user_story_id: "471244" });
+  assert.equal(plan.suggested_skill, "memory-vault-generate");
+  assert.equal(plan.blockers.length, 0);
 });
